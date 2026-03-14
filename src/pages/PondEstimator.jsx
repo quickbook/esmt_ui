@@ -296,8 +296,11 @@ export function PondEstimator() {
                           <TextField
                             size="small"
                             type="number"
+                            fullWidth
                             disabled={!selected}
                             sx={{
+                              minWidth: 70,
+                              "& input": { textAlign: "center" },
                               "& .MuiInputBase-input": {
                                 color: "primary.dark",
                                 fontWeight: 600,
