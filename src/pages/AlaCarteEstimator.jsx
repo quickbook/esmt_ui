@@ -468,7 +468,7 @@ export function AlaCarteEstimator() {
 
   return (
     <Box sx={{ minHeight: "84vh", py: 8, px: 2 }}>
-      <Container maxWidth="xl">
+      <Container maxWidth={{ xs: "sm", md: "xl" }}>
         <Paper
           sx={{
             p: { xs: 3, md: 6 },

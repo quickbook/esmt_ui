@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { Stepper } from "../components/Stepper";
 import React from "react";
@@ -29,9 +29,13 @@ export function Availability() {
     navigate("/pond-selection");
   };
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <Box sx={{ minHeight: "84vh", py: 8, px: 2 }}>
-      <Container maxWidth="lg">
+      <Container maxWidth={{ xs: "sm", md: "lg" }}>
         <Paper
           sx={{
             p: { xs: 3, md: 6 },
@@ -186,7 +190,13 @@ export function Availability() {
                 "&:hover": { backgroundColor: "#537D96" },
               }}
             >
-              Continue to Quote
+              <Typography variant="p" sx={{ display: {xs: "none", md: "flex"} }}>
+                Continue to Quote
+              </Typography>
+              <Typography variant="p" sx={{ display: {xs: "flex", md: "none"} }}>
+                Continue
+              </Typography>
+
             </Button>
           </Box>
         </Paper>

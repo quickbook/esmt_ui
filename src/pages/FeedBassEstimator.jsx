@@ -81,7 +81,7 @@ export function FeedBassEstimator() {
 
   return (
     <Box sx={{ minHeight: "84vh", py: 8, px: 2 }}>
-      <Container maxWidth="lg">
+      <Container maxWidth={{ xs: "sm", md: "lg" }}>
         <Paper
           sx={{
             p: { xs: 3, md: 6 },
@@ -168,7 +168,7 @@ export function FeedBassEstimator() {
                       <Box
                         display="flex"
                         alignItems="center"
-                        justifyContent="center"
+                        justifyContent="space-between"
                         gap={2}
                       >
                         <TextField
@@ -224,12 +224,12 @@ export function FeedBassEstimator() {
                 borderRadius: 2,
               }}
             >
-              <Typography fontWeight="500" color="#537D96">
+              <Typography fontWeight="500" color="text.disabled">
                 Total Cost Estimate More than 12,000 bream or 600 pounds of
                 minnows/shiners
               </Typography>
 
-              <Typography fontWeight="bold" color="#537D96">
+              <Typography fontWeight="bold" color="text.disabled">
                 $ {totalCostMore12000.toFixed(2)} - Delivery included
               </Typography>
             </Box>
@@ -244,12 +244,12 @@ export function FeedBassEstimator() {
                 borderRadius: 2,
               }}
             >
-              <Typography fontWeight="500" color="#537D96">
+              <Typography fontWeight="500" color="text.disabled">
                 Total Cost Estimate Less than 12,000 bream or 600 pounds of
                 minnows/shiners
               </Typography>
 
-              <Typography fontWeight="bold" color="#537D96">
+              <Typography fontWeight="bold" color="text.disabled">
                 $ {totalCostLess12000.toFixed(2)} - Delivery included
               </Typography>
             </Box>
@@ -265,11 +265,11 @@ export function FeedBassEstimator() {
               textAlign: "center",
             }}
           >
-            <Typography fontWeight="bold" color="#537D96" mb={1}>
+            <Typography fontWeight="bold" color="text.disabled" mb={1}>
               $750 minimum
             </Typography>
 
-            <Typography fontSize={12} color="#537D96">
+            <Typography fontSize={12} color="text.disabled">
               Estimated Price is calculated using pond size, fish size and
               distance from Lonoke, Arkansas.
               <br />A Representative will contact you to confirm the estimate
@@ -285,7 +285,7 @@ export function FeedBassEstimator() {
               onClick={handleBack}
               sx={{
                 backgroundColor: "#E0E0E0",
-                color: "#537D96",
+                color: "text.secondary",
                 "&:hover": { backgroundColor: "#D5D5D5" },
               }}
             >
@@ -298,7 +298,7 @@ export function FeedBassEstimator() {
               onClick={handleNext}
               sx={{
                 backgroundColor: "#44A194",
-                "&:hover": { backgroundColor: "#537D96" },
+                "&:hover": { backgroundColor: "text.disabled" },
               }}
             >
               Next

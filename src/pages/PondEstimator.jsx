@@ -190,7 +190,7 @@ export function PondEstimator() {
 
   return (
     <Box sx={{ minHeight: "84vh", py: 6 }}>
-      <Container maxWidth="lg">
+      <Container maxWidth={{ xs: "sm", md: "lg" }}>
         <Paper
           sx={{
             p: 4,
@@ -239,7 +239,8 @@ export function PondEstimator() {
             {config.description}
           </Typography>
 
-          <Table size="small" sx={{ border: "1px solid #ddd" }}>
+          <Box sx={{ overflowX: "auto" }}>
+            <Table size="small" sx={{ border: "1px solid #ddd", minWidth: 800 }}>
             <TableHead>
               <TableRow>
                 <TableCell />
@@ -325,6 +326,7 @@ export function PondEstimator() {
               })}
             </TableBody>
           </Table>
+          </Box>
 
           <Box mt={4} p={2} border="2px solid #44A194" borderRadius={2}>
             <Typography fontWeight="bold" color="primary.contrastText">

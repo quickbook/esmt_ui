@@ -19,7 +19,7 @@ const HomePage = () => {
         alignItems: "center",
       }}
     >
-      <Container maxWidth="md" sx={{ ...glassBoxStyles, padding: "4rem 6rem" }}>
+      <Container maxWidth="md" sx={{ ...glassBoxStyles, padding: { xs: "4rem 2rem", sm: 4, lg: "4rem 6rem" } }}>
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
@@ -29,8 +29,9 @@ const HomePage = () => {
             variant="h2"
             fontWeight="bold"
             color="primary.contrastText"
-            mb={2}
+            mb={4}
             textAlign="center"
+            sx={{ fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' } }}
           >
             Welcome
           </Typography>
@@ -47,6 +48,7 @@ const HomePage = () => {
             fontWeight="bold"
             color="primary.contrastText"
             textAlign="center"
+            sx={{ fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' } }}
           >
             Let's start with some basic info about you.
           </Typography>
@@ -60,8 +62,8 @@ const HomePage = () => {
               sx={{
                 background: "#44A194",
                 "&:hover": { background: "#537D96" },
-                padding: "12px 48px",
-                fontSize: "1.2rem",
+                padding: { xs: "10px 24px", sm: "12px 36px", md: "12px 48px" },
+                fontSize: { xs: "1rem", sm: "1.1rem", md: "1.2rem" },
                 borderRadius: 4,
                 mt: 2,
               }}

@@ -104,7 +104,7 @@ export function CustomerInfo() {
         alignItems: "center",
       }}
     >
-      <Container maxWidth="sm" sx={{ ...glassBoxStyles, padding: "2rem" }}>
+      <Container maxWidth="sm" sx={{ ...glassBoxStyles, padding: {xs:2,sm:"2rem"} }}>
         <Box textAlign="center" mb={4}>
           {/* Page Counter */}
           <Typography
@@ -151,7 +151,12 @@ export function CustomerInfo() {
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -40 }}
-            transition={{ duration: 0.35 }}
+            transition={{
+              duration: 0.35,
+              ease: "easeOut",
+              type: "tween",
+            }}
+            style={{ willChange: "transform, opacity" }}
           >
             <Typography
               variant="h4"
@@ -180,7 +185,7 @@ export function CustomerInfo() {
                     [current.id]: e.target.value,
                   })
                 }
-                sx={{ mb: 4,...textFieldSx }}
+                sx={{ mb: 4, ...textFieldSx }}
               />
             ) : (
               <Select

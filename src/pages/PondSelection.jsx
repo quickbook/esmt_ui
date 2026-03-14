@@ -131,7 +131,7 @@ export function PondSelection() {
 
   return (
     <Box sx={{ minHeight: "84vh", display: "flex", alignItems: "center" }}>
-      <Container maxWidth="md" sx={{ ...glassBoxStyles, padding: 4, my: step === 2 ? 2 : 0 }}>
+      <Container maxWidth="md" sx={{ ...glassBoxStyles, padding: { xs: 2, sm: 3, md: 4 }, my: step === 2 ? 2 : 0 }}>
         <Box textAlign="center" mb={4}>
           {/* Page Counter */}
           <Typography
@@ -175,7 +175,12 @@ export function PondSelection() {
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -40 }}
-            transition={{ duration: 0.35 }}
+            transition={{ 
+              duration: 0.35,
+              ease: "easeOut",
+              type: "tween"
+            }}
+            style={{ willChange: 'transform, opacity' }}
           >
             <Typography
               variant="h4"
@@ -188,7 +193,7 @@ export function PondSelection() {
 
             {/* Step 1 */}
             {step === 0 && (
-              <Box display="flex" gap={3}>
+              <Box sx={{display:'flex', flexDirection:{xs: 'column', md: "row"}}} gap={3}>
                 {["new", "old"].map((type) => (
                   <Box
                     key={type}
@@ -215,7 +220,7 @@ export function PondSelection() {
 
             {/* Step 2 */}
             {step === 1 && pondType === "old" && (
-              <Box display="flex" gap={3}>
+              <Box sx={{display:'flex', flexDirection:{xs: 'column', md: "row"}}} gap={3}>
                 {["yes", "no"].map((ans) => (
                   <Box
                     key={ans}

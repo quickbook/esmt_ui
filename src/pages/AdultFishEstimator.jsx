@@ -96,7 +96,7 @@ export function AdultFishEstimator() {
 
   return (
     <Box sx={{ minHeight: "84vh", py: 8, px: 2 }}>
-      <Container maxWidth="lg">
+      <Container maxWidth={{ xs: "sm", md: "lg" }}>
         <Paper
           sx={{
             p: { xs: 3, md: 6 },
@@ -235,11 +235,11 @@ export function AdultFishEstimator() {
                 borderRadius: 2,
               }}
             >
-              <Typography fontWeight="500" color="#537D96">
+              <Typography fontWeight="500" color="text.disabled">
                 Total Cost Estimate Less Than 450 Pounds Of Fish
               </Typography>
 
-              <Typography fontWeight="bold" color="#537D96">
+              <Typography fontWeight="bold" color="text.disabled">
                 $ {totalCostLess450.toFixed(2)} - Delivery included
               </Typography>
             </Box>
@@ -254,11 +254,11 @@ export function AdultFishEstimator() {
                 borderRadius: 2,
               }}
             >
-              <Typography fontWeight="500" color="#537D96">
+              <Typography fontWeight="500" color="text.disabled">
                 Total Cost Estimate More Than 450 Pounds Of Fish
               </Typography>
 
-              <Typography fontWeight="bold" color="#537D96">
+              <Typography fontWeight="bold" color="text.disabled">
                 $ {totalCostMore450.toFixed(2)} - Delivery included
               </Typography>
             </Box>
@@ -274,15 +274,15 @@ export function AdultFishEstimator() {
               textAlign: "center",
             }}
           >
-            <Typography fontWeight="bold" color="#537D96">
+            <Typography fontWeight="bold" color="text.disabled">
               $750 minimum
             </Typography>
 
-            <Typography fontSize={14} color="#537D96">
+            <Typography fontSize={14} color="text.disabled">
               Not all species available at all times
             </Typography>
 
-            <Typography fontSize={12} color="#537D96">
+            <Typography fontSize={12} color="text.disabled">
               Estimated Price is calculated using pond size, fish size and
               distance from Lonoke, Arkansas. A Representative will contact you
               to confirm the estimate prior to fish delivery.
@@ -297,8 +297,8 @@ export function AdultFishEstimator() {
               onClick={handleBack}
               sx={{
                 backgroundColor: "#E0E0E0",
-                color: "#537D96",
-                "&:hover": { backgroundColor: "#D5D5D5" },
+                color: "secondary.main",
+                "&:hover": { backgroundColor: "#text.disabled" },
               }}
             >
               Back
@@ -310,7 +310,7 @@ export function AdultFishEstimator() {
               onClick={handleNext}
               sx={{
                 backgroundColor: "#44A194",
-                "&:hover": { backgroundColor: "#537D96" },
+                "&:hover": { backgroundColor: "text.disabled" },
               }}
             >
               Next

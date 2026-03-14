@@ -77,7 +77,7 @@ export function GrassCarpEstimator() {
 
   return (
     <Box sx={{ minHeight: "84vh", py: 8, px: 2 }}>
-      <Container maxWidth="lg">
+      <Container maxWidth={{ xs: "sm", md: "lg" }}>
         <Paper
           sx={{
             p: { xs: 3, md: 6 },
@@ -222,11 +222,11 @@ export function GrassCarpEstimator() {
                 borderRadius: 2,
               }}
             >
-              <Typography fontWeight="500" color="#537D96">
+              <Typography fontWeight="500" color="text.disabled">
                 Total Cost Estimate Less than 1000 Fish
               </Typography>
 
-              <Typography fontWeight="bold" color="#537D96">
+              <Typography fontWeight="bold" color="text.disabled">
                 $ {totalCostLess1000.toFixed(2)} - Delivery included
               </Typography>
             </Box>
@@ -241,11 +241,11 @@ export function GrassCarpEstimator() {
                 borderRadius: 2,
               }}
             >
-              <Typography fontWeight="500" color="#537D96">
+              <Typography fontWeight="500" color="text.disabled">
                 Total Cost Estimate More than 1000 Fish
               </Typography>
 
-              <Typography fontWeight="bold" color="#537D96">
+              <Typography fontWeight="bold" color="text.disabled">
                 $ {totalCostMore1000.toFixed(2)} - Delivery included
               </Typography>
             </Box>
@@ -261,11 +261,11 @@ export function GrassCarpEstimator() {
               textAlign: "center",
             }}
           >
-            <Typography fontWeight="bold" color="#537D96" mb={1}>
+            <Typography fontWeight="bold" color="text.disabled" mb={1}>
               $750 minimum DELIVERED
             </Typography>
 
-            <Typography fontSize={12} color="#537D96">
+            <Typography fontSize={12} color="text.disabled">
               Estimated Price is calculated using pond size, fish size and
               distance from Lonoke, Arkansas.
               <br />A Representative will contact you to confirm the estimate
@@ -281,7 +281,7 @@ export function GrassCarpEstimator() {
               onClick={handleBack}
               sx={{
                 backgroundColor: "#E0E0E0",
-                color: "#537D96",
+                color: "text.secondary",
                 "&:hover": { backgroundColor: "#D5D5D5" },
               }}
             >
@@ -294,7 +294,7 @@ export function GrassCarpEstimator() {
               onClick={handleNext}
               sx={{
                 backgroundColor: "#44A194",
-                "&:hover": { backgroundColor: "#537D96" },
+                "&:hover": { backgroundColor: "text.disabled" },
               }}
             >
               Next

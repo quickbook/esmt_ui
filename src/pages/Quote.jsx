@@ -21,7 +21,7 @@ export function Quote() {
 
   return (
     <Box sx={{ minHeight: "84vh", py: 4, px: 2 }}>
-      <Box sx={{ maxWidth: 896, mx: "auto" }}>
+      <Box sx={{ maxWidth: { xs: "100%", sm: 896 }, mx: "auto" }}>
         <Paper
           sx={{
             borderRadius: 3,
@@ -71,19 +71,19 @@ export function Quote() {
               </Typography>
               <Box sx={{ ...glassBoxStyles, p: 2, borderRadius: 2 }}>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }} >
                     <Typography variant="body2" color="text.disabled">Full Name</Typography>
                     <Typography variant="body1" color="text.primary" fontWeight={500}>John Smith</Typography>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }} >
                     <Typography variant="body2" color="text.disabled">Email</Typography>
                     <Typography variant="body1" color="text.primary" fontWeight={500}>john@email.com</Typography>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }} >
                     <Typography variant="body2" color="text.disabled">Phone</Typography>
                     <Typography variant="body1" color="text.primary" fontWeight={500}>123-456-7890</Typography>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }} >
                     <Typography variant="body2" color="text.disabled">Address</Typography>
                     <Typography variant="body1" color="text.primary" fontWeight={500}>123 Main St, Lonoke, AR</Typography>
                   </Grid>
@@ -98,15 +98,15 @@ export function Quote() {
               </Typography>
               <Box sx={{ ...glassBoxStyles, p: 2, borderRadius: 2 }}>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={4}>
+                  <Grid size={{ xs: 12, sm: 4 }}>
                     <Typography variant="body2" color="text.disabled">Pond Size</Typography>
                     <Typography variant="body1" color="text.primary" fontWeight={500}>1.5 acres</Typography>
                   </Grid>
-                  <Grid item xs={12} sm={4}>
+                  <Grid size={{ xs: 12, sm: 4 }} >
                     <Typography variant="body2" color="text.disabled">Distance from Lonoke</Typography>
                     <Typography variant="body1" color="text.primary" fontWeight={500}>2.0 miles</Typography>
                   </Grid>
-                  <Grid item xs={12} sm={4}>
+                  <Grid size={{ xs: 12, sm: 4 }} >
                     <Typography variant="body2" color="text.disabled">Pond Access</Typography>
                     <Typography variant="body1" color="text.primary" fontWeight={500}>Good solid road/driveway</Typography>
                   </Grid>
@@ -121,11 +121,11 @@ export function Quote() {
               </Typography>
               <Box sx={{ ...glassBoxStyles, p: 2, borderRadius: 2 }}>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }} >
                     <Typography variant="body2" color="text.disabled">Pond Type</Typography>
                     <Typography variant="body1" color="text.primary" fontWeight={500}>New Pond</Typography>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }} >
                     <Typography variant="body2" color="text.disabled">Selected Option</Typography>
                     <Typography variant="body1" color="text.primary" fontWeight={500}>Trophy Bass Pond</Typography>
                   </Grid>
@@ -139,7 +139,8 @@ export function Quote() {
                 Trophy Bass Pond Estimator
               </Typography>
               <Box sx={{ ...glassBoxStyles, p: 2, borderRadius: 2 }}>
-                <Table size="small" sx={{ border: "1px solid #ddd" }}>
+                <Box sx={{ overflowX: "auto" }}>
+                  <Table size="small" sx={{ border: "1px solid #ddd", minWidth: 600 }}>
                   <TableHead>
                     <TableRow sx={{ backgroundColor: "rgba(68,161,148,0.1)" }}>
                       <TableCell>Option</TableCell>
@@ -187,6 +188,7 @@ export function Quote() {
                     </TableRow>
                   </TableBody>
                 </Table>
+                </Box>
               </Box>
             </Box>
 
@@ -197,11 +199,11 @@ export function Quote() {
               </Typography>
               <Box sx={{ ...glassBoxStyles, p: 2, borderRadius: 2 }}>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }} >
                     <Typography variant="body2" color="text.disabled">Preferred Date</Typography>
                     <Typography variant="body1" color="text.primary" fontWeight={500}>March 20, 2026</Typography>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }} >
                     <Typography variant="body2" color="text.disabled">Preferred Time</Typography>
                     <Typography variant="body1" color="text.primary" fontWeight={500}>2:00 PM</Typography>
                   </Grid>
@@ -271,6 +273,7 @@ export function Quote() {
             <Box
               sx={{
                 display: "flex",
+                flexDirection: { xs: "column", md: "row" },
                 justifyContent: "space-between",
                 alignItems: "center",
                 bgcolor: "#44A194",

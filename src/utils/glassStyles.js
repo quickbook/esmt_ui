@@ -6,6 +6,8 @@ export const glassBoxStyles = {
   border: '1px solid rgba(255, 255, 255, 0.2)',
   boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.15)',
   borderRadius: '12px',
+  transform: 'translateZ(0)',
+  backfaceVisibility: 'hidden',
 };
 
 export const glassPaperStyles = {
@@ -13,6 +15,8 @@ export const glassPaperStyles = {
   backgroundColor: 'rgba(255, 255, 255, 0.15)',
   border: '1px solid rgba(255, 255, 255, 0.2)',
   boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.15)',
+  transform: 'translateZ(0)',
+  backfaceVisibility: 'hidden',
 };
 
 export const glassContainerStyles = {
