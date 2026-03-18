@@ -72,16 +72,16 @@ export function FeedBassEstimator() {
   };
 
   const handleNext = () => {
-    navigate("/availability");
+    navigate("/estimate/availability");
   };
 
   const handleBack = () => {
-    navigate("/pond-selection");
+    navigate("/estimate/pond-info");
   };
 
   return (
     <Box sx={{ minHeight: "84vh", py: 8, px: 2 }}>
-      <Container maxWidth={{ xs: "sm", md: "lg" }}>
+      <Container maxWidth={{ xs: "sm", md: "md" }}>
         <Paper
           sx={{
             p: { xs: 3, md: 6 },
@@ -102,13 +102,13 @@ export function FeedBassEstimator() {
                 color: "primary.contrastText",
               }}
             >
-              Page 4 / 6
+              Page 3 / 5
             </Typography>
             {/* Label */}
             <Typography
               sx={{
                 mt: 1,
-                fontSize: { xs: "0.75rem", md: "0.875rem" },
+                fontSize: { xs: "0.75rem", md: "1.25rem" },
                 textAlign: "center",
                 color: "primary.light",
                 fontWeight: 500,
@@ -119,14 +119,14 @@ export function FeedBassEstimator() {
           </Box>
 
           {/* Title */}
-          <Typography
+          {/* <Typography
             variant="h4"
             fontWeight="bold"
             color="primary.contrastText"
             mb={1}
           >
             Feed Bass Estimator
-          </Typography>
+          </Typography> */}
 
           <Typography color="primary.contrastText" mb={4}>
             Enter the Quantity of Fish You Desire to Purchase To Feed Your Bass
@@ -229,7 +229,7 @@ export function FeedBassEstimator() {
                 minnows/shiners
               </Typography>
 
-              <Typography fontWeight="bold" color="text.disabled">
+              <Typography fontWeight="bold" color="text.primary">
                 $ {totalCostMore12000.toFixed(2)} - Delivery included
               </Typography>
             </Box>
@@ -249,7 +249,7 @@ export function FeedBassEstimator() {
                 minnows/shiners
               </Typography>
 
-              <Typography fontWeight="bold" color="text.disabled">
+              <Typography fontWeight="bold" color="text.primary">
                 $ {totalCostLess12000.toFixed(2)} - Delivery included
               </Typography>
             </Box>
@@ -265,7 +265,7 @@ export function FeedBassEstimator() {
               textAlign: "center",
             }}
           >
-            <Typography fontWeight="bold" color="text.disabled" mb={1}>
+            <Typography fontWeight="bold" color="text.primary" mb={1}>
               $750 minimum
             </Typography>
 
@@ -284,9 +284,9 @@ export function FeedBassEstimator() {
               startIcon={<ArrowLeftIcon />}
               onClick={handleBack}
               sx={{
-                backgroundColor: "#E0E0E0",
-                color: "text.secondary",
-                "&:hover": { backgroundColor: "#D5D5D5" },
+                backgroundColor: "text.secondary",
+                color: "secondary.main",
+                "&:hover": { backgroundColor: "text.primary" },
               }}
             >
               Back

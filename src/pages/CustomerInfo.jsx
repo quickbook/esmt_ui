@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Container,
@@ -9,15 +9,13 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import { motion, AnimatePresence } from "framer-motion";
 import { glassBoxStyles } from "../utils/glassStyles";
 import { useNavigate } from "react-router-dom";
-import { textFieldSx } from "../theme/theme";
+import { menuItemSx, selectSx, textFieldSx } from "../theme/theme";
+import { motion } from "framer-motion";
 
 export function CustomerInfo() {
   const navigate = useNavigate();
-
-  const [step, setStep] = useState(0);
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -26,38 +24,6 @@ export function CustomerInfo() {
     address: "",
     hearAbout: "",
   });
-
-  const questions = [
-    {
-      id: "fullName",
-      question: "What is your full name?",
-      type: "text",
-      placeholder: "John Smith",
-    },
-    {
-      id: "email",
-      question: "What is your email address?",
-      type: "email",
-      placeholder: "john@email.com",
-    },
-    {
-      id: "phone",
-      question: "What is your phone number?",
-      type: "tel",
-      placeholder: "123-456-7890",
-    },
-    {
-      id: "address",
-      question: "What is your address?",
-      type: "text",
-      placeholder: "Your home address",
-    },
-    {
-      id: "hearAbout",
-      question: "How did you hear about us?",
-      type: "select",
-    },
-  ];
 
   const hearAboutOptions = [
     "AGFC Guidebook",
@@ -74,26 +40,25 @@ export function CustomerInfo() {
     "State Fair",
   ];
 
-  const current = questions[step];
-
-  const handleNext = () => {
-    if (step < questions.length - 1) {
-      setStep(step + 1);
-    } else {
-      //console.log("FORM DATA", formData);
-      navigate("/pond-info");
-    }
+  const handleChange = (field, value) => {
+    setFormData({
+      ...formData,
+      [field]: value,
+    });
   };
 
   const handleBack = () => {
-    if (step > 0) {
-      setStep(step - 1);
-    } else {
-      navigate("/");
-    }
+    navigate("/estimate/");
   };
 
-  const progress = ((step + 1) / questions.length) * 100;
+  const handleNext = () => {
+    console.log("FORM DATA:", formData);
+    navigate("/estimate/pond-info");
+  };
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <Box
@@ -102,147 +67,222 @@ export function CustomerInfo() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        py: 6,
       }}
     >
-      <Container maxWidth="sm" sx={{ ...glassBoxStyles, padding: {xs:2,sm:"2rem"} }}>
-        <Box textAlign="center" mb={4}>
-          {/* Page Counter */}
-          <Typography
-            sx={{
-              textAlign: "center",
-              fontWeight: 600,
-              color: "primary.contrastText",
-            }}
-          >
-            Page 1 / 6
-          </Typography>
-          {/* Label */}
-          <Typography
-            sx={{
-              mt: 1,
-              fontSize: { xs: "0.75rem", md: "0.875rem" },
-              textAlign: "center",
-              color: "primary.light",
-              fontWeight: 500,
-            }}
-          >
-            Customer Information
-          </Typography>
-        </Box>
-
-        {/* Progress Bar */}
-        <LinearProgress
-          variant="determinate"
-          value={progress}
-          sx={{
-            mb: 5,
-            height: 8,
-            borderRadius: 4,
-            backgroundColor: "#e5e7eb",
-            "& .MuiLinearProgress-bar": {
-              backgroundColor: "#44A194",
-            },
+      <Container
+        sx={{
+          ...glassBoxStyles,
+          padding: { xs: 2, sm: "2rem" },
+          mx: { xs: 1, md: 0 },
+        }}
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -40 }}
+          transition={{
+            duration: 0.4,
+            ease: "easeOut",
+            type: "tween",
           }}
-        />
-
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={step}
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -40 }}
-            transition={{
-              duration: 0.35,
-              ease: "easeOut",
-              type: "tween",
-            }}
-            style={{ willChange: "transform, opacity" }}
-          >
+          style={{ willChange: "transform, opacity" }}
+        >
+          {/* Header */}
+          <Box textAlign="center" mb={4}>
             <Typography
-              variant="h4"
-              fontWeight="bold"
-              color="primary.contrastText"
-              mb={4}
+              sx={{
+                fontWeight: 600,
+                color: "primary.contrastText",
+              }}
             >
-              {current.question}
+              Page 1 / 5
             </Typography>
 
-            {/* Input types */}
-            {current.type === "text" ||
-            current.type === "email" ||
-            current.type === "tel" ? (
-              <TextField
-                fullWidth
-                autoFocus
-                type={current.type}
-                placeholder={current.placeholder}
-                value={formData[current.id]}
-                multiline={current.id === "address"}
-                rows={current.id === "address" ? 3 : 1}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    [current.id]: e.target.value,
-                  })
-                }
-                sx={{ mb: 4, ...textFieldSx }}
-              />
-            ) : (
-              <Select
-                fullWidth
-                autoFocus
-                value={formData.hearAbout}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    hearAbout: e.target.value,
-                  })
-                }
-                displayEmpty
-                sx={{
-                  mb: 4,
-                  color: "primary.contrastText",
-                  ".MuiSelect-icon": { color: "primary.contrastText" },
-                }}
-              >
-                <MenuItem
-                  disabled
-                  value=""
-                  sx={{ color: "primary.contrastText" }}
-                >
-                  Select an option
-                </MenuItem>
-                {hearAboutOptions.map((option, index) => (
-                  <MenuItem
-                    key={index}
-                    value={option}
-                    sx={{ color: "primary.contrastText" }}
-                  >
-                    {option}
-                  </MenuItem>
-                ))}
-                <MenuItem value="other" sx={{ color: "primary.contrastText" }}>
-                  Other
-                </MenuItem>
-              </Select>
-            )}
+            <Typography
+              sx={{
+                mt: 1,
+                fontSize: { xs: "1rem", md: "1.25rem" },
+                color: "primary.light",
+                fontWeight: 500,
+              }}
+            >
+              Customer Information
+            </Typography>
+          </Box>
 
-            <Box display="flex" justifyContent="space-between">
-              <Button onClick={handleBack}>Back</Button>
+          {/* Progress */}
+          <LinearProgress
+            variant="determinate"
+            value={20}
+            sx={{
+              mb: 5,
+              height: 6,
+              borderRadius: 4,
+              backgroundColor: "#e5e7eb",
+              "& .MuiLinearProgress-bar": {
+                backgroundColor: "#44A194",
+              },
+            }}
+          />
 
-              <Button
-                variant="contained"
-                onClick={handleNext}
-                sx={{
-                  background: "#44A194",
-                  "&:hover": { background: "#537D96" },
-                }}
-              >
-                {step === questions.length - 1 ? "Next" : "Continue"}
-              </Button>
-            </Box>
-          </motion.div>
-        </AnimatePresence>
+          {/* <Typography
+            variant="h3"
+            fontWeight="bold"
+            color="text.disabled"
+            mb={6}
+            //textAlign={"center"}
+          >
+            Tell Us About You
+          </Typography> */}
+
+          {/* Full Name */}
+          <Box mb={1}>
+            <Typography
+              variant="h5"
+              fontWeight="bold"
+              color="primary.contrastText"
+              mb={1}
+            >
+              What is your name?
+            </Typography>
+            <TextField
+              fullWidth
+              label="Enter your full name"
+              value={formData.fullName}
+              onChange={(e) => handleChange("fullName", e.target.value)}
+              sx={{ mb: 3, ...textFieldSx }}
+            />
+          </Box>
+
+          {/* Email */}
+          <Box mb={1}>
+            <Typography
+              variant="h5"
+              fontWeight="bold"
+              color="primary.contrastText"
+              mb={1}
+            >
+              What is your mailing address?
+            </Typography>
+            <TextField
+              fullWidth
+              label="Enter your email address"
+              type="email"
+              //placeholder="john@email.com"
+              value={formData.email}
+              onChange={(e) => handleChange("email", e.target.value)}
+              sx={{ mb: 3, ...textFieldSx }}
+            />
+          </Box>
+
+          {/* Phone */}
+          <Box mb={1}>
+            <Typography
+              variant="h5"
+              fontWeight="bold"
+              color="primary.contrastText"
+              mb={1}
+            >
+              What is your phone number?
+            </Typography>
+            <TextField
+              fullWidth
+              label="Enter your phone number"
+              type="tel"
+              //placeholder="123-456-7890"
+              value={formData.phone}
+              onChange={(e) => handleChange("phone", e.target.value)}
+              sx={{ mb: 3, ...textFieldSx }}
+            />
+          </Box>
+
+          {/* Quote Email */}
+          <Box mb={1}>
+            <Typography
+              variant="h5"
+              fontWeight="bold"
+              color="primary.contrastText"
+              mb={1}
+            >
+              What is an email address I can send a written quote to?
+            </Typography>
+            <TextField
+              fullWidth
+              label="Enter your working email address"
+              type="quote-email"
+              //placeholder="john@email.com"
+              value={formData["quote-email"]}
+              onChange={(e) => handleChange("quote-email", e.target.value)}
+              sx={{ mb: 3, ...textFieldSx }}
+            />
+          </Box>
+
+          {/* Address */}
+          <Box mb={1}>
+            <Typography
+              variant="h5"
+              fontWeight="bold"
+              color="primary.contrastText"
+              mb={1}
+            >
+              Where is the physical address of the pond?
+            </Typography>
+            <TextField
+              fullWidth
+              label="Enter your physical address"
+              multiline
+              rows={3}
+              //placeholder="Your home address"
+              value={formData.address}
+              onChange={(e) => handleChange("address", e.target.value)}
+              sx={{ mb: 3, ...textFieldSx }}
+            />
+          </Box>
+
+          {/* Hear About */}
+          <Typography
+            variant="h5"
+            fontWeight="bold"
+            color="primary.contrastText"
+            mb={1}
+          >
+            How did you hear about us?
+          </Typography>
+          <Select
+            fullWidth
+            autoFocus
+            value={formData.hearAbout}
+            onChange={(e) => handleChange("hearAbout", e.target.value)}
+            displayEmpty
+            sx={{ ...selectSx, mb: 6 }}
+          >
+            <MenuItem disabled value="" sx={{ ...menuItemSx }}>
+              Select option
+            </MenuItem>
+            {hearAboutOptions.map((option, index) => (
+              <MenuItem key={index} value={option} sx={{ ...menuItemSx }}>
+                {option}
+              </MenuItem>
+            ))}
+          </Select>
+
+          {/* Buttons */}
+          <Box display="flex" justifyContent="space-between" sx={{ mb: 2 }}>
+            <Button onClick={handleBack}>Back</Button>
+
+            <Button
+              variant="contained"
+              onClick={handleNext}
+              sx={{
+                background: "#44A194",
+                "&:hover": { background: "#537D96" },
+              }}
+            >
+              Continue
+            </Button>
+          </Box>
+        </motion.div>
       </Container>
     </Box>
   );

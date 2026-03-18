@@ -9,6 +9,7 @@ import {
   Typography,
   TextField,
   Button,
+  LinearProgress,
 } from "@mui/material";
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
@@ -22,11 +23,11 @@ export function Availability() {
   });
 
   const handleNext = () => {
-    navigate("/quote");
+    navigate("/estimate/quote");
   };
 
   const handleBack = () => {
-    navigate("/pond-selection");
+    navigate(-1);
   };
 
   useEffect(() => {
@@ -35,7 +36,7 @@ export function Availability() {
 
   return (
     <Box sx={{ minHeight: "84vh", py: 8, px: 2 }}>
-      <Container maxWidth={{ xs: "sm", md: "lg" }}>
+      <Container maxWidth={{ xs: "sm", md: "md" }}>
         <Paper
           sx={{
             p: { xs: 3, md: 6 },
@@ -55,13 +56,13 @@ export function Availability() {
                 color: "primary.contrastText",
               }}
             >
-              Page 5 / 6
+              Page 4 / 5
             </Typography>
             {/* Label */}
             <Typography
               sx={{
                 mt: 1,
-                fontSize: { xs: "0.75rem", md: "0.875rem" },
+                fontSize: { xs: "0.75rem", md: "1.25rem" },
                 textAlign: "center",
                 color: "primary.light",
                 fontWeight: 500,
@@ -70,6 +71,20 @@ export function Availability() {
               Availability
             </Typography>
           </Box>
+          {/* Progress */}
+          <LinearProgress
+            variant="determinate"
+            value={80}
+            sx={{
+              mb: 5,
+              height: 6,
+              borderRadius: 4,
+              backgroundColor: "#e5e7eb",
+              "& .MuiLinearProgress-bar": {
+                backgroundColor: "#44A194",
+              },
+            }}
+          />
 
           <Typography
             variant="h4"
@@ -151,8 +166,7 @@ export function Availability() {
             {/* Note */}
             <Box
               sx={{
-                backgroundColor: "#F4F8F7",
-                border: "1px solid rgba(68,161,148,0.3)",
+                border: "1px solid #dcdcdc",
                 borderRadius: 2,
                 p: 2,
               }}
@@ -173,9 +187,9 @@ export function Availability() {
               startIcon={<ArrowLeftIcon />}
               onClick={handleBack}
               sx={{
-                backgroundColor: "#E0E0E0",
-                color: "#537D96",
-                "&:hover": { backgroundColor: "#D5D5D5" },
+                backgroundColor: "text.secondary",
+                color: "secondary.main",
+                "&:hover": { backgroundColor: "text.primary" },
               }}
             >
               Back
@@ -190,13 +204,18 @@ export function Availability() {
                 "&:hover": { backgroundColor: "#537D96" },
               }}
             >
-              <Typography variant="p" sx={{ display: {xs: "none", md: "flex"} }}>
+              <Typography
+                variant="p"
+                sx={{ display: { xs: "none", md: "flex" } }}
+              >
                 Continue to Quote
               </Typography>
-              <Typography variant="p" sx={{ display: {xs: "flex", md: "none"} }}>
+              <Typography
+                variant="p"
+                sx={{ display: { xs: "flex", md: "none" } }}
+              >
                 Continue
               </Typography>
-
             </Button>
           </Box>
         </Paper>

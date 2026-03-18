@@ -22,7 +22,7 @@ export function Login() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    navigate("/customer-info");
+    navigate("/estimate/customer-info");
   };
 
   return (
@@ -208,7 +208,7 @@ export function Login() {
             >
               Don't have an account?{" "}
               <Link
-                onClick={() => navigate("/signup")}
+                onClick={() => navigate("/estimate/signup")}
                 underline="hover"
                 fontWeight={600}
                 sx={{

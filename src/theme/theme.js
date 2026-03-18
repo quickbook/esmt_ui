@@ -1,3 +1,4 @@
+import { zhCN } from "@mui/material/locale";
 import { createTheme } from "@mui/material/styles";
 
 const theme = createTheme({
@@ -20,8 +21,9 @@ const theme = createTheme({
     },
     text: {
       primary: "#FFFFFF",
-      secondary: "#6B7280",
+      secondary: "#dcdcdc",
       disabled: "#d3d3d3",
+      dark: "#000000",
     },
     error: {
       main: "#EF4444",
@@ -138,6 +140,7 @@ const theme = createTheme({
             boxShadow: "0 10px 25px rgba(0, 0, 0, 0.15)",
           },
         },
+
         contained: {
           boxShadow: "0 4px 15px rgba(68, 161, 148, 0.3)",
         },
@@ -206,6 +209,27 @@ const theme = createTheme({
         },
       },
     },
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          scrollbarWidth: "thin", // Firefox
+        },
+        "*::-webkit-scrollbar": {
+          width: "6px",
+          height: "6px",
+        },
+        "*::-webkit-scrollbar-track": {
+          background: "transparent",
+        },
+        "*::-webkit-scrollbar-thumb": {
+          backgroundColor: "rgba(100,100,100,0.5)",
+          borderRadius: "10px",
+        },
+        "*::-webkit-scrollbar-thumb:hover": {
+          backgroundColor: "rgba(100,100,100,0.8)",
+        },
+      },
+    },
   },
 });
 
@@ -221,6 +245,29 @@ export const textFieldSx = {
   "& .MuiInputLabel-root.Mui-focused": { color: "#44A194" },
   //placeholder color
   "& .MuiInputBase-input::placeholder": { color: "#000" },
+};
+
+export const selectSx = {
+  mb: 4,
+  color: "primary.contrastText",
+  ".MuiSelect-icon": { color: "primary.contrastText" },
+};
+
+export const menuItemSx = {
+  wordBreak: "break-word", // Break long words
+  overflowWrap: "break-word", // Alternative for better browser support
+  whiteSpace: "normal", // Allow wrapping
+  color: "#000000",
+  bgcolor: "rgba(255, 255, 255, 0.25)",
+  "&:hover": {
+    bgcolor: "rgba(255, 255, 255, 0.35)",
+  },
+  "&.Mui-selected": {
+    bgcolor: "rgba(255, 255, 255, 0.45)",
+    "&:hover": {
+      bgcolor: "rgba(255, 255, 255, 0.45)",
+    },
+  },
 };
 
 export default theme;

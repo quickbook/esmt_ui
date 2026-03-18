@@ -26,13 +26,13 @@ const TopBar = () => {
   };
 
   const handleLogin = () => {
-    navigate("/login");
+    navigate("/estimate/login");
     handleClose();
   };
 
   const handleLogout = () => {
     // Add logout logic here if needed
-    navigate("/signup");
+    navigate("/estimate/signup");
     handleClose();
   };
 
@@ -43,7 +43,7 @@ const TopBar = () => {
         sx={{ padding: { xs: "0 4px 0 8px", md: "0 24px" } }}
       >
         <Toolbar disableGutters sx={{ justifyContent: "space-between" }}>
-          <RouterLink to="/" style={{ textDecoration: "none" }}>
+          <RouterLink to="/estimate/" style={{ textDecoration: "none" }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <Box
                 component="img"

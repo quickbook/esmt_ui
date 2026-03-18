@@ -450,11 +450,11 @@ export function AlaCarteEstimator() {
   };
 
   const handleNext = () => {
-    navigate("/availability");
+    navigate("/estimate/availability");
   };
 
   const handleBack = () => {
-    navigate("/pond-selection");
+    navigate("/estimate/pond-info");
   };
 
   // Group items by category for better display
@@ -468,7 +468,7 @@ export function AlaCarteEstimator() {
 
   return (
     <Box sx={{ minHeight: "84vh", py: 8, px: 2 }}>
-      <Container maxWidth={{ xs: "sm", md: "xl" }}>
+      <Container maxWidth={{ xs: "sm", md: "md" }}>
         <Paper
           sx={{
             p: { xs: 3, md: 6 },
@@ -489,13 +489,13 @@ export function AlaCarteEstimator() {
                 color: "primary.contrastText",
               }}
             >
-              Page 4 / 6
+              Page 3 / 5
             </Typography>
             {/* Label */}
             <Typography
               sx={{
                 mt: 1,
-                fontSize: { xs: "0.75rem", md: "0.875rem" },
+                fontSize: { xs: "0.75rem", md: "1.25rem" },
                 textAlign: "center",
                 color: "primary.light",
                 fontWeight: 500,
@@ -621,15 +621,16 @@ export function AlaCarteEstimator() {
                 Fish Cost Estimate
               </Typography>
 
-              <Typography fontSize={24} fontWeight="bold" color="#44A194">
+              <Typography fontSize={24} fontWeight="bold" color="primary.contrastText">
                 $ {totalCost.toFixed(2)} - Delivery Included
               </Typography>
             </Box>
 
             <Typography
               textAlign="center"
-              fontSize={14}
+              fontSize="1rem"
               color="primary.contrastText"
+              fontWeight={600}
               mt={1}
             >
               $750 minimum

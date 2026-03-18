@@ -53,20 +53,20 @@ export function PondSelection() {
   const newPondOptions = [
     { value: "trophy-bass", label: "I have a new pond and want trophy bass" },
     { value: "bass-pond", label: "I have a new pond and want bass and bream" },
-    { value: "fishing-pond", label: "Bass, bream, crappie and catfish" },
-    { value: "catfish-pond", label: "Catfish pond" },
-    { value: "hybrid-bream", label: "Big bream pond" },
+    { value: "fishing-pond", label: "I have a new pond and want to fish for bass, bream, crappie and catfish" },
+    { value: "catfish-pond", label: "I have a new pond and want to fish for catfish" },
+    { value: "hybrid-bream", label: "I have a new pond and want to fish for big bream" },
   ];
 
   const oldPondOptions = [
-    { value: "adult-fish", label: "Add catchable fish" },
-    { value: "feed-bass", label: "Feed my bass" },
-    { value: "grass-carp", label: "Stock grass carp for weeds" },
+    { value: "adult-fish", label: "I have an old pond and want to add catchable fish" },
+    { value: "feed-bass", label: "I have an old pond and want  to feed my bass" },
+    { value: "grass-carp", label: "I want to stock grass carp to get rid of my weeds" },
   ];
 
   const alaCarteOption = {
     value: "ala-carte",
-    label: "Stop asking questions, I know what I want",
+    label: "Stop asking me questions, I googled it and know exactly what I want, just sell me some fish already",
   };
 
   const getOptions = () => {
@@ -117,7 +117,7 @@ export function PondSelection() {
 
   const handleBack = () => {
     if (step === 0) {
-      navigate("/pond-info");
+      navigate("/estimate/pond-info");
     } else if (step > 0) {
       if (step === steps.length - 1 && pondType === "new") {
         setStep(0); // back to first question

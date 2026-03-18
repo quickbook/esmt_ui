@@ -7,7 +7,7 @@ const HomePage = () => {
   const navigate = useNavigate();
 
   const handleStart = () => {
-    navigate("/customer-info");
+    navigate("/estimate/customer-info");
   };
 
   return (

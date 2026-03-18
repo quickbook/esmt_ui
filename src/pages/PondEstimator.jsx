@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Box,
@@ -10,354 +10,577 @@ import {
   TableHead,
   TableRow,
   TableCell,
-  TextField,
   Checkbox,
   Button,
+  Radio,
+  TextField,
+  FormControlLabel,
+  LinearProgress,
 } from "@mui/material";
-import { glassBoxStyles } from "../utils/glassStyles";
+import { motion } from "framer-motion";
 
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-
-import { Stepper } from "../components/Stepper";
+import { glassBoxStyles } from "../utils/glassStyles";
+import { textFieldSx } from "../theme/theme";
+import { u } from "framer-motion/client";
 
 const FIXED_OPTIONS = [
-  {
-    text: "Best to Stock Bass",
-    fishOption: "Small Fish Option",
-    size: "1 to 3 inch fish",
-    type: "small",
-    color: "#fecaca",
-  },
-  {
-    text: "in June for best",
-    fishOption: "Medium Fish Option",
-    size: "3 to 4 inch fish",
-    type: "medium",
-    color: "#fef08a",
-  },
-  {
-    text: "Growth potential",
-    fishOption: "Large Fish Option",
-    size: "4 to 5 inch fish",
-    type: "large",
-    color: "#fdba74",
-  },
-  {
-    text: "Stock others first",
-    fishOption: "1 Year Old Population Option",
-    size: "5 to 6 inch Bluegill in pounds",
-    type: "year",
-    color: "#bbf7d0",
-  },
-  {
-    text: "",
-    fishOption: "Giant Fish Option",
-    size: "10 to 13 inch Bass in pounds",
-    type: "giant",
-    color: "#bfdbfe",
-  },
+  { text: "Best to Stock Bass", color: "#ff9090" },
+  { text: "in June for best", color: "#ffc383" },
+  { text: "Growth potential", color: "#aaffa7" },
+  { text: "Stock others first", color: "#87d5fc" },
 ];
 
 const pondConfigs = {
   "trophy-bass": {
     title: "Trophy Bass Pond Estimator",
-    description: "Grow Bass over 10 pounds. Slow fishing. Long term investment",
+    description:
+      "Grow Bass over 10 pounds, Slow fishing long term growth. Best to Stock Bass in June for best  Growth potential Stock others first.",
+    stockDesc:
+      "Bluegill, Redear and Minnows stocked in fall or spring and Bass stocked in June",
+    columns: [
+      "Head-Bluegill",
+      "Head-Redear",
+      "Head-Bass",
+      "Pounds-Minnows",
+      "Pounds-Shinners",
+    ],
+
+    // 🔵 BLUE SECTION (from your image)
+    breakdownHeaders: [
+      { label: "5 to 6 inch Bluegill", type: "pounds" },
+      { label: "3 to 4 inch Bluegill", type: "head" },
+      { label: "1 to 3 inch Bluegill", type: "head" },
+      { label: "5 to 6 inch Redear", type: "pounds" },
+      { label: "3 to 4 inch Redear", type: "head" },
+      { label: "1 to 3 inch Redear", type: "head" },
+      { label: "Minnows", type: "pounds" },
+      { label: "12 to 15 inch Bass", type: "pounds" },
+    ],
   },
-  "bass-pond": {
-    title: "Bass Pond Estimator",
-    description: "Bass to Stock Bass. In line for best Growth potential",
-  },
-  "fishing-pond": {
-    title: "Fishing Pond Estimator",
-    description: "Medium Fish Option. 4 to 6 inch bass fish",
-  },
+
   "catfish-pond": {
     title: "Catfish Pond Estimator",
-    description: "Stock catfish for your pond",
+    description:
+      "Grow Catfish up to 5 pounds. Small ponds with low management. Can be stocked year round so long asnot to hot for redear.",
+    stockDesc: "All fish stocked at same time.",
+    columns: ["Head-Redear", "Pounds-Minnows", "Head-Catfish"],
+
+    breakdownHeaders: [
+      { label: "5 to 6 inch Redear", type: "pounds" },
+      { label: "Minnows", type: "pounds" },
+      { label: "12 to 15 inch Catfish", type: "pounds" },
+    ],
   },
+
+  "fishing-pond": {
+    title: "Fishing Pond Estimator",
+    description:
+      "Grow quality bass, bream, crappie and catfish. Great for kids. All fish can be stocked at same time Crappie do best October to April.",
+    stockDesc:
+      "Crappie are not available May through September, Hybrid Crappie can be substituted for Black Crappie if they are available, Not all sizes of hybrid crappie are available at all times.",
+    columns: [
+      "Head-Bluegill",
+      "Head-Redear",
+      "Head-Bass",
+      " Pounds-Minnows",
+      "Head-Catfish",
+      "Head-Crappie",
+    ],
+
+    breakdownHeaders: [
+      { label: "5 to 6 inch Bluegill", type: "pounds" },
+      { label: "3 to 4 inch Bluegill", type: "head" },
+      { label: "1 to 3 inch Bluegill", type: "head" },
+      { label: "5 to 6 inch Redear", type: "pounds" },
+      { label: "3 to 4 inch Redear", type: "head" },
+      { label: "1 to 3 inch Redear", type: "head" },
+      { label: "Minnows", type: "pounds" },
+      { label: "12 to 15 inch Bass", type: "pounds" },
+      { label: "12 to 15 inch Catfish", type: "pounds" },
+      { label: "5 to 6 inch Crappie", type: "head" },
+    ],
+  },
+
   "hybrid-bream": {
     title: "Hybrid Bream Pond Estimator",
-    description: "Large Hybrid Bream. Medium fishing potential",
+    description:
+      "Grow Bream up to 1 pound. Small ponds with low management. 80 to 90% male reduced spawning reduces competition makes big bream.",
+    stockDesc: "All fish stocked at same time.",
+    columns: [
+      "Head-Hybrid Bream",
+      "Head-Redear",
+      "Head-Bass",
+      "Pounds-Minnows",
+      "Head-Catfish",
+    ],
+
+    breakdownHeaders: [
+      { label: "5 to 6 inch Hybrid", type: "pounds" },
+      { label: "5 to 6 inch Redear", type: "pounds" },
+      { label: "Minnows", type: "pounds" },
+      { label: "12 to 15 inch Bass", type: "pounds" },
+      { label: "12 to 15 inch Catfish", type: "pounds" },
+    ],
+  },
+
+  "bass-pond": {
+    title: "Bass Pond Estimator",
+    description:
+      "Grow Bass over 5 pounds. Will require regular bass harvest to maintain balance. Best to Stock Bass in June for best  Growth potential Stock others first.",
+    stockDesc:
+      "Bluegill, Redear and Minnows stocked in fall or spring and Bass stocked in June",
+    columns: ["Head-Bluegill", "Head-Redear", "Head-Bass", "Pounds-Minnows"],
+
+    breakdownHeaders: [
+      { label: "5 to 6 inch Bluegill", type: "pounds" },
+      { label: "3 to 4 inch Bluegill", type: "head" },
+      { label: "1 to 3 inch Bluegill", type: "head" },
+      { label: "5 to 6 inch Redear", type: "pounds" },
+      { label: "3 to 4 inch Redear", type: "head" },
+      { label: "1 to 3 inch Redear", type: "head" },
+      { label: "Minnows", type: "pounds" },
+      { label: "12 to 15 inch Bass", type: "pounds" },
+    ],
   },
 };
 
 export function PondEstimator() {
   const navigate = useNavigate();
   const { type } = useParams();
-  const config = type ? pondConfigs[type] : null;
+  const config = pondConfigs[type];
 
+  const [formData, setFormData] = useState({}); // this will hold all the data we want to pass to the next page
   const [selectedOptions, setSelectedOptions] = useState([]);
-  const [quantities, setQuantities] = useState({});
+  const [apiData, setApiData] = useState(null);
   const [grassCarpSelected, setGrassCarpSelected] = useState(false);
-  const [grassCarpQty, setGrassCarpQty] = useState(0);
-  const [grassCarpPrice, setGrassCarpPrice] = useState(5.75);
-  const [totalCost, setTotalCost] = useState(0);
+  const [grassCarpQty, setGrassCarpQty] = useState(1);
+  const [regularHybrid, setRegularHybrid] = useState(false);
+  const [specklebelly, setSpecklebelly] = useState(false);
 
-  const getPrice = (type, field) => {
-    const prices = {
-      small: { bluegill: 0.1, redear: 0.15, bass: 0.38 },
-      medium: { bluegill: 0.22, redear: 0.32, bass: 0.95 },
-      large: { bluegill: 0.65, redear: 0.8, bass: 1.25 },
-      year: { bluegill: 8, redear: 9, bass: 10 },
-      giant: { bluegill: 8, redear: 9, bass: 10 },
+  const handleToggle = (i) => {
+    setSelectedOptions((prev) =>
+      prev.includes(i) ? prev.filter((idx) => idx !== i) : [...prev, i],
+    );
+  };
+
+  const handleBack = () => {
+    navigate("/estimate/pond-info");
+  };
+
+  const handleNext = () => {
+    const selectedOptionDetails = selectedOptions.map((i) => ({
+      ...apiData.options[i],
+      stock: apiData.stock[i],
+    }));
+
+    const finalData = {
+      pondType: type,
+      selectedOptions: selectedOptionDetails,
+      grassCarp: {
+        selected: grassCarpSelected,
+        quantity: grassCarpQty,
+        total: apiData.grassCarpPrice * grassCarpQty,
+      },
+      hybridChoice:
+        config.title === "Hybrid Bream Pond Estimator"
+          ? {
+              regularHybrid,
+              specklebelly,
+            }
+          : null,
+      breakdown: apiData.breakdownValues,
     };
 
-    if (field === "minnows") return 6.5;
-    if (field === "shiners") return 7;
+    setFormData(finalData);
 
-    return prices[type]?.[field] || 0;
+    console.log("FINAL FORM DATA 👉", finalData);
+
+    navigate("/estimate/availability");
   };
 
-  const calculateRowCost = (optionKey, optionType) => {
-    const q = quantities[optionKey] || {};
-    let total = 0;
-
-    ["bluegill", "redear", "bass", "minnows", "shiners"].forEach((field) => {
-      total += (q[field] || 0) * getPrice(optionType, field);
+  // 🔥 MOCK API (replace later)
+  useEffect(() => {
+    const random = () => Math.floor(Math.random() * 500);
+    setApiData({
+      options: [
+        { label: "Small Fish Option", size: "1-3 inch", price: 120 },
+        { label: "Medium Fish Option", size: "3-4 inch", price: 220 },
+        { label: "Large Fish Option", size: "4-5 inch", price: 350 },
+        {
+          label: "1 Year Old Population",
+          size: "1 inch to Catchable",
+          price: 500,
+        },
+      ],
+      stock: [
+        [100, 50, 25, 200, 120],
+        [200, 100, 50, 300, 80],
+        [300, 150, 75, 400, 90],
+      ],
+      breakdownValues: [50, 100, 200, 30, 60, 120, 500, 25],
+      grassCarpPrice: 5.75,
+      notes: ["$750 minimum"],
     });
-
-    return total;
-  };
+  }, [type]);
 
   useEffect(() => {
-    let total = 0;
+    window.scrollTo(0, 0);
+  }, []);
 
-    selectedOptions.forEach((key) => {
-      const option = FIXED_OPTIONS.find(
-        (o, i) => `${o.fishOption}-${i}` === key,
-      );
-
-      if (option) {
-        total += calculateRowCost(key, option.type);
-      }
-    });
-
-    if (grassCarpSelected) {
-      total += grassCarpQty * grassCarpPrice;
-    }
-
-    setTotalCost(total);
-  }, [quantities, selectedOptions, grassCarpSelected, grassCarpQty]);
-
-  const handleQuantityChange = (optionKey, field, value) => {
-    setQuantities((prev) => ({
-      ...prev,
-      [optionKey]: {
-        ...(prev[optionKey] || {}),
-        [field]: Number(value) || 0,
-      },
-    }));
-  };
-
-  const handleOptionToggle = (optionKey) => {
-    setSelectedOptions((prev) =>
-      prev.includes(optionKey)
-        ? prev.filter((k) => k !== optionKey)
-        : [...prev, optionKey],
-    );
-  };
-
-  if (!config) {
-    return (
-      <Box
-        sx={{
-          minHeight: "84vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          ...glassBoxStyles,
-        }}
-      >
-        <Box textAlign="center">
-          <Typography
-            variant="h5"
-            fontWeight="bold"
-            color="primary.contrastText"
-          ></Typography>
-
-          <Button
-            variant="contained"
-            sx={{ mt: 3, background: "#44A194" }}
-            onClick={() => navigate("/pond-selection")}
-          >
-            Go Back
-          </Button>
-        </Box>
-      </Box>
-    );
-  }
+  if (!apiData) return null;
 
   return (
-    <Box sx={{ minHeight: "84vh", py: 6 }}>
-      <Container maxWidth={{ xs: "sm", md: "lg" }}>
-        <Paper
-          sx={{
-            p: 4,
-            borderRadius: 3,
-            backdropFilter: "blur(16px) saturate(180%)",
-            backgroundColor: "rgba(255, 255, 255, 0.15)",
-            border: "1px solid rgba(255, 255, 255, 0.2)",
-            boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.15)",
-            color: "primary.contrastText",
+    <Box
+      sx={{
+        minHeight: "84vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        py: 6,
+      }}
+    >
+      <Container
+        sx={{
+          padding: { xs: 0, sm: "0" },
+          //my: { xs: 1, md: 2 },
+        }}
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -40 }}
+          transition={{
+            duration: 0.4,
+            ease: "easeOut",
+            type: "tween",
           }}
         >
-          <Box textAlign="center" mb={4}>
-            {/* Page Counter */}
-            <Typography
-              sx={{
-                textAlign: "center",
-                fontWeight: 600,
-                color: "primary.contrastText",
-              }}
-            >
-              Page 4 / 6
-            </Typography>
-            {/* Label */}
-            <Typography
-              sx={{
-                mt: 1,
-                fontSize: { xs: "0.75rem", md: "0.875rem" },
-                textAlign: "center",
-                color: "primary.light",
-                fontWeight: 500,
-              }}
-            >
-              {config.title}
-            </Typography>
-          </Box>
-
-          <Typography
-            variant="h5"
-            fontWeight="bold"
-            color="primary.contrastText"
+          <Paper
+            sx={{
+              padding: { xs: 1, sm: 4 },
+              borderRadius: 1,
+            }}
           >
-            {config.title}
-          </Typography>
+            <Box textAlign="center" mb={4} mt={2}>
+              {/* Header */}
+              <Typography
+                textAlign="center"
+                sx={{
+                  fontWeight: 600,
+                  color: "primary.contrastText",
+                }}
+              >
+                Page 3 / 5
+              </Typography>
 
-          <Typography fontSize={14} mb={3} color="primary.contrastText">
-            {config.description}
-          </Typography>
+              <Typography
+                sx={{
+                  mt: 1,
+                  fontSize: { xs: "1rem", md: "1.25rem" },
+                  color: "primary.light",
+                  fontWeight: 500,
+                }}
+              >
+                {config.title}
+              </Typography>
+            </Box>
 
-          <Box sx={{ overflowX: "auto" }}>
-            <Table size="small" sx={{ border: "1px solid #ddd", minWidth: 800 }}>
-            <TableHead>
-              <TableRow>
-                <TableCell />
-                <TableCell>Option</TableCell>
-                <TableCell>Size</TableCell>
-                <TableCell align="center">Estimated Price</TableCell>
-                <TableCell align="center">Select</TableCell>
-                <TableCell align="center">Bluegill</TableCell>
-                <TableCell align="center">Redear</TableCell>
-                <TableCell align="center">Bass</TableCell>
-                <TableCell align="center">Minnows</TableCell>
-                <TableCell align="center">Shiners</TableCell>
-              </TableRow>
-            </TableHead>
+            {/* Progress */}
+            <LinearProgress
+              variant="determinate"
+              value={60}
+              sx={{
+                mb: 5,
+                height: 6,
+                borderRadius: 4,
+                backgroundColor: "#e5e7eb",
+                "& .MuiLinearProgress-bar": {
+                  backgroundColor: "#44A194",
+                },
+              }}
+            />
 
-            <TableBody sx={{ color: "primary.dark" }}>
-              {FIXED_OPTIONS.map((option, index) => {
-                const optionKey = `${option.fishOption}-${index}`;
-                const selected = selectedOptions.includes(optionKey);
+            {/* Note and Description */}
+            <Box>
+              <Typography
+                //fontSize="1.125rem"
+                fontWeight="bold"
+                color="primary.contrastText"
+                mb={2}
+              >
+                Note: {config.description}
+              </Typography>
+              <Typography
+                fontSize="0.875rem"
+                color="primary.contrastText"
+                mb={2}
+              >
+                Select the option that best describes your pond. A
+                representative will contact you to confirm the estimate and
+                discuss stocking options prior to delivery.
+              </Typography>
+            </Box>
 
-                return (
-                  <TableRow
-                    key={index}
-                    sx={{
-                      background: option.color,
-                      "& .MuiTableCell-root": {
-                        color: "primary.dark",
-                      },
-                    }}
-                  >
-                    <TableCell>{option.text}</TableCell>
-                    <TableCell>{option.fishOption}</TableCell>
-                    <TableCell>{option.size}</TableCell>
-
-                    <TableCell align="center">
-                      {selected
-                        ? `$${calculateRowCost(optionKey, option.type).toFixed(
-                            2,
-                          )}`
-                        : ""}
+            {/* TABLE */}
+            <Box sx={{ overflowX: "auto", width: "100%" }} mb={4}>
+              <Table>
+                <TableHead>
+                  <TableRow sx={{ background: "rgba(255,255,255,0.2)" }}>
+                    <TableCell>Option</TableCell>
+                    <TableCell>Size</TableCell>
+                    <TableCell>Price</TableCell>
+                    <TableCell>
+                      Select
+                      <br />
+                      Preferred
+                      <br />
+                      Option
                     </TableCell>
+                    {config.columns.map((c) => (
+                      <TableCell key={c}>
+                        {c.split("-").map((s, i) => (
+                          <div key={i + s}>{s}</div>
+                        ))}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
 
-                    <TableCell align="center">
-                      <Checkbox
-                        checked={selected}
-                        onChange={() => handleOptionToggle(optionKey)}
-                      />
-                    </TableCell>
-
-                    {["bluegill", "redear", "bass", "minnows", "shiners"].map(
-                      (field) => (
-                        <TableCell key={field}>
-                          <TextField
-                            size="small"
-                            type="number"
-                            fullWidth
-                            disabled={!selected}
-                            sx={{
-                              minWidth: 70,
-                              "& input": { textAlign: "center" },
-                              "& .MuiInputBase-input": {
-                                color: "primary.dark",
-                                fontWeight: 600,
-                              },
-                              backgroundColor: selected ? "#FFF7CC" : "transparent",
-                              borderRadius: 1,
-                            }}
-                            value={
-                              selected
-                                ? quantities[optionKey]?.[field] || ""
-                                : ""
-                            }
-                            onChange={(e) =>
-                              handleQuantityChange(
-                                optionKey,
-                                field,
-                                e.target.value,
-                              )
-                            }
+                <TableBody>
+                  {apiData.options.map((opt, i) => {
+                    const isFourthRow = i === 3;
+                    return (
+                      <TableRow
+                        key={i}
+                        sx={{ background: FIXED_OPTIONS[i].color }}
+                      >
+                        <TableCell sx={{ color: "text.dark" }}>
+                          {opt.label}
+                        </TableCell>
+                        <TableCell sx={{ color: "text.dark" }}>
+                          {opt.size}
+                        </TableCell>
+                        <TableCell sx={{ color: "text.dark" }}>
+                          ${opt.price}
+                        </TableCell>
+                        <TableCell sx={{ color: "text.dark" }}>
+                          <Checkbox
+                            sx={{ color: "text.dark" }}
+                            checked={selectedOptions.includes(i)}
+                            onChange={() => handleToggle(i)}
                           />
                         </TableCell>
-                      ),
-                    )}
+
+                        {/* STOCK VALUES */}
+                        {config.columns.map((_, idx) => (
+                          <TableCell
+                            key={idx}
+                            align="center"
+                            sx={{ color: "text.dark" }}
+                          >
+                            {!isFourthRow ? apiData.stock[i][idx] : ""}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+
+              {/* 🔵 BLUE SECTION */}
+              <Table sx={{ background: FIXED_OPTIONS[3].color}}>
+                <TableHead>
+                  <TableRow>
+                    {config.breakdownHeaders.map((h, i) => (
+                      <TableCell
+                        key={i}
+                        align="center"
+                        sx={{ color: "text.dark" }}
+                      >
+                        {h.type === "pounds" ? "Pounds" : "Head"}
+                        <br />
+                        {h.label}
+                      </TableCell>
+                    ))}
                   </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-          </Box>
+                </TableHead>
 
-          <Box mt={4} p={2} border="2px solid #44A194" borderRadius={2}>
-            <Typography fontWeight="bold" color="primary.contrastText">
-              Fish Cost Estimate
-            </Typography>
-            <Typography fontSize={24} color="#44A194">
-              ${totalCost.toFixed(2)}
-            </Typography>
-          </Box>
+                <TableBody>
+                  <TableRow>
+                    {config.breakdownHeaders.map((_, i) => (
+                      <TableCell
+                        key={i}
+                        align="center"
+                        sx={{ color: "text.dark" }}
+                      >
+                        {apiData.breakdownValues[i] || 0}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </Box>
 
-          <Box display="flex" justifyContent="space-between" mt={4}>
-            <Button
-              startIcon={<ArrowLeftIcon />}
-              onClick={() => navigate("/pond-selection")}
+            {/* Grass Carp */}
+            <Box mt={4} p={2}>
+              <Typography fontWeight="bold" sx={{ color: "text.primary" }}>
+                ADD 8 to 10 inch TRIPLOID GRASS CARP
+              </Typography>
+
+              <Box
+                display="flex"
+                alignItems="center"
+                flexDirection={{ xs: "column", md: "row" }}
+                gap={2}
+                mt={2}
+              >
+                <TextField
+                  type="number"
+                  size="small"
+                  value={grassCarpQty}
+                  onChange={(e) => {
+                    const value = Number(e.target.value);
+                    if (value >= 0) {
+                      setGrassCarpQty(value);
+                    }
+                  }}
+                  sx={{ ...textFieldSx }}
+                />
+
+                <Typography sx={{ color: "text.primary" }}>
+                  $ {apiData.grassCarpPrice * grassCarpQty}
+                </Typography>
+
+                <Checkbox
+                  sx={{ color: "text.primary" }}
+                  checked={grassCarpSelected}
+                  onChange={(e) => setGrassCarpSelected(e.target.checked)}
+                />
+
+                <Typography fontSize={13} color="text.secondary">
+                  ARKANSAS, MISSOURI, MISSISSIPPI, OKLAHOMA, TENNESSEE ONLY
+                </Typography>
+              </Box>
+            </Box>
+            {/* Additional Info for hybrid bream */}
+            {config.title === "Hybrid Bream Pond Estimator" && (
+              <Box
+                sx={{
+                  mt: 2,
+                  p: 2,
+                  border: "1px solid #e0e0e0",
+                }}
+              >
+                {/* Info Text */}
+                <Typography
+                  sx={{
+                    fontSize: "0.75rem",
+                    color: "text.secondary",
+                    mb: 1.5,
+                  }}
+                >
+                  Specklebelly can be substituted for regular hybrid bream.
+                </Typography>
+
+                {/* Options */}
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={regularHybrid}
+                        onChange={(e) => {
+                          setRegularHybrid(e.target.checked);
+                          if (e.target.checked) setSpecklebelly(false); // optional mutual exclusivity
+                        }}
+                      />
+                    }
+                    label={
+                      <Typography
+                        sx={{ fontSize: "0.8rem", color: "text.primary" }}
+                      >
+                        Customer wants regular hybrids
+                      </Typography>
+                    }
+                  />
+
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={specklebelly}
+                        onChange={(e) => {
+                          setSpecklebelly(e.target.checked);
+                          if (e.target.checked) setRegularHybrid(false);
+                        }}
+                      />
+                    }
+                    label={
+                      <Typography
+                        sx={{ fontSize: "0.8rem", color: "text.primary" }}
+                      >
+                        Customer wants specklebelly
+                      </Typography>
+                    }
+                  />
+                </Box>
+              </Box>
+            )}
+
+            {/* Notes */}
+            <Box
+              sx={{
+                my: 4,
+                textAlign: "center",
+                display: "flex",
+                flexDirection: "column",
+                gap: 1,
+              }}
             >
-              Back
-            </Button>
+              <Typography
+                sx={{
+                  fontSize: "0.875rem",
+                  fontWeight: "bold",
+                  color: "text.primary",
+                }}
+              >
+                $750 minimum
+              </Typography>
 
-            <Button
-              variant="contained"
-              endIcon={<ArrowRightIcon />}
-              sx={{ background: "#44A194" }}
-              onClick={() => navigate("/availability")}
-            >
-              Next
-            </Button>
-          </Box>
-        </Paper>
+              <Typography sx={{ fontSize: "0.75rem", color: "text.primary" }}>
+                {config.stockDesc}
+              </Typography>
+
+              <Typography sx={{ fontSize: "0.75rem", color: "text.primary" }}>
+                Estimated Price is calculated using pond size, fish size and
+                distance from Lonoke, Arkansas.
+                <br />A Representative will contact you to confirm the estimate
+                prior to fish delivery.
+              </Typography>
+            </Box>
+
+            {/* NAV */}
+            <Box display="flex" justifyContent="space-between" mt={4}>
+              <Button
+                onClick={handleBack}
+                sx={{
+                  backgroundColor: "text.secondary",
+                  color: "secondary.main",
+                  "&:hover": { backgroundColor: "text.primary" },
+                }}
+              >
+                <ArrowLeftIcon /> Back
+              </Button>
+
+              <Button
+                variant="contained"
+                onClick={handleNext}
+              >
+                Next <ArrowRightIcon />
+              </Button>
+            </Box>
+          </Paper>
+        </motion.div>
       </Container>
     </Box>
   );

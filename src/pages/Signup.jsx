@@ -71,7 +71,7 @@ export function Signup() {
     }
 
     // Navigate to customer info page after signup
-    navigate("/customer-info");
+    navigate("/estimate/customer-info");
   };
 
   return (
@@ -249,7 +249,7 @@ export function Signup() {
             >
               Already have an account?{" "}
               <Link
-                onClick={() => navigate("/login")}
+                onClick={() => navigate("/estimate/login")}
                 underline="hover"
                 fontWeight={600}
                 sx={{
