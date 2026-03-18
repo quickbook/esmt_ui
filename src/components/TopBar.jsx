@@ -43,7 +43,7 @@ const TopBar = () => {
         sx={{ padding: { xs: "0 4px 0 8px", md: "0 24px" } }}
       >
         <Toolbar disableGutters sx={{ justifyContent: "space-between" }}>
-          <RouterLink to="/estimate/" style={{ textDecoration: "none" }}>
+          <RouterLink to="/" style={{ textDecoration: "none" }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <Box
                 component="img"

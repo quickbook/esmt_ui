@@ -238,7 +238,7 @@ export function PondEstimator() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        py: 6,
+        py: 3,
       }}
     >
       <Container
@@ -259,7 +259,7 @@ export function PondEstimator() {
         >
           <Paper
             sx={{
-              padding: { xs: 1, sm: 4 },
+              padding: { xs: 1, sm: "1rem 2rem" },
               borderRadius: 1,
             }}
           >
@@ -268,6 +268,7 @@ export function PondEstimator() {
               <Typography
                 textAlign="center"
                 sx={{
+                  fontSize: "0.875rem",
                   fontWeight: 600,
                   color: "primary.contrastText",
                 }}
@@ -278,7 +279,7 @@ export function PondEstimator() {
               <Typography
                 sx={{
                   mt: 1,
-                  fontSize: { xs: "1rem", md: "1.25rem" },
+                  fontSize: "0.875rem",
                   color: "primary.light",
                   fontWeight: 500,
                 }}

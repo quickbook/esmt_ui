@@ -76,11 +76,11 @@ export function GrassCarpEstimator() {
   };
 
   return (
-    <Box sx={{ minHeight: "84vh", py: 8, px: 2 }}>
+    <Box sx={{ minHeight: "84vh", py: 4, px: { xs: 0, md: "1rem 2rem" } }}>
       <Container maxWidth={{ xs: "sm", md: "md" }}>
         <Paper
           sx={{
-            p: { xs: 3, md: 6 },
+            p: { xs: 2, md: "1rem 2rem" },
             borderRadius: 3,
             backdropFilter: "blur(16px) saturate(180%)",
             backgroundColor: "rgba(255, 255, 255, 0.15)",
@@ -89,7 +89,7 @@ export function GrassCarpEstimator() {
             color: "primary.contrastText",
           }}
         >
-          <Box textAlign="center" mb={4}>
+          <Box textAlign="center" mb={2}>
             {/* Page Counter */}
             <Typography
               sx={{
@@ -104,7 +104,7 @@ export function GrassCarpEstimator() {
             <Typography
               sx={{
                 mt: 1,
-                fontSize: { xs: "0.75rem", md: "1.25rem" },
+                fontSize: "0.875rem",
                 textAlign: "center",
                 color: "primary.light",
                 fontWeight: 500,
@@ -216,6 +216,8 @@ export function GrassCarpEstimator() {
               display="flex"
               justifyContent="space-between"
               alignItems="center"
+              flexDirection={{xs:'column', md:'row'}}
+              gap={{xs:2,md:0}}
               p={2}
               sx={{
                 ...glassBoxStyles,
@@ -235,6 +237,8 @@ export function GrassCarpEstimator() {
               display="flex"
               justifyContent="space-between"
               alignItems="center"
+              flexDirection={{xs:'column', md:'row'}}
+              gap={{xs:2,md:0}}
               p={2}
               sx={{
                 ...glassBoxStyles,
@@ -294,7 +298,7 @@ export function GrassCarpEstimator() {
               onClick={handleNext}
               sx={{
                 backgroundColor: "#44A194",
-                "&:hover": { backgroundColor: "text.disabled" },
+                "&:hover": { backgroundColor: "secondary.main" },
               }}
             >
               Next

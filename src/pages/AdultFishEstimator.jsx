@@ -95,11 +95,11 @@ export function AdultFishEstimator() {
   };
 
   return (
-    <Box sx={{ minHeight: "84vh", py: 8, px: 2 }}>
+    <Box sx={{ minHeight: "84vh", py: 4, px: { xs: 0, md: "1rem 2rem" } }}>
       <Container maxWidth={{ xs: "sm", md: "md" }}>
         <Paper
           sx={{
-            p: { xs: 3, md: 6 },
+            p: { xs: 2, md: "1rem 2rem" },
             borderRadius: 3,
             backdropFilter: "blur(16px) saturate(180%)",
             backgroundColor: "rgba(255, 255, 255, 0.15)",
@@ -113,6 +113,7 @@ export function AdultFishEstimator() {
             {/* Page Counter */}
             <Typography
               sx={{
+                fontSize: "0.875rem",
                 textAlign: "center",
                 fontWeight: 600,
                 color: "primary.contrastText",
@@ -124,7 +125,7 @@ export function AdultFishEstimator() {
             <Typography
               sx={{
                 mt: 1,
-                fontSize: { xs: "0.75rem", md: "1.25rem" },
+                fontSize: "0.875rem",
                 textAlign: "center",
                 color: "primary.light",
                 fontWeight: 500,
@@ -229,6 +230,8 @@ export function AdultFishEstimator() {
               display="flex"
               justifyContent="space-between"
               alignItems="center"
+              flexDirection={{xs:'column', md:'row'}}
+              gap={{xs:2,md:0}}
               p={2}
               sx={{
                 ...glassBoxStyles,
@@ -248,6 +251,8 @@ export function AdultFishEstimator() {
               display="flex"
               justifyContent="space-between"
               alignItems="center"
+              flexDirection={{xs:'column', md:'row'}}
+              gap={{xs:2,md:0}}
               p={2}
               sx={{
                 ...glassBoxStyles,
@@ -310,7 +315,7 @@ export function AdultFishEstimator() {
               onClick={handleNext}
               sx={{
                 backgroundColor: "#44A194",
-                "&:hover": { backgroundColor: "text.disabled" },
+                "&:hover": { backgroundColor: "secondary.main" },
               }}
             >
               Next

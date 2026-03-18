@@ -242,7 +242,12 @@ export const textFieldSx = {
       borderColor: "primary.main",
     },
   },
-  "& .MuiInputLabel-root.Mui-focused": { color: "#44A194" },
+  //label size
+  "& .MuiInputLabel-root": {
+    fontSize: "0.875rem",
+    color: "#6B7280",
+  },
+  "& .MuiInputLabel-root.Mui-focused": { color: "#44A194"},
   //placeholder color
   "& .MuiInputBase-input::placeholder": { color: "#000" },
 };
@@ -250,6 +255,7 @@ export const textFieldSx = {
 export const selectSx = {
   mb: 4,
   color: "primary.contrastText",
+  border: "1px solid",
   ".MuiSelect-icon": { color: "primary.contrastText" },
 };
 

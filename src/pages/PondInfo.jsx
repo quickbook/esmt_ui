@@ -16,12 +16,12 @@ import {
   Alert,
   FormControlLabel,
   Checkbox,
+  Grid,
 } from "@mui/material";
 import { motion } from "framer-motion";
-
+import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import { glassBoxStyles } from "../utils/glassStyles";
 import { menuItemSx, selectSx, textFieldSx } from "../theme/theme";
-import { menu } from "framer-motion/client";
 
 export function PondInfo() {
   const navigate = useNavigate();
@@ -71,7 +71,7 @@ export function PondInfo() {
     "Hybrid Crappie",
     "Grinnel / Bowfin",
     "Shad",
-    "Specklebelly Bream"
+    "Specklebelly Bream",
   ];
 
   const newPondOptions = [
@@ -169,11 +169,11 @@ export function PondInfo() {
         minHeight: "84vh",
         display: "flex",
         alignItems: "center",
-        py: 6,
+        pt: 2,
       }}
     >
       <Container
-        sx={{ ...glassBoxStyles, padding: { xs: 2, sm: "2rem" } }}
+        sx={{ ...glassBoxStyles, padding: { xs: 2, sm: "1rem 2rem" } }}
       >
         <motion.div
           initial={{ opacity: 0, y: 40 }}
@@ -187,9 +187,10 @@ export function PondInfo() {
           style={{ willChange: "transform, opacity" }}
         >
           {/* Header */}
-          <Box textAlign="center" mb={4}>
+          <Box textAlign="center" mb={2}>
             <Typography
               sx={{
+                fontSize: "0.875rem",
                 fontWeight: 600,
                 color: "primary.contrastText",
               }}
@@ -200,7 +201,7 @@ export function PondInfo() {
             <Typography
               sx={{
                 mt: 1,
-                fontSize: { xs: "0.75rem", md: "1.25rem" },
+                fontSize: "0.875rem",
                 color: "primary.light",
                 fontWeight: 500,
               }}
@@ -214,8 +215,8 @@ export function PondInfo() {
             variant="determinate"
             value={40}
             sx={{
-              mb: 5,
-              height: 8,
+              mb: 2,
+              height: 6,
               borderRadius: 4,
               backgroundColor: "#e5e7eb",
               "& .MuiLinearProgress-bar": {
@@ -223,277 +224,319 @@ export function PondInfo() {
               },
             }}
           />
-
-          {/* Pond Size */}
-          <Typography
-            variant="h5"
-            fontWeight="bold"
-            color="primary.contrastText"
-            mb={1}
+          <Grid
+            container
+            spacing={3}
+            rowGap={{ xs: 2, md: 1 }}
+            sx={{ flex: 1, overflow: "hidden" }}
           >
-            How big is the pond in surface acres?
-          </Typography>
-
-          <TextField
-            fullWidth
-            type="number"
-            placeholder="e.g. 1.5"
-            value={formData.pondSize}
-            onChange={(e) => handleChange("pondSize", e.target.value)}
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">acres</InputAdornment>
-                ),
-              },
-            }}
-            sx={{ mb: 4, ...textFieldSx }}
-          />
-
-          {/* Distance */}
-          <Typography
-            variant="h5"
-            fontWeight="bold"
-            color="primary.contrastText"
-            mb={1}
-          >
-            How many miles is your pond from Lonoke, Arkansas?
-          </Typography>
-          <Typography
-            variant="body2"
-            color="primary.light"
-            mb={1}
-            sx={{ fontStyle: "italic" }}
-          >
-            We will verify the distance and confirm the total cost with you
-            prior to delivery.
-          </Typography>
-
-          <TextField
-            fullWidth
-            type="number"
-            placeholder="e.g. 2.0"
-            value={formData.distance}
-            onChange={(e) => handleChange("distance", e.target.value)}
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">miles</InputAdornment>
-                ),
-              },
-            }}
-            sx={{ mb: 4, ...textFieldSx }}
-          />
-
-          {/* Pond Access */}
-          <Typography
-            variant="h5"
-            fontWeight="bold"
-            color="primary.contrastText"
-            mb={1}
-          >
-            How is access to the pond?
-          </Typography>
-
-          <Select
-            fullWidth
-            value={formData.pondAccess}
-            autoFocus
-            onChange={(e) => handleChange("pondAccess", e.target.value)}
-            displayEmpty
-            sx={{ ...selectSx }}
-          >
-            <MenuItem disabled value="" sx={{ ...menuItemSx }}>
-              Select an option
-            </MenuItem>
-
-            {pondAccessOptions.map((option, index) => (
-              <MenuItem key={index} value={option} sx={{ ...menuItemSx }}>
-                {option}
-              </MenuItem>
-            ))}
-          </Select>
-
-          {/* NEW / OLD POND */}
-          <Typography
-            variant="h5"
-            fontWeight="bold"
-            color="primary.contrastText"
-            mb={1}
-          >
-            Is this an old pond or a new pond?
-          </Typography>
-
-          <Box
-            sx={{ display: "flex", flexDirection: { xs: "column", md: "row" } }}
-            gap={3}
-            mb={4}
-          >
-            {["new", "old"].map((type) => (
-              <Box
-                key={type}
-                onClick={() => setPondType(type)}
-                sx={{
-                  flex: 1,
-                  border: "2px solid",
-                  borderColor:
-                    pondType === type ? "primary.contrastText" : "#537D96",
-                  borderRadius: 2,
-                  p: 1,
-                  cursor: "pointer",
-                  textAlign: "center",
-                }}
-              >
-                <Radio checked={pondType === type} />
-                <span style={{ color: "#fff" }}>
-                  {type === "new" ? "New Pond" : "Old Pond"}
-                </span>
-              </Box>
-            ))}
-          </Box>
-
-          {/* FISH IN POND */}
-          {pondType === "old" && (
-            <>
+            <Grid size={{ xs: 12, md: 6 }}>
+              {/* Pond Size */}
               <Typography
-                variant="h5"
+                variant="h6"
+                fontWeight="bold"
+                color="primary.contrastText"
+                mb={{ xs: 2, md: 4.7 }}
+              >
+                How big is your pond in surface acres?
+              </Typography>
+
+              <TextField
+                fullWidth
+                size="small"
+                type="number"
+                placeholder="e.g. 1.5"
+                value={formData.pondSize}
+                onChange={(e) => handleChange("pondSize", e.target.value)}
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="end">acres</InputAdornment>
+                    ),
+                  },
+                }}
+                sx={{ ...textFieldSx }}
+              />
+            </Grid>
+
+            <Grid size={{ xs: 12, md: 6 }}>
+              {/* Distance */}
+              <Typography
+                variant="h6"
                 fontWeight="bold"
                 color="primary.contrastText"
                 mb={1}
               >
-                Are there any fish in the pond now?
+                How many miles is your pond from Lonoke, Arkansas?
               </Typography>
-              
+              <Typography
+                variant="body2"
+                color="primary.light"
+                mb={1}
+                sx={{ fontStyle: "italic" }}
+              >
+                We will verify the distance and confirm the total cost with you
+                prior to delivery.
+              </Typography>
+
+              <TextField
+                fullWidth
+                size="small"
+                type="number"
+                placeholder="e.g. 2.0"
+                value={formData.distance}
+                onChange={(e) => handleChange("distance", e.target.value)}
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="end">miles</InputAdornment>
+                    ),
+                  },
+                }}
+                sx={{ ...textFieldSx, mb: 2 }}
+              />
+            </Grid>
+
+            <Grid size={{ xs: 12, md: 6 }}>
+              {/* Pond Access */}
+              <Typography
+                variant="h6"
+                fontWeight="bold"
+                color="primary.contrastText"
+                mb={1}
+              >
+                How is access to the pond?
+              </Typography>
+
+              <Select
+                fullWidth
+                size="small"
+                value={formData.pondAccess}
+                autoFocus
+                onChange={(e) => handleChange("pondAccess", e.target.value)}
+                displayEmpty
+                sx={{ ...selectSx }}
+              >
+                <MenuItem disabled value="" sx={{ ...menuItemSx }}>
+                  Select an option
+                </MenuItem>
+
+                {pondAccessOptions.map((option, index) => (
+                  <MenuItem key={index} value={option} sx={{ ...menuItemSx }}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </Select>
+            </Grid>
+
+            <Grid size={{ xs: 12, md: 6 }}>
+              {/* NEW / OLD POND */}
+              <Typography
+                variant="h6"
+                fontWeight="bold"
+                color="primary.contrastText"
+                mb={1}
+              >
+                Is this an old pond or a new pond?
+              </Typography>
 
               <Box
                 sx={{
                   display: "flex",
                   flexDirection: { xs: "column", md: "row" },
                 }}
+                mb={{xs: 3, md: 1}}
                 gap={3}
-                mb={4}
               >
-                {["yes", "no"].map((ans) => (
+                {["new", "old"].map((type) => (
                   <Box
-                    key={ans}
-                    onClick={() => setHasFish(ans)}
+                    key={type}
+                    onClick={() => setPondType(type)}
                     sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      gap: 1,
                       flex: 1,
                       border: "2px solid",
                       borderColor:
-                        hasFish === ans ? "primary.contrastText" : "#537D96",
+                        pondType === type ? "primary.contrastText" : "#537D96",
                       borderRadius: 2,
-                      p: 1,
+                      //p: 1,
                       cursor: "pointer",
                       textAlign: "center",
                     }}
                   >
-                    <Radio checked={hasFish === ans} />
-                    <span style={{ color: "#fff" }}>{ans.toUpperCase()}</span>
+                    <Radio checked={pondType === type} size="small" />
+                    <span
+                      style={{
+                        color: "#fff",
+                        fontSize: "1rem",
+                        fontWeight: 500,
+                      }}
+                    >
+                      {type === "new" ? "New Pond" : "Old Pond"}
+                    </span>
                   </Box>
                 ))}
               </Box>
-            </>
-          )}
+            </Grid>
 
-          {/* EXISTING FISH SPECIES */}
-          {pondType === "old" && hasFish === "yes" && (
-            <>
-              <Typography
-                variant="h5"
-                fontWeight="bold"
-                color="primary.contrastText"
-                mb={2}
-              >
-                What kind of fish are in the pond?
-              </Typography>
-              <Typography
-            variant="body2"
-            color="primary.light"
-            mb={3}
-            sx={{ fontStyle: "italic" }}
-          >
-            Select the fish species that are currently in your pond. This will help us make better recommendations for your stocking needs.
-          </Typography>
+            {/* FISH IN POND */}
+            {pondType === "old" && (
+              <Grid size={{ xs: 12, md: 6 }}>
+                <Typography
+                  variant="h6"
+                  fontWeight="bold"
+                  color="primary.contrastText"
+                  mb={1}
+                >
+                  Are there any fish in the pond now?
+                </Typography>
 
-              <Box
-                display="grid"
-                gridTemplateColumns={{ xs: "1fr 1fr", md: "1fr 1fr 1fr" }}
-                gap={2}
-                mb={4}
-              >
-                {fishSpecies.map((fish) => (
-                  <FormControlLabel
-                    key={fish}
-                    control={
-                      <Checkbox
-                        checked={selectedFish.includes(fish)}
-                        sx={{ color: "primary.contrastText" }}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedFish([...selectedFish, fish]);
-                          } else {
-                            setSelectedFish(
-                              selectedFish.filter((f) => f !== fish),
-                            );
-                          }
-                        }}
-                      />
-                    }
-                    label={fish}
-                    sx={{
-                      color: "primary.contrastText",
-                      ".MuiFormControlLabel-label": {
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: { xs: "column", md: "row" },
+                  }}
+                  gap={3}
+                  mb={2}
+                >
+                  {["yes", "no"].map((ans) => (
+                    <Box
+                      key={ans}
+                      onClick={() => setHasFish(ans)}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        gap: 1,
+                        flex: 1,
+                        border: "2px solid",
+                        borderColor:
+                          hasFish === ans ? "primary.contrastText" : "#537D96",
+                        borderRadius: 2,
+                        //p: 1,
+                        cursor: "pointer",
+                        textAlign: "center",
+                      }}
+                    >
+                      <Radio checked={hasFish === ans} size="small" />
+                      <span style={{ color: "#fff" }}>{ans.toUpperCase()}</span>
+                    </Box>
+                  ))}
+                </Box>
+              </Grid>
+            )}
+
+            {/* EXISTING FISH SPECIES */}
+            {pondType === "old" && hasFish === "yes" && (
+              <Grid size={{ xs: 12, md: 6 }}>
+                <Typography
+                  variant="h6"
+                  fontWeight="bold"
+                  color="primary.contrastText"
+                  mb={2}
+                >
+                  What kind of fish are in the pond?
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="primary.light"
+                  mb={3}
+                  sx={{ fontStyle: "italic" }}
+                >
+                  Select the fish species that are currently in your pond. This
+                  will help us make better recommendations for your stocking
+                  needs.
+                </Typography>
+
+                <Box
+                  display="grid"
+                  gridTemplateColumns={{ xs: "1fr 1fr", md: "1fr 1fr 1fr" }}
+                  gap={2}
+                  mb={4}
+                >
+                  {fishSpecies.map((fish) => (
+                    <FormControlLabel
+                      key={fish}
+                      control={
+                        <Checkbox
+                          checked={selectedFish.includes(fish)}
+                          sx={{ color: "primary.contrastText" }}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedFish([...selectedFish, fish]);
+                            } else {
+                              setSelectedFish(
+                                selectedFish.filter((f) => f !== fish),
+                              );
+                            }
+                          }}
+                        />
+                      }
+                      label={fish}
+                      sx={{
                         color: "primary.contrastText",
-                      },
-                    }}
-                  />
-                ))}
-              </Box>
-            </>
-          )}
+                        ".MuiFormControlLabel-label": {
+                          color: "primary.contrastText",
+                        },
+                      }}
+                    />
+                  ))}
+                </Box>
+              </Grid>
+            )}
 
-          {/* INTEREST SELECT */}
-          {(pondType === "new" || (pondType === "old" && hasFish)) && (
-            <>
-              (
-              <Typography
-                variant="h5"
-                fontWeight="bold"
-                color="primary.contrastText"
-                mb={1}
-              >
-                Which statement fits your interest?
-              </Typography>
-              <Select
-                fullWidth
-                value={selectedOption}
-                onChange={(e) => setSelectedOption(e.target.value)}
-                displayEmpty
-                sx={{ ...selectSx }}
-              >
-                <MenuItem disabled value="" sx={{ ...menuItemSx }}>
-                  Select option
-                </MenuItem>
-
-                {getOptions().map((opt) => (
-                  <MenuItem
-                    key={opt.value}
-                    value={opt.value}
-                    sx={{ ...menuItemSx }}
-                  >
-                    {opt.label}
+            {/* INTEREST SELECT */}
+            {(pondType === "new" || (pondType === "old" && hasFish)) && (
+              <Grid size={{ xs: 12 }}>
+                <Typography
+                  variant="h6"
+                  fontWeight="bold"
+                  color="primary.contrastText"
+                  mb={1}
+                >
+                  Which statement fits your interest?
+                </Typography>
+                <Select
+                  fullWidth
+                  size="small"
+                  value={selectedOption}
+                  onChange={(e) => setSelectedOption(e.target.value)}
+                  displayEmpty
+                  sx={{ ...selectSx}}
+                >
+                  <MenuItem disabled value="" sx={{ ...menuItemSx }}>
+                    Select option
                   </MenuItem>
-                ))}
-              </Select>
-              )
-            </>
-          )}
+
+                  {getOptions().map((opt) => (
+                    <MenuItem
+                      key={opt.value}
+                      value={opt.value}
+                      sx={{ ...menuItemSx }}
+                    >
+                      {opt.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </Grid>
+            )}
+          </Grid>
 
           {/* Buttons */}
-          <Box display="flex" justifyContent="space-between">
-            <Button onClick={handleBack}>Back</Button>
-
+          <Box display="flex" justifyContent="space-between" mt={2}>
+            <Button
+              onClick={handleBack}
+              sx={{
+                backgroundColor: "text.secondary",
+                color: "secondary.main",
+                "&:hover": { backgroundColor: "text.primary" },
+              }}
+            >
+              <ArrowLeftIcon /> Back
+            </Button>
             <Button
               variant="contained"
               onClick={handleNext}

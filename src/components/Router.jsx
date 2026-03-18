@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Signup } from "../pages/Signup";
 import { CustomerInfo } from "../pages/CustomerInfo";
 import { PondInfo } from "../pages/PondInfo";
@@ -13,6 +13,7 @@ import { AlaCarteEstimator } from "../pages/AlaCarteEstimator";
 import { PondEstimator } from "../pages/PondEstimator";
 import HomePage from "../pages/HomePage";
 import TopBar from "./TopBar";
+import ErrorPage from "../pages/ErrorPage";
 
 
 const Router = () => {
@@ -20,7 +21,8 @@ const Router = () => {
     <BrowserRouter>
       <TopBar />
       <Routes>
-        <Route path="/estimate/" element={<HomePage />} />
+        <Route path="/" element={<Navigate to="/estimate" replace />} />
+        <Route path="/estimate" element={<HomePage />} />
         <Route path="/estimate/login" element={<Login />} />
         <Route path="/estimate/signup" element={<Signup />} />
         <Route path="/estimate/customer-info" element={<CustomerInfo />} />
@@ -33,6 +35,7 @@ const Router = () => {
         <Route path="/estimate/estimator/ala-carte" element={<AlaCarteEstimator />} />
         <Route path="/estimate/availability" element={<Availability />} />
         <Route path="/estimate/quote" element={<Quote />} />
+        <Route path="*" element={<ErrorPage />} />
       </Routes>
     </BrowserRouter>
   );

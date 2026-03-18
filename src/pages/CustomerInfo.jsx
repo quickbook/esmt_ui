@@ -8,8 +8,11 @@ import {
   LinearProgress,
   Select,
   MenuItem,
+  Grid,
 } from "@mui/material";
 import { glassBoxStyles } from "../utils/glassStyles";
+import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
+
 import { useNavigate } from "react-router-dom";
 import { menuItemSx, selectSx, textFieldSx } from "../theme/theme";
 import { motion } from "framer-motion";
@@ -48,7 +51,7 @@ export function CustomerInfo() {
   };
 
   const handleBack = () => {
-    navigate("/estimate/");
+    navigate("/");
   };
 
   const handleNext = () => {
@@ -67,13 +70,13 @@ export function CustomerInfo() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        py: 6,
+        pt: 2,
       }}
     >
       <Container
         sx={{
           ...glassBoxStyles,
-          padding: { xs: 2, sm: "2rem" },
+          padding: { xs: 2, sm: " 1rem 2rem" },
           mx: { xs: 1, md: 0 },
         }}
       >
@@ -89,9 +92,10 @@ export function CustomerInfo() {
           style={{ willChange: "transform, opacity" }}
         >
           {/* Header */}
-          <Box textAlign="center" mb={4}>
+          <Box textAlign="center" mb={2}>
             <Typography
               sx={{
+                fontSize: "0.875rem",
                 fontWeight: 600,
                 color: "primary.contrastText",
               }}
@@ -102,7 +106,7 @@ export function CustomerInfo() {
             <Typography
               sx={{
                 mt: 1,
-                fontSize: { xs: "1rem", md: "1.25rem" },
+                fontSize: "0.875rem",
                 color: "primary.light",
                 fontWeight: 500,
               }}
@@ -116,7 +120,7 @@ export function CustomerInfo() {
             variant="determinate"
             value={20}
             sx={{
-              mb: 5,
+              mb: 2,
               height: 6,
               borderRadius: 4,
               backgroundColor: "#e5e7eb",
@@ -135,141 +139,169 @@ export function CustomerInfo() {
           >
             Tell Us About You
           </Typography> */}
+          <Grid container spacing={3} rowGap={0} sx={{ flex: 1, overflow: "hidden" }}>
+            <Grid size={{ xs: 12, md: 6 }}>
+              {/* Full Name */}
+              <Box mb={1}>
+                <Typography
+                  variant="h6"
+                  fontWeight="bold"
+                  color="primary.contrastText"
+                  mb={1}
+                >
+                  What is your name?
+                </Typography>
+                <TextField
+                  fullWidth
+                  size="small"
 
-          {/* Full Name */}
-          <Box mb={1}>
-            <Typography
-              variant="h5"
-              fontWeight="bold"
-              color="primary.contrastText"
-              mb={1}
-            >
-              What is your name?
-            </Typography>
-            <TextField
-              fullWidth
-              label="Enter your full name"
-              value={formData.fullName}
-              onChange={(e) => handleChange("fullName", e.target.value)}
-              sx={{ mb: 3, ...textFieldSx }}
-            />
-          </Box>
+                  label="Enter your full name"
+                  value={formData.fullName}
+                  onChange={(e) => handleChange("fullName", e.target.value)}
+                  sx={{ mb: 3, ...textFieldSx }}
+                />
+              </Box>
+            </Grid>
 
-          {/* Email */}
-          <Box mb={1}>
-            <Typography
-              variant="h5"
-              fontWeight="bold"
-              color="primary.contrastText"
-              mb={1}
-            >
-              What is your mailing address?
-            </Typography>
-            <TextField
-              fullWidth
-              label="Enter your email address"
-              type="email"
-              //placeholder="john@email.com"
-              value={formData.email}
-              onChange={(e) => handleChange("email", e.target.value)}
-              sx={{ mb: 3, ...textFieldSx }}
-            />
-          </Box>
+            <Grid size={{ xs: 12, md: 6 }}>
+              {/* Email */}
+              <Box mb={1}>
+                <Typography
+                  variant="h6"
+                  fontWeight="bold"
+                  color="primary.contrastText"
+                  mb={1}
+                >
+                  What is your mailing address?
+                </Typography>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="Enter your email address"
+                  type="email"
+                  //placeholder="john@email.com"
+                  value={formData.email}
+                  onChange={(e) => handleChange("email", e.target.value)}
+                  sx={{ mb: 3, ...textFieldSx }}
+                />
+              </Box>
+            </Grid>
 
-          {/* Phone */}
-          <Box mb={1}>
-            <Typography
-              variant="h5"
-              fontWeight="bold"
-              color="primary.contrastText"
-              mb={1}
-            >
-              What is your phone number?
-            </Typography>
-            <TextField
-              fullWidth
-              label="Enter your phone number"
-              type="tel"
-              //placeholder="123-456-7890"
-              value={formData.phone}
-              onChange={(e) => handleChange("phone", e.target.value)}
-              sx={{ mb: 3, ...textFieldSx }}
-            />
-          </Box>
+            <Grid size={{ xs: 12, md: 6 }}>
+              {/* Phone */}
+              <Box mb={1}>
+                <Typography
+                  variant="h6"
+                  fontWeight="bold"
+                  color="primary.contrastText"
+                  mb={1}
+                >
+                  What is your phone number?
+                </Typography>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="Enter your phone number"
+                  type="tel"
+                  //placeholder="123-456-7890"
+                  value={formData.phone}
+                  onChange={(e) => handleChange("phone", e.target.value)}
+                  sx={{ mb: 3, ...textFieldSx }}
+                />
+              </Box>
+            </Grid>
 
-          {/* Quote Email */}
-          <Box mb={1}>
-            <Typography
-              variant="h5"
-              fontWeight="bold"
-              color="primary.contrastText"
-              mb={1}
-            >
-              What is an email address I can send a written quote to?
-            </Typography>
-            <TextField
-              fullWidth
-              label="Enter your working email address"
-              type="quote-email"
-              //placeholder="john@email.com"
-              value={formData["quote-email"]}
-              onChange={(e) => handleChange("quote-email", e.target.value)}
-              sx={{ mb: 3, ...textFieldSx }}
-            />
-          </Box>
+            <Grid size={{ xs: 12, md: 6 }}>
+              {/* Quote Email */}
+              <Box mb={1}>
+                <Typography
+                  variant="h6"
+                  fontWeight="bold"
+                  color="primary.contrastText"
+                  mb={1}
+                >
+                  What is an email address I can send a written quote to?
+                </Typography>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="Enter your working email address"
+                  type="quote-email"
+                  //placeholder="john@email.com"
+                  value={formData["quote-email"]}
+                  onChange={(e) => handleChange("quote-email", e.target.value)}
+                  sx={{ mb: 3, ...textFieldSx }}
+                />
+              </Box>
+            </Grid>
 
-          {/* Address */}
-          <Box mb={1}>
-            <Typography
-              variant="h5"
-              fontWeight="bold"
-              color="primary.contrastText"
-              mb={1}
-            >
-              Where is the physical address of the pond?
-            </Typography>
-            <TextField
-              fullWidth
-              label="Enter your physical address"
-              multiline
-              rows={3}
-              //placeholder="Your home address"
-              value={formData.address}
-              onChange={(e) => handleChange("address", e.target.value)}
-              sx={{ mb: 3, ...textFieldSx }}
-            />
-          </Box>
+            <Grid size={{ xs: 12, md: 6 }}>
+              {/* Address */}
+              <Box mb={1}>
+                <Typography
+                  variant="h6"
+                  fontWeight="bold"
+                  color="primary.contrastText"
+                  mb={1}
+                >
+                  Where is the physical address of the pond?
+                </Typography>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="Enter your physical address"
+                 
+                  //placeholder="Your home address"
+                  value={formData.address}
+                  onChange={(e) => handleChange("address", e.target.value)}
+                  sx={{ mb: 3, ...textFieldSx }}
+                />
+              </Box>
+            </Grid>
 
-          {/* Hear About */}
-          <Typography
-            variant="h5"
-            fontWeight="bold"
-            color="primary.contrastText"
-            mb={1}
-          >
-            How did you hear about us?
-          </Typography>
-          <Select
-            fullWidth
-            autoFocus
-            value={formData.hearAbout}
-            onChange={(e) => handleChange("hearAbout", e.target.value)}
-            displayEmpty
-            sx={{ ...selectSx, mb: 6 }}
-          >
-            <MenuItem disabled value="" sx={{ ...menuItemSx }}>
-              Select option
-            </MenuItem>
-            {hearAboutOptions.map((option, index) => (
-              <MenuItem key={index} value={option} sx={{ ...menuItemSx }}>
-                {option}
-              </MenuItem>
-            ))}
-          </Select>
+            <Grid size={{ xs: 12, md: 6 }}>
+              {/* Hear About */}
+              <Typography
+                variant="h6"
+                fontWeight="bold"
+                color="primary.contrastText"
+                mb={1}
+                >
+                How did you hear about us?
+              </Typography>
+              <Select
+                fullWidth
+                autoFocus
+                size="small"
+                value={formData.hearAbout}
+                onChange={(e) => handleChange("hearAbout", e.target.value)}
+                displayEmpty
+                sx={{ ...selectSx }}
+              >
+                <MenuItem disabled value="" sx={{ ...menuItemSx }}>
+                  Select option
+                </MenuItem>
+                {hearAboutOptions.map((option, index) => (
+                  <MenuItem key={index} value={option} sx={{ ...menuItemSx }}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </Select>
+            </Grid>
+          </Grid>
 
           {/* Buttons */}
-          <Box display="flex" justifyContent="space-between" sx={{ mb: 2 }}>
-            <Button onClick={handleBack}>Back</Button>
+          <Box display="flex" justifyContent="space-between">
+            <Button
+              onClick={handleBack}
+              sx={{
+                backgroundColor: "text.secondary",
+                color: "secondary.main",
+                "&:hover": { backgroundColor: "text.primary" },
+              }}
+            >
+              <ArrowLeftIcon /> Back
+            </Button>
 
             <Button
               variant="contained"

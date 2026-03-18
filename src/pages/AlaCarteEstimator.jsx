@@ -495,7 +495,7 @@ export function AlaCarteEstimator() {
             <Typography
               sx={{
                 mt: 1,
-                fontSize: { xs: "0.75rem", md: "1.25rem" },
+                fontSize: "0.875rem",
                 textAlign: "center",
                 color: "primary.light",
                 fontWeight: 500,
