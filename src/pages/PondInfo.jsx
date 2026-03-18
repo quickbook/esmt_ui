@@ -66,10 +66,12 @@ export function PondInfo() {
     "White Crappie",
     "Blue Catfish",
     "Flathead Catfish",
-    "Mud Cat",
+    "Mud Catfish / Bullhead Catfish",
     "Gar",
-    "Grinnel",
+    "Hybrid Crappie",
+    "Grinnel / Bowfin",
     "Shad",
+    "Specklebelly Bream"
   ];
 
   const newPondOptions = [
@@ -97,7 +99,7 @@ export function PondInfo() {
     },
     {
       value: "feed-bass",
-      label: "I have an old pond and want  to feed my bass",
+      label: "I have an old pond and want to feed my bass",
     },
     {
       value: "grass-carp",
@@ -108,7 +110,7 @@ export function PondInfo() {
   const alaCarteOption = {
     value: "ala-carte",
     label:
-      "Stop asking me questions, I googled it and know exactly what I want, just sell me some fish already",
+      "I want to create my own custom fish stocking  from your ala carte menu",
   };
 
   const getOptions = () => {

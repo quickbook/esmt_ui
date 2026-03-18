@@ -505,8 +505,9 @@ export function Quote() {
               </Typography>
               <Box sx={{ ...glassBoxStyles, p: 2, borderRadius: 2 }}>
                 <Typography variant="body1" color="text.primary">
-                  Please ensure the pond area is accessible. Bring any existing
-                  pond documentation or photos for better assessment.
+                  Estimated Price is calculated using pond size, fish size and
+              distance from Lonoke, Arkansas. A Representative will contact you to confirm the estimate
+              prior to fish delivery.
                 </Typography>
               </Box>
             </Box>
@@ -611,8 +612,7 @@ export function Quote() {
                 Important Note:
               </Typography>
               <Typography variant="body2" sx={{ color: "primary.light" }}>
-                This is an estimated quote. Final pricing may vary based on site
-                inspection and specific requirements. Our team will contact you
+                This is an estimated quote. Final pricing will be confirmed prior to delivery during our follow up call with you. Our team will contact you
                 within 24 hours to discuss details.
               </Typography>
             </Box>
