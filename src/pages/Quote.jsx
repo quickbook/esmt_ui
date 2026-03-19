@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Stepper } from "../components/Stepper";
+import { useEstimateForm } from "../contexts/EstimateFormContext";
 import {
   Box,
   Typography,
@@ -19,86 +20,78 @@ import {
 import { ArrowLeft, CheckCircle, FileText, Mail } from "lucide-react";
 import { glassBoxStyles } from "../utils/glassStyles";
 import { mockEstimateOptionsApiData, pondConfigs } from "../api/mockApiData";
+import { newPondOptions, oldPondOptions } from "./PondInfo";
 
-export const selectedOptionsdata = {
-  pondType: "trophy-bass",
-
-  selectedOptions: [
-    {
-      label: "Small Fish Option",
-      size: "1-3 inch",
-      price: 220,
-      stock: {
-        "Head-Bluegill": 400,
-        "Head-Redear": 120,
-        "Head-Bass": 30,
-        "Pounds-Minnows": 12,
-        "Pounds-Shinners": 7,
-      },
-    },
-    {
-      label: "Medium Fish Option",
-      size: "3-4 inch",
-      price: 380,
-      stock: {
-        "Head-Bluegill": 800,
-        "Head-Redear": 300,
-        "Head-Bass": 75,
-        "Pounds-Minnows": 15,
-        "Pounds-Shinners": 8,
-      },
-    },
-    {
-      label: "1 Year Old Population",
-      size: "1 inch to Catchable",
-      price: 525,
-      breakdown: {
-        "Pounds - 5 to 6 inch Bluegill": 50,
-        "Head - 3 to 4 inch Bluegill": 300,
-        "Head - 1 to 3 inch Bluegill": 800,
-        "Pounds - 5 to 6 inch Redear": 30,
-        "Head - 3 to 4 inch Redear": 200,
-        "Head - 1 to 3 inch Redear": 500,
-        "Pounds - Minnows": 100,
-        "Pounds - 12 to 15 inch Bass": 40,
-      },
-    },
-  ],
-
-  grassCarp: {
-    selected: true,
-    quantity: 5,
-    pricePerUnit: 5.75,
-    total: 28.75,
-  },
-
-  hybridChoice: null,
-
-  totalPrice: 1228.75,
-};
 export function Quote() {
   const navigate = useNavigate();
+  const { data, reset } = useEstimateForm();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
-  const data = selectedOptionsdata; // This would come from form state or API in a real app
-  const apiData = mockEstimateOptionsApiData; // This would be fetched from an API in a real app
-  const config = pondConfigs["trophy-bass"]; // This would be determined based on user selection in a real app
+  const customer = data.customer;
+  const pondInfo = data.pondInfo;
+  const estimator = data.estimator;
+  const availability = data.availability;
 
-  // Mock selected options (these would come from form state in a real app)
+  const apiData = mockEstimateOptionsApiData;
+  const pondType =
+    estimator.pondType || pondInfo.selectedOption || "trophy-bass";
+  const config = pondConfigs[pondType] || pondConfigs["trophy-bass"];
+
+  const grassCarp = estimator.grassCarp || {
+    selected: false,
+    quantity: 0,
+    total: 0,
+  };
+
+  const selectedOptions = estimator.selectedOptions || [];
+
+  const totalPrice =
+    typeof estimator.totalPrice === "number"
+      ? estimator.totalPrice
+      : selectedOptions.reduce((sum, opt) => sum + (opt.price || 0), 0) +
+        (grassCarp.total || 0);
 
   const handleEdit = () => {
     navigate("/estimate/customer-info");
   };
 
   const handleConfirm = () => {
-    
     setSnackbarOpen(true);
+
     window.scrollTo({ top: 0, behavior: "smooth" });
+
+    setTimeout(() => {
+      reset();
+      navigate("/");
+    }, 3000);
   };
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const formatCurrency = (amount) => {
+    return `$${amount.toFixed(2)}`;
+  };
+
+  // Helper function to format column headers for display
+  const formatColumnHeader = (col) => {
+    const parts = col.split("-");
+    const unit = parts[0];
+    const fish = parts.slice(1).join(" ");
+    return { unit, fish };
+  };
+
+  // Get stock quantities for each option
+  const getStockQuantities = (opt) => {
+    if (!opt.stock || !config) return [];
+
+    return config.columns.map((col, colIdx) => {
+      const { unit, fish } = formatColumnHeader(col);
+      const quantity = opt.stock[colIdx] || 0;
+      return { fish, unit, quantity };
+    });
+  };
 
   return (
     <Box sx={{ minHeight: "84vh", py: 4, px: 2 }}>
@@ -141,7 +134,7 @@ export function Quote() {
             </Typography>
           </Box>
 
-          {/* Mock Data Sections */}
+          {/* Data Sections */}
           <Box sx={{ mb: 4 }}>
             {/* Customer Info */}
             <Box sx={{ mb: 3 }}>
@@ -163,7 +156,7 @@ export function Quote() {
                       color="text.primary"
                       fontWeight={500}
                     >
-                      John Smith
+                      {customer.fullName || "—"}
                     </Typography>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
@@ -175,7 +168,7 @@ export function Quote() {
                       color="text.primary"
                       fontWeight={500}
                     >
-                      john@email.com
+                      {customer.email || "—"}
                     </Typography>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
@@ -187,7 +180,7 @@ export function Quote() {
                       color="text.primary"
                       fontWeight={500}
                     >
-                      123-456-7890
+                      {customer.phone || "—"}
                     </Typography>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
@@ -199,7 +192,7 @@ export function Quote() {
                       color="text.primary"
                       fontWeight={500}
                     >
-                      123 Main St, Lonoke, AR
+                      {customer.address || "—"}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -226,7 +219,7 @@ export function Quote() {
                       color="text.primary"
                       fontWeight={500}
                     >
-                      1.5 acres
+                      {pondInfo.pondSize ? `${pondInfo.pondSize} acres` : "—"}
                     </Typography>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 4 }}>
@@ -238,7 +231,7 @@ export function Quote() {
                       color="text.primary"
                       fontWeight={500}
                     >
-                      2.0 miles
+                      {pondInfo.distance ? `${pondInfo.distance} miles` : "—"}
                     </Typography>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 4 }}>
@@ -250,7 +243,7 @@ export function Quote() {
                       color="text.primary"
                       fontWeight={500}
                     >
-                      Good solid road/driveway
+                      {pondInfo.pondAccess || "—"}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -277,9 +270,27 @@ export function Quote() {
                       color="text.primary"
                       fontWeight={500}
                     >
-                      New Pond
+                      {pondInfo.pondType
+                        ? pondInfo.pondType === "new"
+                          ? "New Pond"
+                          : "Existing Pond"
+                        : "—"}
                     </Typography>
                   </Grid>
+                  {pondInfo.hasFish && (
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <Typography variant="body2" color="text.disabled">
+                        Existing Fish
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        color="text.primary"
+                        fontWeight={500}
+                      >
+                        {pondInfo.selectedFish.join(", ")}
+                      </Typography>
+                    </Grid>
+                  )}
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <Typography variant="body2" color="text.disabled">
                       Selected Option
@@ -289,169 +300,204 @@ export function Quote() {
                       color="text.primary"
                       fontWeight={500}
                     >
-                      Trophy Bass Pond
+                      {pondInfo.pondType === "new"
+                        ? newPondOptions.find(
+                            (op) => op.value === pondInfo.selectedOption,
+                          )?.label
+                        : pondInfo.pondType === "old"
+                          ? oldPondOptions.find(
+                              (op) => op.value === pondInfo.selectedOption,
+                            )?.label
+                          : "-"}
                     </Typography>
                   </Grid>
                 </Grid>
               </Box>
             </Box>
 
-            {/* Trophy Pond Estimator */}
+            {/* Pond Estimator Details */}
             <Box sx={{ mb: 3 }}>
               <Typography
                 variant="h6"
                 fontWeight={600}
-                sx={{ color: "primary.light", mb: 2 }}
+                sx={{
+                  color: "primary.light",
+                  mb: 2,
+                  textTransform: "capitalize",
+                }}
               >
-                Trophy Bass Pond Estimator
+                {estimator.pondTypeTitle || estimator.pondType || "Pond"}{" "}
+                Estimator
               </Typography>
-              <Box sx={{ ...glassBoxStyles, p: 2, borderRadius: 2 }}>
-                {/* <Box sx={{ overflowX: "auto" }}>
-                  <Table size="small" sx={{ border: "1px solid #ddd", minWidth: 600 }}>
-                  <TableHead>
-                    <TableRow sx={{ backgroundColor: "rgba(68,161,148,0.1)" }}>
-                      <TableCell>Option</TableCell>
-                      <TableCell>Size</TableCell>
-                      <TableCell align="center">Fish per Acre</TableCell>
-                      <TableCell align="center">Quantity</TableCell>
-                      <TableCell align="center">Price ($)</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    <TableRow >
-                      <TableCell>Small Fish Option</TableCell>
-                      <TableCell>1 to 3 inch fish</TableCell>
-                      <TableCell align="center">500</TableCell>
-                      <TableCell align="center">750</TableCell>
-                      <TableCell align="center">$ 285.00</TableCell>
-                    </TableRow>
-                    <TableRow >
-                      <TableCell>Medium Fish Option</TableCell>
-                      <TableCell>3 to 4 inch fish</TableCell>
-                      <TableCell align="center">300</TableCell>
-                      <TableCell align="center">450</TableCell>
-                      <TableCell align="center">$ 427.50</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Large Fish Option</TableCell>
-                      <TableCell>4 to 5 inch fish</TableCell>
-                      <TableCell align="center">200</TableCell>
-                      <TableCell align="center">300</TableCell>
-                      <TableCell align="center">$ 375.00</TableCell>
-                    </TableRow>
-                    <TableRow >
-                      <TableCell>1 Year Old Population</TableCell>
-                      <TableCell>5 to 6 inch Bluegill</TableCell>
-                      <TableCell align="center">50 lbs</TableCell>
-                      <TableCell align="center">75 lbs</TableCell>
-                      <TableCell align="center">$ 600.00</TableCell>
-                    </TableRow>
-                    <TableRow >
-                      <TableCell>Giant Fish Option</TableCell>
-                      <TableCell>10 to 13 inch Bass</TableCell>
-                      <TableCell align="center">20 lbs</TableCell>
-                      <TableCell align="center">30 lbs</TableCell>
-                      <TableCell align="center">$ 300.00</TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-                </Box> */}
-                {/* OPTIONS */}
-                {data.selectedOptions.map((opt, idx) => (
-                  <Box
-                    key={idx}
-                    sx={{
-                      mb: 3,
-                      p: 2,
-                      border: "1px solid #ddd",
-                      borderRadius: 2,
-                    }}
-                  >
-                    {/* Title */}
-                    <Box display="flex" justifyContent="space-between">
-                      <Typography color="text.primary" fontWeight={500}>
-                        {opt.label} ({opt.size})
-                      </Typography>
+
+              <Box sx={{ ...glassBoxStyles, p: 3, borderRadius: 2 }}>
+                {selectedOptions.length === 0 ? (
+                  <Typography color="text.secondary" align="center">
+                    No estimator options selected
+                  </Typography>
+                ) : (
+                  selectedOptions.map((opt, idx) => {
+                    // Check if we have stockDetails (for small, medium, large)
+                    const hasStockDetails =
+                      opt.stockDetails && opt.stockDetails.length > 0;
+                    // Check if we have breakdown (for 1 year old)
+                    const hasBreakdown =
+                      opt.breakdown && opt.breakdown.length > 0;
+
+                    return (
+                      <Box key={idx}>
+                        {/* Option Header with Package Price */}
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            mb: 2,
+                            pb: 1,
+                            borderBottom: "1px solid rgba(255,255,255,0.1)",
+                          }}
+                        >
+                          <Box>
+                            <Typography
+                              color="text.primary"
+                              fontWeight={600}
+                              fontSize="1.1rem"
+                            >
+                              {opt.label}
+                            </Typography>
+                            <Typography color="text.secondary" variant="body2">
+                              Size: {opt.size}
+                            </Typography>
+                          </Box>
+                          <Typography
+                            color="primary.light"
+                            fontWeight={700}
+                            fontSize="1.2rem"
+                          >
+                            {formatCurrency(opt.price || 0)}
+                          </Typography>
+                        </Box>
+
+                        {/* Stock Details - For small, medium, large options - Simple format like 1 year old */}
+                        {hasStockDetails && (
+                          <Box sx={{ mb: 3, ml: 2 }}>
+                            <Typography
+                              color="text.secondary"
+                              variant="subtitle2"
+                              gutterBottom
+                            >
+                              Stock Quantities:
+                            </Typography>
+                            <Grid container spacing={2}>
+                              {opt.stockDetails.map((item, i) => (
+                                <Grid size={{ xs: 6, sm: 4 }} key={i}>
+                                  <Typography
+                                    color="text.primary"
+                                    variant="body2"
+                                  >
+                                    {item.fishName}:{" "}
+                                    <strong>
+                                      {item.quantity} {item.unit}
+                                    </strong>
+                                  </Typography>
+                                </Grid>
+                              ))}
+                            </Grid>
+                          </Box>
+                        )}
+
+                        {/* Breakdown for 1 Year Old Population */}
+                        {hasBreakdown && (
+                          <Box sx={{ mb: 3, ml: 2 }}>
+                            <Typography
+                              color="text.secondary"
+                              variant="subtitle2"
+                              gutterBottom
+                            >
+                              Mature Population Breakdown:
+                            </Typography>
+                            <Grid container spacing={2}>
+                              {opt.breakdown.map((item, i) => (
+                                <Grid size={{ xs: 6, sm: 4 }} key={i}>
+                                  <Typography
+                                    color="text.primary"
+                                    variant="body2"
+                                  >
+                                    {item.fishName}:{" "}
+                                    <strong>
+                                      {item.quantity} {item.unit}
+                                    </strong>
+                                  </Typography>
+                                </Grid>
+                              ))}
+                            </Grid>
+                          </Box>
+                        )}
+
+                        {idx < selectedOptions.length - 1 && (
+                          <Divider
+                            sx={{ my: 3, borderColor: "rgba(255,255,255,0.1)" }}
+                          />
+                        )}
+                      </Box>
+                    );
+                  })
+                )}
+
+                {/* Grass Carp */}
+                {grassCarp.selected && (
+                  <>
+                    <Divider
+                      sx={{ my: 3, borderColor: "rgba(255,255,255,0.1)" }}
+                    />
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Box>
+                        <Typography color="text.primary" fontWeight={600}>
+                          {grassCarp.description ||
+                            "8 to 10 inch Triploid Grass Carp"}
+                        </Typography>
+                        <Typography color="text.secondary" variant="body2">
+                          Quantity: {grassCarp.quantity}
+                        </Typography>
+                      </Box>
                       <Typography
-                        fontSize={"1.2rem"}
-                        color="text.primary"
-                        fontWeight={600}
+                        color="primary.light"
+                        fontWeight={700}
+                        fontSize="1.2rem"
                       >
-                        ${opt.price}
+                        {formatCurrency(grassCarp.total || 0)}
                       </Typography>
                     </Box>
-
-                    {/* STOCK DATA */}
-                    {opt.stock && (
-                      <Box mt={1}>
-                        {Object.entries(opt.stock).map(([key, val]) => (
-                          <Typography
-                            color="text.primary"
-                            key={key}
-                            fontSize="0.875rem"
-                          >
-                            {key}:{" "}
-                            <strong style={{ fontSize: "1rem" }}>{val}</strong>
-                          </Typography>
-                        ))}
-                      </Box>
-                    )}
-
-                    {/* BREAKDOWN DATA */}
-                    {opt.breakdown && (
-                      <Box mt={1}>
-                        {Object.entries(opt.breakdown).map(([key, val]) => (
-                          <Typography
-                            color="text.primary"
-                            key={key}
-                            fontSize="0.875rem"
-                          >
-                            {key}:{" "}
-                            <strong style={{ fontSize: "1rem" }}>{val}</strong>
-                          </Typography>
-                        ))}
-                      </Box>
-                    )}
-                  </Box>
-                ))}
-
-                {/* GRASS CARP */}
-                {data.grassCarp.selected && (
-                  <Box
-                    sx={{
-                      mb: 3,
-                      p: 2,
-                      border: "1px solid #ddd",
-                      borderRadius: 2,
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Typography color="text.primary">
-                      8 to 10 inch Grass Carp:{" "}
-                      <strong style={{ fontSize: "1rem" }}>
-                        {data.grassCarp.quantity}
-                      </strong>
-                    </Typography>
-                    <Typography
-                      fontSize={"1.2rem"}
-                      color="text.primary"
-                      fontWeight={500}
-                    >
-                      ${data.grassCarp.total}
-                    </Typography>
-                  </Box>
+                  </>
                 )}
 
-                {/* HYBRID OPTION */}
-                {data.hybridChoice && (
-                  <Typography color="text.primary" fontSize="0.85rem" mb={2}>
-                    {data.hybridChoice.regularHybrid &&
-                      "Regular Hybrid Selected"}
-                    {data.hybridChoice.specklebelly && "Specklebelly Selected"}
-                  </Typography>
-                )}
+                {/* Hybrid Choice */}
+                {estimator.hybridChoice &&
+                  (estimator.hybridChoice.regularHybrid ||
+                    estimator.hybridChoice.specklebelly) && (
+                    <>
+                      <Divider
+                        sx={{ my: 3, borderColor: "rgba(255,255,255,0.1)" }}
+                      />
+                      <Box>
+                        <Typography color="text.primary" fontWeight={600}>
+                          Hybrid Bream Selection:
+                        </Typography>
+                        <Typography color="text.secondary">
+                          {estimator.hybridChoice.regularHybrid &&
+                            "✓ Regular Hybrid"}
+                          {estimator.hybridChoice.specklebelly &&
+                            "✓ Specklebelly"}
+                        </Typography>
+                      </Box>
+                    </>
+                  )}
               </Box>
             </Box>
 
@@ -475,7 +521,15 @@ export function Quote() {
                       color="text.primary"
                       fontWeight={500}
                     >
-                      March 20, 2026
+                      {availability.availableDate
+                        ? new Date(
+                            availability.availableDate,
+                          ).toLocaleDateString(undefined, {
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric",
+                          })
+                        : "—"}
                     </Typography>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
@@ -487,7 +541,7 @@ export function Quote() {
                       color="text.primary"
                       fontWeight={500}
                     >
-                      2:00 PM
+                      {availability.availableTime || "—"}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -505,15 +559,14 @@ export function Quote() {
               </Typography>
               <Box sx={{ ...glassBoxStyles, p: 2, borderRadius: 2 }}>
                 <Typography variant="body1" color="text.primary">
-                  Estimated Price is calculated using pond size, fish size and
-              distance from Lonoke, Arkansas. A Representative will contact you to confirm the estimate
-              prior to fish delivery.
+                  {estimator.stockingDescription ||
+                    "Estimated Price is calculated using pond size, fish size and distance from Lonoke, Arkansas. A Representative will contact you to confirm the estimate prior to fish delivery."}
                 </Typography>
               </Box>
             </Box>
           </Box>
 
-          {/* Quote Breakdown Card */}
+          {/* Quote Total */}
           <Box
             sx={{
               backdropFilter: "blur(16px) saturate(180%)",
@@ -524,41 +577,6 @@ export function Quote() {
               overflow: "hidden",
             }}
           >
-            {/* Line Items
-            <Box
-              sx={{ p: 4, display: "flex", flexDirection: "column", gap: 2 }}
-            >
-              {[
-                { label: "Base Pond Price", amount: "$ 2000.00" },
-                { label: "Add-On Services", amount: "$ 600.00" },
-                { label: "Access Adjustment", amount: "$ 399.00" },
-              ].map((item) => (
-                <Box key={item.label}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      pb: 2,
-                    }}
-                  >
-                    <Typography fontWeight={500} sx={{ color: "primary.light" }}>
-                      {item.label}
-                    </Typography>
-                    <Typography
-                      variant="body1" color="text.primary"
-                      fontWeight={600}
-                      sx={{ color: "primary.light", fontSize: "1.125rem" }}
-                    >
-                      {item.amount}
-                    </Typography>
-                  </Box>
-                  <Divider sx={{ borderColor: "grey.300" }} />
-                </Box>
-              ))}
-            </Box> */}
-
-            {/* Total Row */}
             <Box
               sx={{
                 display: "flex",
@@ -580,7 +598,7 @@ export function Quote() {
                 fontWeight={700}
                 sx={{ color: "white", fontSize: "1.875rem" }}
               >
-                {`$ ${data.totalPrice.toFixed(2)}`}
+                {formatCurrency(totalPrice)}
               </Typography>
             </Box>
           </Box>
@@ -612,8 +630,9 @@ export function Quote() {
                 Important Note:
               </Typography>
               <Typography variant="body2" sx={{ color: "primary.light" }}>
-                This is an estimated quote. Final pricing will be confirmed prior to delivery during our follow up call with you. Our team will contact you
-                within 24 hours to discuss details.
+                This is an estimated quote. Final pricing will be confirmed
+                prior to delivery during our follow up call with you. Our team
+                will contact you within 24 hours to discuss details.
               </Typography>
             </Box>
           </Box>
@@ -711,24 +730,23 @@ export function Quote() {
               Confirm Quote
             </Button>
           </Box>
-          
         </Paper>
       </Box>
       <Snackbar
-            open={snackbarOpen}
-            autoHideDuration={3000}
-            onClose={() => setSnackbarOpen(false)}
-            anchorOrigin={{ vertical: "top", horizontal: "center" }}
-          >
-            <Alert
-              onClose={() => setSnackbarOpen(false)}
-              severity="success"
-              variant="filled"
-              sx={{ width: "100%" }}
-            >
-              Quote confirmed! We'll contact you shortly.
-            </Alert>
-          </Snackbar>
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity="success"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          Quote confirmed! We'll contact you shortly.
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

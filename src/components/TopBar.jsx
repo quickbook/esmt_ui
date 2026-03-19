@@ -12,9 +12,12 @@ import {
 } from "@mui/material";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { glassBoxStyles } from "../utils/glassStyles";
+import { useEstimateForm } from "../contexts/EstimateFormContext";
 
 const TopBar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
+    const { data, reset } = useEstimateForm();
+  
   const navigate = useNavigate();
 
   const handleMenu = (event) => {
@@ -24,6 +27,12 @@ const TopBar = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const handleHome = () => {
+    navigate("/");
+    reset();
+    handleClose();
+  }
 
   const handleLogin = () => {
     navigate("/estimate/login");
@@ -43,8 +52,7 @@ const TopBar = () => {
         sx={{ padding: { xs: "0 4px 0 8px", md: "0 24px" } }}
       >
         <Toolbar disableGutters sx={{ justifyContent: "space-between" }}>
-          <RouterLink to="/" style={{ textDecoration: "none" }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }} onClick={handleHome} style={{ cursor: "pointer" }}>
               <Box
                 component="img"
                 sx={{ height: 38 }}
@@ -58,7 +66,6 @@ const TopBar = () => {
                 src="/Label.png"
               />
             </Box>
-          </RouterLink>
 
           <Box sx={{ flexGrow: 1 }} />
 

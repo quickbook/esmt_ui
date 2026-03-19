@@ -19,45 +19,53 @@ import { glassBoxStyles } from "../utils/glassStyles";
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { calculateFishCost } from "../utils/pricing";
+import { useEstimateForm } from "../contexts/EstimateFormContext";
 
 export function AdultFishEstimator() {
   const navigate = useNavigate();
+  const { data, updateSection } = useEstimateForm();
   const [fishData, setFishData] = useState([
     {
       name: "Adult Bass",
       size: "12 to 15 inch fish",
       recommendation: "50 to 100 pounds per acre recommended",
       quantity: 0,
+      pricePerPound: 10.5,
     },
     {
       name: "Adult Catfish",
       size: "12 to 15 inch fish",
       recommendation: "100 to 500 pounds per acre recommended",
       quantity: 0,
+      pricePerPound: 8.75,
     },
     {
       name: "Adult Bream",
       size: "5 to 6 inch fish",
       recommendation: "50 to 300 pounds per acre recommended",
       quantity: 0,
+      pricePerPound: 7.25,
     },
     {
       name: "Adult Hybrid Bream",
       size: "5 to 6 inch fish",
       recommendation: "50 to 300 pounds per acre recommended",
       quantity: 0,
+      pricePerPound: 8.5,
     },
     {
       name: "Adult Redear",
       size: "5 to 6 inch fish",
       recommendation: "50 to 100 pounds per acre recommended",
       quantity: 0,
+      pricePerPound: 7.75,
     },
     {
       name: "Adult Crappie",
       size: "5 to 6 inch fish",
       recommendation: "50 to 100 pounds per acre recommended",
       quantity: 0,
+      pricePerPound: 9.25,
     },
   ]);
 
@@ -66,17 +74,19 @@ export function AdultFishEstimator() {
 
   useEffect(() => {
     let totalPounds = 0;
+    let totalCost = 0;
     fishData.forEach((fish) => {
       totalPounds += fish.quantity;
+      totalCost += fish.quantity * (fish.pricePerPound || 0);
     });
 
     // Calculate costs based on total pounds
     if (totalPounds < 450) {
-      setTotalCostLess450(totalPounds * 10); // Simplified pricing
+      setTotalCostLess450(totalCost); // Simplified pricing
       setTotalCostMore450(0);
     } else {
       setTotalCostLess450(0);
-      setTotalCostMore450(totalPounds * 10);
+      setTotalCostMore450(totalCost + 100); // Add a flat fee for larger orders
     }
   }, [fishData]);
 
@@ -96,10 +106,10 @@ export function AdultFishEstimator() {
 
   return (
     <Box sx={{ minHeight: "84vh", py: 4, px: { xs: 0, md: "1rem 2rem" } }}>
-      <Container maxWidth={{ xs: "sm", md: "md" }}>
+      <Container>
         <Paper
           sx={{
-            p: { xs: 2, md: "1rem 2rem" },
+            p: { xs: 2, md: "1.5rem 4rem" },
             borderRadius: 3,
             backdropFilter: "blur(16px) saturate(180%)",
             backgroundColor: "rgba(255, 255, 255, 0.15)",
@@ -160,13 +170,15 @@ export function AdultFishEstimator() {
                   <TableCell
                     sx={{
                       color: "white",
-                      textAlign: "center",
+                      //textAlign: "center",
                       fontWeight: "bold",
                     }}
                   >
                     Quantity (pounds)
                   </TableCell>
-                  <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                  <TableCell
+                    sx={{ color: "white", fontWeight: "bold", minWidth: 80 }}
+                  >
                     Size
                   </TableCell>
                   <TableCell sx={{ color: "white", fontWeight: "bold" }}>
@@ -189,13 +201,15 @@ export function AdultFishEstimator() {
                         type="number"
                         size="small"
                         value={fish.quantity || ""}
-                        onChange={(e) =>
-                          handleQuantityChange(index, e.target.value)
-                        }
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          const nextQty = Number(value) < 0 ? 0 : value;
+                          handleQuantityChange(index, nextQty);
+                        }}
                         placeholder="0"
                         inputProps={{ min: 0, step: 1 }}
                         sx={{
-                          width: "100%",
+                          width: { md: "50%" },
                           "& input": { textAlign: "center" },
                           backgroundColor: "#FFF7CC",
                           "& .MuiInputBase-input": {
@@ -225,13 +239,13 @@ export function AdultFishEstimator() {
           </Box>
 
           {/* Cost Section */}
-          <Box mt={4} display="flex" flexDirection="column" gap={2}>
+          <Box display="flex" flexDirection="column" gap={2} mt={"4rem"}>
             <Box
               display="flex"
               justifyContent="space-between"
               alignItems="center"
-              flexDirection={{xs:'column', md:'row'}}
-              gap={{xs:2,md:0}}
+              flexDirection={{ xs: "column", md: "row" }}
+              gap={{ xs: 2, md: 0 }}
               p={2}
               sx={{
                 ...glassBoxStyles,
@@ -251,8 +265,8 @@ export function AdultFishEstimator() {
               display="flex"
               justifyContent="space-between"
               alignItems="center"
-              flexDirection={{xs:'column', md:'row'}}
-              gap={{xs:2,md:0}}
+              flexDirection={{ xs: "column", md: "row" }}
+              gap={{ xs: 2, md: 0 }}
               p={2}
               sx={{
                 ...glassBoxStyles,

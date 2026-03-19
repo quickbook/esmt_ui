@@ -3,6 +3,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { Box } from "@mui/material";
 import theme from "./theme/theme";
 import Router from "./components/Router";
+import { EstimateFormProvider } from "./contexts/EstimateFormContext";
 
 function App() {
   return (
@@ -32,7 +33,9 @@ function App() {
         }}
       >
         <Box sx={{ position: "relative", zIndex: 1 }}>
-          <Router />
+          <EstimateFormProvider>
+            <Router />
+          </EstimateFormProvider>
         </Box>
       </Box>
     </ThemeProvider>

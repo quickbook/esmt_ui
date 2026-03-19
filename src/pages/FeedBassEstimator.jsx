@@ -24,21 +24,21 @@ export function FeedBassEstimator() {
   const [fishData, setFishData] = useState([
     {
       name: "Intermediate Bream",
-      unit: "fish",
+      unit: "Fish",
       recommendation:
         "Recommended 1000 to 2000 per acre after harvest of 8 to 15 inch bass.",
       quantity: 0,
     },
     {
       name: "Fathead Minnows",
-      unit: "pounds",
+      unit: "Pounds",
       recommendation:
         "Recommended 100 plus pounds per acre in established ponds. Comes down to how much you want to spend.",
       quantity: 0,
     },
     {
       name: "Golden Shiners",
-      unit: "pounds",
+      unit: "Pounds",
       recommendation:
         "Recommended 100 plus pounds per acre in established ponds. Comes down to how much you want to spend.",
       quantity: 0,
@@ -81,10 +81,10 @@ export function FeedBassEstimator() {
 
   return (
     <Box sx={{ minHeight: "84vh", py: 4, px: { xs: 0, md: "1rem 2rem" } }}>
-      <Container maxWidth={{ xs: "sm", md: "md" }}>
+      <Container >
         <Paper
           sx={{
-            p: { xs: 2, md: "1rem 2rem" },
+            p: { xs: 2, md: "1.5rem 4rem" },
             borderRadius: 3,
             backdropFilter: "blur(16px) saturate(180%)",
             backgroundColor: "rgba(255, 255, 255, 0.15)",
@@ -93,7 +93,7 @@ export function FeedBassEstimator() {
             color: "primary.contrastText",
           }}
         >
-          <Box textAlign="center" mb={2}>
+          <Box textAlign="center" mb={3}>
             {/* Page Counter */}
             <Typography
               sx={{
@@ -128,7 +128,7 @@ export function FeedBassEstimator() {
             Feed Bass Estimator
           </Typography> */}
 
-          <Typography color="primary.contrastText" mb={4}>
+          <Typography color="primary.contrastText" mb={2}>
             Enter the Quantity of Fish You Desire to Purchase To Feed Your Bass
           </Typography>
 
@@ -144,7 +144,6 @@ export function FeedBassEstimator() {
                     sx={{
                       color: "white",
                       fontWeight: "bold",
-                      textAlign: "center",
                     }}
                   >
                     Quantity
@@ -168,7 +167,7 @@ export function FeedBassEstimator() {
                       <Box
                         display="flex"
                         alignItems="center"
-                        justifyContent="space-between"
+                        //justifyContent="space-between"
                         gap={2}
                       >
                         <TextField
@@ -181,7 +180,7 @@ export function FeedBassEstimator() {
                           placeholder="0"
                           inputProps={{ min: 0, step: 1 }}
                           sx={{
-                            width: 120,
+                            width: {xs: 60, md:"50%"},
                             "& input": { textAlign: "center" },
                             backgroundColor: "#FFF7CC",
                             "& .MuiInputBase-input": {
@@ -213,7 +212,7 @@ export function FeedBassEstimator() {
           </Box>
 
           {/* Cost Estimates */}
-          <Box mt={4} display="flex" flexDirection="column" gap={2}>
+          <Box mt={8} display="flex" flexDirection="column" gap={2}>
             <Box
               display="flex"
               justifyContent="space-between"

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   Box,
   Container,
@@ -16,17 +16,12 @@ import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import { useNavigate } from "react-router-dom";
 import { menuItemSx, selectSx, textFieldSx } from "../theme/theme";
 import { motion } from "framer-motion";
+import { useEstimateForm } from "../contexts/EstimateFormContext";
 
 export function CustomerInfo() {
   const navigate = useNavigate();
-
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    address: "",
-    hearAbout: "",
-  });
+  const { data, updateSection } = useEstimateForm();
+  const formData = data.customer;
 
   const hearAboutOptions = [
     "AGFC Guidebook",
@@ -44,10 +39,7 @@ export function CustomerInfo() {
   ];
 
   const handleChange = (field, value) => {
-    setFormData({
-      ...formData,
-      [field]: value,
-    });
+    updateSection("customer", { [field]: value });
   };
 
   const handleBack = () => {
@@ -226,10 +218,9 @@ export function CustomerInfo() {
                   fullWidth
                   size="small"
                   label="Enter your working email address"
-                  type="quote-email"
-                  //placeholder="john@email.com"
-                  value={formData["quote-email"]}
-                  onChange={(e) => handleChange("quote-email", e.target.value)}
+                  type="email"
+                  value={formData.quoteEmail}
+                  onChange={(e) => handleChange("quoteEmail", e.target.value)}
                   sx={{ mb: 3, ...textFieldSx }}
                 />
               </Box>

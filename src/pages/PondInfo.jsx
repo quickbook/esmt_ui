@@ -22,26 +22,62 @@ import { motion } from "framer-motion";
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import { glassBoxStyles } from "../utils/glassStyles";
 import { menuItemSx, selectSx, textFieldSx } from "../theme/theme";
+import { useEstimateForm } from "../contexts/EstimateFormContext";
+
+export const newPondOptions = [
+  { value: "trophy-bass", label: "I want to fish for trophy bass." },
+  { value: "bass-pond", label: "I want to fish for quality bass and bream." },
+  {
+    value: "fishing-pond",
+    label:
+      "I want to fish for a variety of fsh (bass, bream, crappie, catish).",
+  },
+  {
+    value: "catfish-pond",
+    label: "I want to fish for catfish.",
+  },
+  {
+    value: "hybrid-bream",
+    label: "I want to fish for big bream in a small pond.",
+  },
+];
+
+export const oldPondOptions = [
+  {
+    value: "adult-fish",
+    label: "I want to add catchable/adult fsh to my existng pond ",
+  },
+  {
+    value: "feed-bass",
+    label: "I want to feed the bass in my pond ",
+  },
+  {
+    value: "grass-carp",
+    label: "I want to stock grass carp to eat the weeds in my pond ",
+  },
+];
+
+export const alaCarteOption = {
+  value: "ala-carte",
+  label:
+    "I want to create my own custom fish stocking  from your ala carte menu",
+};
 
 export function PondInfo() {
   const navigate = useNavigate();
+  const { data, updateSection } = useEstimateForm();
+  const {
+    pondSize,
+    distance,
+    pondAccess,
+    pondType,
+    hasFish,
+    selectedFish,
+    selectedOption,
+  } = data.pondInfo;
 
-  const [pondType, setPondType] = useState("");
-  const [hasFish, setHasFish] = useState("");
-  const [selectedFish, setSelectedFish] = useState([]);
-  const [selectedOption, setSelectedOption] = useState("");
   const [snackOpen, setSnackOpen] = useState(false);
   const [snackMessage, setSnackMessage] = useState("");
-
-  const [formData, setFormData] = useState({
-    pondSize: "",
-    distance: "",
-    pondAccess: "",
-    pondType: "",
-    hasFish: "",
-    selectedFish: [],
-    selectedOption: "",
-  });
 
   const pondAccessOptions = [
     "Good solid road/driveway to the pond",
@@ -74,45 +110,6 @@ export function PondInfo() {
     "Specklebelly Bream",
   ];
 
-  const newPondOptions = [
-    { value: "trophy-bass", label: "I have a new pond and want trophy bass" },
-    { value: "bass-pond", label: "I have a new pond and want bass and bream" },
-    {
-      value: "fishing-pond",
-      label:
-        "I have a new pond and want to fish for bass, bream, crappie and catfish",
-    },
-    {
-      value: "catfish-pond",
-      label: "I have a new pond and want to fish for catfish",
-    },
-    {
-      value: "hybrid-bream",
-      label: "I have a new pond and want to fish for big bream",
-    },
-  ];
-
-  const oldPondOptions = [
-    {
-      value: "adult-fish",
-      label: "I have an old pond and want to add catchable fish",
-    },
-    {
-      value: "feed-bass",
-      label: "I have an old pond and want to feed my bass",
-    },
-    {
-      value: "grass-carp",
-      label: "I want to stock grass carp to get rid of my weeds",
-    },
-  ];
-
-  const alaCarteOption = {
-    value: "ala-carte",
-    label:
-      "I want to create my own custom fish stocking  from your ala carte menu",
-  };
-
   const getOptions = () => {
     if (pondType === "new") return [...newPondOptions, alaCarteOption];
     if (pondType === "old") return [...oldPondOptions, alaCarteOption];
@@ -127,10 +124,7 @@ export function PondInfo() {
   ];
 
   const handleChange = (field, value) => {
-    setFormData({
-      ...formData,
-      [field]: value,
-    });
+    updateSection("pondInfo", { [field]: value });
   };
 
   const handleBack = () => {
@@ -246,7 +240,7 @@ export function PondInfo() {
                 size="small"
                 type="number"
                 placeholder="e.g. 1.5"
-                value={formData.pondSize}
+                value={pondSize}
                 onChange={(e) => handleChange("pondSize", e.target.value)}
                 slotProps={{
                   input: {
@@ -284,7 +278,7 @@ export function PondInfo() {
                 size="small"
                 type="number"
                 placeholder="e.g. 2.0"
-                value={formData.distance}
+                value={distance}
                 onChange={(e) => handleChange("distance", e.target.value)}
                 slotProps={{
                   input: {
@@ -311,7 +305,7 @@ export function PondInfo() {
               <Select
                 fullWidth
                 size="small"
-                value={formData.pondAccess}
+                value={pondAccess}
                 autoFocus
                 onChange={(e) => handleChange("pondAccess", e.target.value)}
                 displayEmpty
@@ -345,13 +339,15 @@ export function PondInfo() {
                   display: "flex",
                   flexDirection: { xs: "column", md: "row" },
                 }}
-                mb={{xs: 3, md: 1}}
+                mb={{ xs: 3, md: 1 }}
                 gap={3}
               >
                 {["new", "old"].map((type) => (
                   <Box
                     key={type}
-                    onClick={() => setPondType(type)}
+                    onClick={() =>
+                      updateSection("pondInfo", { pondType: type })
+                    }
                     sx={{
                       display: "flex",
                       justifyContent: "center",
@@ -384,7 +380,7 @@ export function PondInfo() {
 
             {/* FISH IN POND */}
             {pondType === "old" && (
-              <Grid size={{ xs: 12, md: 6 }}>
+              <Grid size={{ xs: 12}}>
                 <Typography
                   variant="h6"
                   fontWeight="bold"
@@ -405,7 +401,9 @@ export function PondInfo() {
                   {["yes", "no"].map((ans) => (
                     <Box
                       key={ans}
-                      onClick={() => setHasFish(ans)}
+                      onClick={() =>
+                        updateSection("pondInfo", { hasFish: ans })
+                      }
                       sx={{
                         display: "flex",
                         justifyContent: "center",
@@ -431,7 +429,7 @@ export function PondInfo() {
 
             {/* EXISTING FISH SPECIES */}
             {pondType === "old" && hasFish === "yes" && (
-              <Grid size={{ xs: 12, md: 6 }}>
+              <Grid size={{ xs: 12}}>
                 <Typography
                   variant="h6"
                   fontWeight="bold"
@@ -453,7 +451,7 @@ export function PondInfo() {
 
                 <Box
                   display="grid"
-                  gridTemplateColumns={{ xs: "1fr 1fr", md: "1fr 1fr 1fr" }}
+                  gridTemplateColumns={{ xs: "1fr 1fr", md: "1fr 1fr 1fr 1fr" }}
                   gap={2}
                   mb={4}
                 >
@@ -465,13 +463,10 @@ export function PondInfo() {
                           checked={selectedFish.includes(fish)}
                           sx={{ color: "primary.contrastText" }}
                           onChange={(e) => {
-                            if (e.target.checked) {
-                              setSelectedFish([...selectedFish, fish]);
-                            } else {
-                              setSelectedFish(
-                                selectedFish.filter((f) => f !== fish),
-                              );
-                            }
+                            const next = e.target.checked
+                              ? [...selectedFish, fish]
+                              : selectedFish.filter((f) => f !== fish);
+                            updateSection("pondInfo", { selectedFish: next });
                           }}
                         />
                       }
@@ -502,10 +497,33 @@ export function PondInfo() {
                 <Select
                   fullWidth
                   size="small"
-                  value={selectedOption}
-                  onChange={(e) => setSelectedOption(e.target.value)}
+                  value={selectedOption || ""}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+
+                    // Reset estimator data when estimator option changes
+                    updateSection("estimator", {
+                      pondType: "",
+                      selectedOptionIndices: [],
+                      selectedOptions: [],
+                      grassCarp: {
+                        selected: false,
+                        quantity: 1,
+                        total: 0,
+                      },
+                      hybridChoice: {
+                        regularHybrid: false,
+                        specklebelly: false,
+                      },
+                      breakdown: [],
+                      totalPrice: 0,
+                    });
+
+                    // Update the selected option
+                    updateSection("pondInfo", { selectedOption: newValue });
+                  }}
                   displayEmpty
-                  sx={{ ...selectSx}}
+                  sx={{ ...selectSx }}
                 >
                   <MenuItem disabled value="" sx={{ ...menuItemSx }}>
                     Select option

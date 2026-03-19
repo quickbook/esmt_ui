@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { Stepper } from "../components/Stepper";
 import React from "react";
@@ -15,13 +15,12 @@ import {
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { glassBoxStyles } from "../utils/glassStyles";
+import { useEstimateForm } from "../contexts/EstimateFormContext";
+
 export function Availability() {
   const navigate = useNavigate();
-
-  const [formData, setFormData] = useState({
-    availableDate: "",
-    availableTime: "",
-  });
+  const { data, updateSection } = useEstimateForm();
+  const { availableDate, availableTime } = data.availability;
 
   const handleNext = () => {
     navigate("/estimate/quote");
@@ -124,12 +123,9 @@ export function Availability() {
                   type="date"
                   fullWidth
                   size="medium"
-                  value={formData.availableDate}
+                  value={availableDate}
                   onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      availableDate: e.target.value,
-                    })
+                    updateSection("availability", { availableDate: e.target.value })
                   }
                   InputLabelProps={{ shrink: true }}
                   sx={{
@@ -158,12 +154,9 @@ export function Availability() {
                   type="time"
                   fullWidth
                   size="medium"
-                  value={formData.availableTime}
+                  value={availableTime}
                   onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      availableTime: e.target.value,
-                    })
+                    updateSection("availability", { availableTime: e.target.value })
                   }
                   InputLabelProps={{ shrink: true }}
                   sx={{

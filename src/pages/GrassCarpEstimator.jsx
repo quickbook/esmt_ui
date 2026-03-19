@@ -77,10 +77,10 @@ export function GrassCarpEstimator() {
 
   return (
     <Box sx={{ minHeight: "84vh", py: 4, px: { xs: 0, md: "1rem 2rem" } }}>
-      <Container maxWidth={{ xs: "sm", md: "md" }}>
+      <Container >
         <Paper
           sx={{
-            p: { xs: 2, md: "1rem 2rem" },
+            p: { xs: 2, md: "1.5rem 4rem" },
             borderRadius: 3,
             backdropFilter: "blur(16px) saturate(180%)",
             backgroundColor: "rgba(255, 255, 255, 0.15)",
@@ -89,7 +89,7 @@ export function GrassCarpEstimator() {
             color: "primary.contrastText",
           }}
         >
-          <Box textAlign="center" mb={2}>
+          <Box textAlign="center" mb={3}>
             {/* Page Counter */}
             <Typography
               sx={{
@@ -124,7 +124,7 @@ export function GrassCarpEstimator() {
             Grass Carp Estimator
           </Typography> */}
 
-          <Typography color="primary.contrastText" mb={4}>
+          <Typography color="primary.contrastText" mb={2}>
             Enter the Quantity of Fish You Desire to Purchase To Eat Your Weeds
           </Typography>
 
@@ -133,7 +133,7 @@ export function GrassCarpEstimator() {
             <Table>
               <TableHead>
                 <TableRow sx={{ backgroundColor: "#537D96" }}>
-                  <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+                  <TableCell sx={{ color: "white", fontWeight: "bold"}}>
                     Size
                   </TableCell>
 
@@ -141,7 +141,6 @@ export function GrassCarpEstimator() {
                     sx={{
                       color: "white",
                       fontWeight: "bold",
-                      textAlign: "center",
                     }}
                   >
                     Quantity
@@ -179,7 +178,7 @@ export function GrassCarpEstimator() {
                           placeholder="0"
                           inputProps={{ min: 0, step: 1 }}
                           sx={{
-                            width: 120,
+                            width: {xs:60,md:120},
                             "& input": { textAlign: "center" },
                             backgroundColor: "#FFF7CC",
                             "& .MuiInputBase-input": {
@@ -211,7 +210,7 @@ export function GrassCarpEstimator() {
           </Box>
 
           {/* Cost Estimates */}
-          <Box mt={4} display="flex" flexDirection="column" gap={2}>
+          <Box mt={8} display="flex" flexDirection="column" gap={2}>
             <Box
               display="flex"
               justifyContent="space-between"

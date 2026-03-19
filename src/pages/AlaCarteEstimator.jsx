@@ -467,11 +467,11 @@ export function AlaCarteEstimator() {
   });
 
   return (
-    <Box sx={{ minHeight: "84vh", py: 8, px: 2 }}>
-      <Container maxWidth={{ xs: "sm", md: "md" }}>
+    <Box sx={{ minHeight: "84vh", py: 4, px: {xs: 0, md:"2rem"} }}>
+      <Container>
         <Paper
           sx={{
-            p: { xs: 3, md: 6 },
+            p: { xs: 2, md: "1.5rem 4rem" },
             borderRadius: 3,
             backdropFilter: "blur(16px) saturate(180%)",
             backgroundColor: "rgba(255, 255, 255, 0.15)",
@@ -506,16 +506,16 @@ export function AlaCarteEstimator() {
           </Box>
 
           {/* Title */}
-          <Typography
+          {/* <Typography
             variant="h4"
             fontWeight="bold"
             color="primary.contrastText"
             mb={1}
           >
             Ala Carte Fish Estimator
-          </Typography>
+          </Typography> */}
 
-          <Typography color="primary.contrastText" mb={4}>
+          <Typography color="primary.contrastText" mb={2}>
             Enter the Quantity of Fish You Wish To Purchase
           </Typography>
 
@@ -534,7 +534,6 @@ export function AlaCarteEstimator() {
                     sx={{
                       color: "white",
                       fontWeight: "bold",
-                      textAlign: "center",
                     }}
                   >
                     Quantity
@@ -575,7 +574,7 @@ export function AlaCarteEstimator() {
                         placeholder="0"
                         inputProps={{ min: 0, step: 1 }}
                         sx={{
-                          width: "100%",
+                          width: {md:"50%"},
                           "& input": { textAlign: "center" },
                           backgroundColor: "#FFF7CC",
                           "& .MuiInputBase-input": {
@@ -589,7 +588,7 @@ export function AlaCarteEstimator() {
 
                     <TableCell
                       align="center"
-                      sx={{ color: "primary.contrastText" }}
+                      sx={{ color: "primary.contrastText", textTransform:"capitalize" }}
                     >
                       {item.unit}
                     </TableCell>
@@ -610,18 +609,19 @@ export function AlaCarteEstimator() {
           >
             <Box
               display="flex"
+              flexDirection={{xs:"column", md:"row"}}
               justifyContent="space-between"
               alignItems="center"
             >
               <Typography
-                fontSize={18}
+                fontSize={16}
                 fontWeight="bold"
                 color="primary.contrastText"
               >
                 Fish Cost Estimate
               </Typography>
 
-              <Typography fontSize={24} fontWeight="bold" color="primary.contrastText">
+              <Typography fontSize={{xs:20,md:24}} fontWeight="bold" color="primary.contrastText">
                 $ {totalCost.toFixed(2)} - Delivery Included
               </Typography>
             </Box>
