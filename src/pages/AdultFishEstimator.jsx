@@ -21,72 +21,78 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { calculateFishCost } from "../utils/pricing";
 import { useEstimateForm } from "../contexts/EstimateFormContext";
 
+const apiData = [
+  {
+    name: "Adult Bass",
+    size: "12 to 15 inch fish",
+    recommendation: "50 to 100 pounds per acre recommended",
+    quantity: 0,
+    pricePerPound: 10.5,
+  },
+  {
+    name: "Adult Catfish",
+    size: "12 to 15 inch fish",
+    recommendation: "100 to 500 pounds per acre recommended",
+    quantity: 0,
+    pricePerPound: 8.75,
+  },
+  {
+    name: "Adult Bream",
+    size: "5 to 6 inch fish",
+    recommendation: "50 to 300 pounds per acre recommended",
+    quantity: 0,
+    pricePerPound: 7.25,
+  },
+  {
+    name: "Adult Hybrid Bream",
+    size: "5 to 6 inch fish",
+    recommendation: "50 to 300 pounds per acre recommended",
+    quantity: 0,
+    pricePerPound: 8.5,
+  },
+  {
+    name: "Adult Redear",
+    size: "5 to 6 inch fish",
+    recommendation: "50 to 100 pounds per acre recommended",
+    quantity: 0,
+    pricePerPound: 7.75,
+  },
+  {
+    name: "Adult Crappie",
+    size: "5 to 6 inch fish",
+    recommendation: "50 to 100 pounds per acre recommended",
+    quantity: 0,
+    pricePerPound: 9.25,
+  },
+];
+
 export function AdultFishEstimator() {
   const navigate = useNavigate();
   const { data, updateSection } = useEstimateForm();
-  const [fishData, setFishData] = useState([
-    {
-      name: "Adult Bass",
-      size: "12 to 15 inch fish",
-      recommendation: "50 to 100 pounds per acre recommended",
-      quantity: 0,
-      pricePerPound: 10.5,
-    },
-    {
-      name: "Adult Catfish",
-      size: "12 to 15 inch fish",
-      recommendation: "100 to 500 pounds per acre recommended",
-      quantity: 0,
-      pricePerPound: 8.75,
-    },
-    {
-      name: "Adult Bream",
-      size: "5 to 6 inch fish",
-      recommendation: "50 to 300 pounds per acre recommended",
-      quantity: 0,
-      pricePerPound: 7.25,
-    },
-    {
-      name: "Adult Hybrid Bream",
-      size: "5 to 6 inch fish",
-      recommendation: "50 to 300 pounds per acre recommended",
-      quantity: 0,
-      pricePerPound: 8.5,
-    },
-    {
-      name: "Adult Redear",
-      size: "5 to 6 inch fish",
-      recommendation: "50 to 100 pounds per acre recommended",
-      quantity: 0,
-      pricePerPound: 7.75,
-    },
-    {
-      name: "Adult Crappie",
-      size: "5 to 6 inch fish",
-      recommendation: "50 to 100 pounds per acre recommended",
-      quantity: 0,
-      pricePerPound: 9.25,
-    },
-  ]);
+  const [fishData, setFishData] = useState(apiData || []);
 
   const [totalCostLess450, setTotalCostLess450] = useState(0);
   const [totalCostMore450, setTotalCostMore450] = useState(0);
+  const [totalCost, setTotalCost] = useState(0);
 
   useEffect(() => {
     let totalPounds = 0;
-    let totalCost = 0;
+    let total = 0;
     fishData.forEach((fish) => {
       totalPounds += fish.quantity;
-      totalCost += fish.quantity * (fish.pricePerPound || 0);
+      total += fish.quantity * (fish.pricePerPound || 0);
     });
 
     // Calculate costs based on total pounds
     if (totalPounds < 450) {
-      setTotalCostLess450(totalCost); // Simplified pricing
+      setTotalCostLess450(total); // Simplified pricing
       setTotalCostMore450(0);
+      setTotalCost(total)
     } else {
+      total += 100;
+      setTotalCost(total);
       setTotalCostLess450(0);
-      setTotalCostMore450(totalCost + 100); // Add a flat fee for larger orders
+      setTotalCostMore450(total); // Add a flat fee for larger orders
     }
   }, [fishData]);
 
@@ -97,8 +103,16 @@ export function AdultFishEstimator() {
   };
 
   const handleNext = () => {
-    navigate("/estimate/availability");
-  };
+  // Save adult fish data to context
+  updateSection("estimator", {
+    pondType: "adult-fish",
+    adultFishData: fishData,
+    totalCostLess450,
+    totalCostMore450,
+    totalPrice: totalCostLess450 + totalCostMore450, // Use the appropriate one
+  });
+  navigate("/estimate/availability");
+};
 
   const handleBack = () => {
     navigate("/estimate/pond-info");

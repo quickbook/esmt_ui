@@ -380,7 +380,7 @@ export function PondInfo() {
 
             {/* FISH IN POND */}
             {pondType === "old" && (
-              <Grid size={{ xs: 12}}>
+              <Grid size={{ xs: 12 }}>
                 <Typography
                   variant="h6"
                   fontWeight="bold"
@@ -429,7 +429,7 @@ export function PondInfo() {
 
             {/* EXISTING FISH SPECIES */}
             {pondType === "old" && hasFish === "yes" && (
-              <Grid size={{ xs: 12}}>
+              <Grid size={{ xs: 12 }}>
                 <Typography
                   variant="h6"
                   fontWeight="bold"
@@ -503,9 +503,13 @@ export function PondInfo() {
 
                     // Reset estimator data when estimator option changes
                     updateSection("estimator", {
+                      // Common fields
                       pondType: "",
                       selectedOptionIndices: [],
                       selectedOptions: [],
+                      totalPrice: 0,
+
+                      // New pond estimator fields
                       grassCarp: {
                         selected: false,
                         quantity: 1,
@@ -516,7 +520,25 @@ export function PondInfo() {
                         specklebelly: false,
                       },
                       breakdown: [],
-                      totalPrice: 0,
+
+                      // Adult Fish Estimator fields
+                      adultFishData: [],
+                      totalCostLess450: 0,
+                      totalCostMore450: 0,
+
+                      // Feed Bass Estimator fields
+                      feedBassData: [],
+                      totalCostLess12000: 0,
+                      totalCostMore12000: 0,
+
+                      // Grass Carp Estimator fields
+                      grassCarpData: [],
+                      totalCostLess1000: 0,
+                      totalCostMore1000: 0,
+
+                      // Ala Carte Estimator fields
+                      alaCarteData: [],
+                      alaCarteTotal: 0,
                     });
 
                     // Update the selected option

@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 const STORAGE_KEY = "esmt_ui_estimate_form";
 
@@ -35,6 +41,25 @@ export const initialEstimateFormData = {
     },
     breakdown: [],
     totalPrice: 0,
+    
+    // Adult Fish Estimator fields
+    adultFishData: [],
+    totalCostLess450: 0,
+    totalCostMore450: 0,
+
+    // Feed Bass Estimator fields
+    feedBassData: [],
+    totalCostLess12000: 0,
+    totalCostMore12000: 0,
+
+    // Grass Carp Estimator fields
+    grassCarpData: [],
+    totalCostLess1000: 0,
+    totalCostMore1000: 0,
+
+    // Ala Carte Estimator fields
+    alaCarteData: [],
+    alaCarteTotal: 0,
   },
   availability: {
     availableDate: "",

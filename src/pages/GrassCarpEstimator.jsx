@@ -20,27 +20,32 @@ import { glassBoxStyles } from "../utils/glassStyles";
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { calculateFishCost } from "../utils/pricing";
+import { useEstimateForm } from "../contexts/EstimateFormContext";
+
+const apiData = [
+  {
+    name: "8 to 10 inch Triploid Grass Carp",
+    unit: "Fish",
+    recommendation:
+      "Recommended 5 per acre for management of vegetation and 10 per acre for complete removal of vegetation. Smaller fish eat filamentous algae but can be eaten by big bass",
+    quantity: 0,
+    price: 5.75,
+  },
+  {
+    name: "12 inch Triploid Grass Carp",
+    unit: "Fish",
+    recommendation:
+      "12 inch fish will survive being introduced to ponds with big bass",
+    quantity: 0,
+    price: 7.25,
+  },
+];
 
 export function GrassCarpEstimator() {
   const navigate = useNavigate();
-  const [fishData, setFishData] = useState([
-    {
-      name: "8 to 10 inch Triploid Grass Carp",
-      unit: "Fish",
-      recommendation:
-        "Recommended 5 per acre for management of vegetation and 10 per acre for complete removal of vegetation. Smaller fish eat filamentous algae but can be eaten by big bass",
-      quantity: 0,
-      price: 5.75,
-    },
-    {
-      name: "12 inch Triploid Grass Carp",
-      unit: "Fish",
-      recommendation:
-        "12 inch fish will survive being introduced to ponds with big bass",
-      quantity: 0,
-      price: 7.25,
-    },
-  ]);
+  const { data, updateSection } = useEstimateForm();
+
+  const [fishData, setFishData] = useState(apiData || []);
 
   const [totalCostLess1000, setTotalCostLess1000] = useState(0);
   const [totalCostMore1000, setTotalCostMore1000] = useState(0);
@@ -57,7 +62,7 @@ export function GrassCarpEstimator() {
       setTotalCostMore1000(0);
     } else {
       setTotalCostLess1000(0);
-      setTotalCostMore1000(totalCost);
+      setTotalCostMore1000(totalCost + 100);
     }
   }, [fishData]);
 
@@ -68,6 +73,13 @@ export function GrassCarpEstimator() {
   };
 
   const handleNext = () => {
+    updateSection("estimator", {
+      pondType: "grass-carp",
+      grassCarpData: fishData,
+      totalCostLess1000,
+      totalCostMore1000,
+      totalPrice: totalCostLess1000 + totalCostMore1000,
+    });
     navigate("/estimate/availability");
   };
 
@@ -77,7 +89,7 @@ export function GrassCarpEstimator() {
 
   return (
     <Box sx={{ minHeight: "84vh", py: 4, px: { xs: 0, md: "1rem 2rem" } }}>
-      <Container >
+      <Container>
         <Paper
           sx={{
             p: { xs: 2, md: "1.5rem 4rem" },
@@ -133,7 +145,7 @@ export function GrassCarpEstimator() {
             <Table>
               <TableHead>
                 <TableRow sx={{ backgroundColor: "#537D96" }}>
-                  <TableCell sx={{ color: "white", fontWeight: "bold"}}>
+                  <TableCell sx={{ color: "white", fontWeight: "bold" }}>
                     Size
                   </TableCell>
 
@@ -178,7 +190,7 @@ export function GrassCarpEstimator() {
                           placeholder="0"
                           inputProps={{ min: 0, step: 1 }}
                           sx={{
-                            width: {xs:60,md:120},
+                            width: { xs: 60, md: 120 },
                             "& input": { textAlign: "center" },
                             backgroundColor: "#FFF7CC",
                             "& .MuiInputBase-input": {
@@ -215,8 +227,8 @@ export function GrassCarpEstimator() {
               display="flex"
               justifyContent="space-between"
               alignItems="center"
-              flexDirection={{xs:'column', md:'row'}}
-              gap={{xs:2,md:0}}
+              flexDirection={{ xs: "column", md: "row" }}
+              gap={{ xs: 2, md: 0 }}
               p={2}
               sx={{
                 ...glassBoxStyles,
@@ -236,8 +248,8 @@ export function GrassCarpEstimator() {
               display="flex"
               justifyContent="space-between"
               alignItems="center"
-              flexDirection={{xs:'column', md:'row'}}
-              gap={{xs:2,md:0}}
+              flexDirection={{ xs: "column", md: "row" }}
+              gap={{ xs: 2, md: 0 }}
               p={2}
               sx={{
                 ...glassBoxStyles,

@@ -198,7 +198,6 @@ export function Quote() {
                 </Grid>
               </Box>
             </Box>
-
             {/* Pond Info */}
             <Box sx={{ mb: 3 }}>
               <Typography
@@ -249,7 +248,6 @@ export function Quote() {
                 </Grid>
               </Box>
             </Box>
-
             {/* Pond Selection */}
             <Box sx={{ mb: 3 }}>
               <Typography
@@ -314,7 +312,8 @@ export function Quote() {
                 </Grid>
               </Box>
             </Box>
-
+            {/* Pond Estimator Details */}
+            
             {/* Pond Estimator Details */}
             <Box sx={{ mb: 3 }}>
               <Typography
@@ -326,27 +325,32 @@ export function Quote() {
                   textTransform: "capitalize",
                 }}
               >
-                {estimator.pondTypeTitle || estimator.pondType || "Pond"}{" "}
-                Estimator
+                {pondInfo.pondType === "new"
+                  ? (estimator.pondTypeTitle || estimator.pondType || "Pond") +
+                    " Estimator"
+                  : pondInfo.selectedOption === "adult-fish"
+                    ? "Adult Fish Estimator"
+                    : pondInfo.selectedOption === "feed-bass"
+                      ? "Feed Bass Estimator"
+                      : pondInfo.selectedOption === "grass-carp"
+                        ? "Grass Carp Estimator"
+                        : pondInfo.selectedOption === "ala-carte"
+                          ? "Ala Carte Estimator"
+                          : "Pond Estimator"}
               </Typography>
 
               <Box sx={{ ...glassBoxStyles, p: 3, borderRadius: 2 }}>
-                {selectedOptions.length === 0 ? (
-                  <Typography color="text.secondary" align="center">
-                    No estimator options selected
-                  </Typography>
-                ) : (
+                {/* New Pond Estimator Options (PondEstimator) */}
+                {pondInfo.pondType === "new" &&
+                  selectedOptions.length > 0 &&
                   selectedOptions.map((opt, idx) => {
-                    // Check if we have stockDetails (for small, medium, large)
                     const hasStockDetails =
                       opt.stockDetails && opt.stockDetails.length > 0;
-                    // Check if we have breakdown (for 1 year old)
                     const hasBreakdown =
                       opt.breakdown && opt.breakdown.length > 0;
 
                     return (
                       <Box key={idx}>
-                        {/* Option Header with Package Price */}
                         <Box
                           sx={{
                             display: "flex",
@@ -378,7 +382,6 @@ export function Quote() {
                           </Typography>
                         </Box>
 
-                        {/* Stock Details - For small, medium, large options - Simple format like 1 year old */}
                         {hasStockDetails && (
                           <Box sx={{ mb: 3, ml: 2 }}>
                             <Typography
@@ -406,7 +409,6 @@ export function Quote() {
                           </Box>
                         )}
 
-                        {/* Breakdown for 1 Year Old Population */}
                         {hasBreakdown && (
                           <Box sx={{ mb: 3, ml: 2 }}>
                             <Typography
@@ -441,66 +443,452 @@ export function Quote() {
                         )}
                       </Box>
                     );
-                  })
-                )}
+                  })}
 
-                {/* Grass Carp */}
-                {grassCarp.selected && (
-                  <>
-                    <Divider
-                      sx={{ my: 3, borderColor: "rgba(255,255,255,0.1)" }}
-                    />
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Box>
-                        <Typography color="text.primary" fontWeight={600}>
-                          {grassCarp.description ||
-                            "8 to 10 inch Triploid Grass Carp"}
-                        </Typography>
-                        <Typography color="text.secondary" variant="body2">
-                          Quantity: {grassCarp.quantity}
-                        </Typography>
+                {/* Adult Fish Estimator */}
+                {pondInfo.selectedOption === "adult-fish" &&
+                  estimator.adultFishData && (
+                    <Box>
+                      <Table size="small">
+                        <TableHead>
+                          <TableRow sx={{ backgroundColor: "#537D96" }}>
+                            <TableCell
+                              sx={{ color: "white", fontWeight: "bold" }}
+                            >
+                              Fish Type
+                            </TableCell>
+                            <TableCell
+                              sx={{ color: "white", fontWeight: "bold" }}
+                            >
+                              Size
+                            </TableCell>
+                            <TableCell
+                              sx={{ color: "white", fontWeight: "bold" }}
+                            >
+                              Quantity (pounds)
+                            </TableCell>
+                            <TableCell
+                              sx={{ color: "white", fontWeight: "bold" }}
+                            >
+                              Price/lb
+                            </TableCell>
+                            <TableCell
+                              sx={{ color: "white", fontWeight: "bold" }}
+                            >
+                              Total
+                            </TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {estimator.adultFishData.map(
+                            (fish, idx) =>
+                              fish.quantity > 0 && (
+                                <TableRow key={idx}>
+                                  <TableCell
+                                    sx={{ color: "primary.contrastText" }}
+                                  >
+                                    {fish.name}
+                                  </TableCell>
+                                  <TableCell
+                                    sx={{ color: "primary.contrastText" }}
+                                  >
+                                    {fish.size}
+                                  </TableCell>
+                                  <TableCell
+                                    sx={{ color: "primary.contrastText" }}
+                                  >
+                                    {fish.quantity} lbs
+                                  </TableCell>
+                                  <TableCell
+                                    sx={{ color: "primary.contrastText" }}
+                                  >
+                                    {formatCurrency(fish.pricePerPound)}
+                                  </TableCell>
+                                  <TableCell
+                                    sx={{
+                                      color: "primary.contrastText",
+                                      fontWeight: "bold",
+                                    }}
+                                  >
+                                    {formatCurrency(
+                                      fish.quantity * fish.pricePerPound,
+                                    )}
+                                  </TableCell>
+                                </TableRow>
+                              ),
+                          )}
+                        </TableBody>
+                      </Table>
+
+                      {/* Cost Estimates */}
+                      <Box mt={3} display="flex" flexDirection="column" gap={2}>
+                        {estimator.totalCostLess450 > 0 && (
+                          <Box
+                            display="flex"
+                            justifyContent="space-between"
+                            p={2}
+                            sx={{ ...glassBoxStyles, borderRadius: 2 }}
+                          >
+                            <Typography color="text.disabled">
+                              Less Than 450 Pounds
+                            </Typography>
+                            <Typography color="text.primary" fontWeight="bold">
+                              {formatCurrency(estimator.totalCostLess450)}
+                            </Typography>
+                          </Box>
+                        )}
+                        {estimator.totalCostMore450 > 0 && (
+                          <Box
+                            display="flex"
+                            justifyContent="space-between"
+                            p={2}
+                            sx={{ ...glassBoxStyles, borderRadius: 2 }}
+                          >
+                            <Typography color="text.disabled">
+                              More Than 450 Pounds
+                            </Typography>
+                            <Typography color="text.primary" fontWeight="bold">
+                              {formatCurrency(estimator.totalCostMore450)}
+                            </Typography>
+                          </Box>
+                        )}
                       </Box>
-                      <Typography
-                        color="primary.light"
-                        fontWeight={700}
-                        fontSize="1.2rem"
-                      >
-                        {formatCurrency(grassCarp.total || 0)}
-                      </Typography>
                     </Box>
-                  </>
-                )}
+                  )}
 
-                {/* Hybrid Choice */}
-                {estimator.hybridChoice &&
-                  (estimator.hybridChoice.regularHybrid ||
-                    estimator.hybridChoice.specklebelly) && (
-                    <>
-                      <Divider
-                        sx={{ my: 3, borderColor: "rgba(255,255,255,0.1)" }}
-                      />
-                      <Box>
-                        <Typography color="text.primary" fontWeight={600}>
-                          Hybrid Bream Selection:
+                {/* Feed Bass Estimator */}
+                {pondInfo.selectedOption === "feed-bass" &&
+                  estimator.feedBassData && (
+                    <Box>
+                      <Table size="small">
+                        <TableHead>
+                          <TableRow sx={{ backgroundColor: "#537D96" }}>
+                            <TableCell
+                              sx={{ color: "white", fontWeight: "bold" }}
+                            >
+                              Fish Type
+                            </TableCell>
+                            <TableCell
+                              sx={{ color: "white", fontWeight: "bold" }}
+                            >
+                              Quantity
+                            </TableCell>
+                            <TableCell
+                              sx={{ color: "white", fontWeight: "bold" }}
+                            >
+                              Unit
+                            </TableCell>
+                            <TableCell
+                              sx={{ color: "white", fontWeight: "bold" }}
+                            >
+                              Price
+                            </TableCell>
+                            <TableCell
+                              sx={{ color: "white", fontWeight: "bold" }}
+                            >
+                              Total
+                            </TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {estimator.feedBassData.map(
+                            (fish, idx) =>
+                              fish.quantity > 0 && (
+                                <TableRow key={idx}>
+                                  <TableCell
+                                    sx={{ color: "primary.contrastText" }}
+                                  >
+                                    {fish.name}
+                                  </TableCell>
+                                  <TableCell
+                                    sx={{ color: "primary.contrastText" }}
+                                  >
+                                    {fish.quantity}
+                                  </TableCell>
+                                  <TableCell
+                                    sx={{ color: "primary.contrastText" }}
+                                  >
+                                    {fish.unit}
+                                  </TableCell>
+                                  <TableCell
+                                    sx={{ color: "primary.contrastText" }}
+                                  >
+                                    {formatCurrency(fish.price)}
+                                  </TableCell>
+                                  <TableCell
+                                    sx={{
+                                      color: "primary.contrastText",
+                                      fontWeight: "bold",
+                                    }}
+                                  >
+                                    {formatCurrency(fish.quantity * fish.price)}
+                                  </TableCell>
+                                </TableRow>
+                              ),
+                          )}
+                        </TableBody>
+                      </Table>
+
+                      {/* Cost Estimates */}
+                      <Box mt={3} display="flex" flexDirection="column" gap={2}>
+                        {estimator.totalCostLess12000 > 0 && (
+                          <Box
+                            display="flex"
+                            justifyContent="space-between"
+                            p={2}
+                            sx={{ ...glassBoxStyles, borderRadius: 2 }}
+                          >
+                            <Typography color="text.disabled">
+                              Less than 12,000 bream or 600 lbs minnows/shiners
+                            </Typography>
+                            <Typography color="text.primary" fontWeight="bold">
+                              {formatCurrency(estimator.totalCostLess12000)}
+                            </Typography>
+                          </Box>
+                        )}
+                        {estimator.totalCostMore12000 > 0 && (
+                          <Box
+                            display="flex"
+                            justifyContent="space-between"
+                            p={2}
+                            sx={{ ...glassBoxStyles, borderRadius: 2 }}
+                          >
+                            <Typography color="text.disabled">
+                              More than 12,000 bream or 600 lbs minnows/shiners
+                            </Typography>
+                            <Typography color="text.primary" fontWeight="bold">
+                              {formatCurrency(estimator.totalCostMore12000)}
+                            </Typography>
+                          </Box>
+                        )}
+                      </Box>
+                    </Box>
+                  )}
+
+                {/* Grass Carp Estimator */}
+                {pondInfo.selectedOption === "grass-carp" &&
+                  estimator.grassCarpData && (
+                    <Box>
+                      <Table size="small">
+                        <TableHead>
+                          <TableRow sx={{ backgroundColor: "#537D96" }}>
+                            <TableCell
+                              sx={{ color: "white", fontWeight: "bold" }}
+                            >
+                              Size
+                            </TableCell>
+                            <TableCell
+                              sx={{ color: "white", fontWeight: "bold" }}
+                            >
+                              Quantity
+                            </TableCell>
+                            <TableCell
+                              sx={{ color: "white", fontWeight: "bold" }}
+                            >
+                              Unit
+                            </TableCell>
+                            <TableCell
+                              sx={{ color: "white", fontWeight: "bold" }}
+                            >
+                              Price/Fish
+                            </TableCell>
+                            <TableCell
+                              sx={{ color: "white", fontWeight: "bold" }}
+                            >
+                              Total
+                            </TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {estimator.grassCarpData.map(
+                            (fish, idx) =>
+                              fish.quantity > 0 && (
+                                <TableRow key={idx}>
+                                  <TableCell
+                                    sx={{ color: "primary.contrastText" }}
+                                  >
+                                    {fish.name}
+                                  </TableCell>
+                                  <TableCell
+                                    sx={{ color: "primary.contrastText" }}
+                                  >
+                                    {fish.quantity}
+                                  </TableCell>
+                                  <TableCell
+                                    sx={{ color: "primary.contrastText" }}
+                                  >
+                                    {fish.unit}
+                                  </TableCell>
+                                  <TableCell
+                                    sx={{ color: "primary.contrastText" }}
+                                  >
+                                    {formatCurrency(fish.price)}
+                                  </TableCell>
+                                  <TableCell
+                                    sx={{
+                                      color: "primary.contrastText",
+                                      fontWeight: "bold",
+                                    }}
+                                  >
+                                    {formatCurrency(fish.quantity * fish.price)}
+                                  </TableCell>
+                                </TableRow>
+                              ),
+                          )}
+                        </TableBody>
+                      </Table>
+
+                      {/* Cost Estimates */}
+                      <Box mt={3} display="flex" flexDirection="column" gap={2}>
+                        {estimator.totalCostLess1000 > 0 && (
+                          <Box
+                            display="flex"
+                            justifyContent="space-between"
+                            p={2}
+                            sx={{ ...glassBoxStyles, borderRadius: 2 }}
+                          >
+                            <Typography color="text.disabled">
+                              Less than 1000 Fish
+                            </Typography>
+                            <Typography color="text.primary" fontWeight="bold">
+                              {formatCurrency(estimator.totalCostLess1000)}
+                            </Typography>
+                          </Box>
+                        )}
+                        {estimator.totalCostMore1000 > 0 && (
+                          <Box
+                            display="flex"
+                            justifyContent="space-between"
+                            p={2}
+                            sx={{ ...glassBoxStyles, borderRadius: 2 }}
+                          >
+                            <Typography color="text.disabled">
+                              More than 1000 Fish
+                            </Typography>
+                            <Typography color="text.primary" fontWeight="bold">
+                              {formatCurrency(estimator.totalCostMore1000)}
+                            </Typography>
+                          </Box>
+                        )}
+                      </Box>
+                    </Box>
+                  )}
+
+                {/* Ala Carte Estimator */}
+                {pondInfo.selectedOption === "ala-carte" &&
+                  estimator.alaCarteData && (
+                    <Box>
+                      <Table size="small">
+                        <TableHead>
+                          <TableRow sx={{ backgroundColor: "#537D96" }}>
+                            <TableCell
+                              sx={{ color: "white", fontWeight: "bold" }}
+                            >
+                              Species
+                            </TableCell>
+                            <TableCell
+                              sx={{ color: "white", fontWeight: "bold" }}
+                            >
+                              Size
+                            </TableCell>
+                            <TableCell
+                              sx={{ color: "white", fontWeight: "bold" }}
+                            >
+                              Quantity
+                            </TableCell>
+                            <TableCell
+                              sx={{ color: "white", fontWeight: "bold" }}
+                            >
+                              Unit
+                            </TableCell>
+                            <TableCell
+                              sx={{ color: "white", fontWeight: "bold" }}
+                            >
+                              Price/Unit
+                            </TableCell>
+                            <TableCell
+                              sx={{ color: "white", fontWeight: "bold" }}
+                            >
+                              Total
+                            </TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {estimator.alaCarteData.map(
+                            (item, idx) =>
+                              item.quantity > 0 && (
+                                <TableRow key={idx}>
+                                  <TableCell
+                                    sx={{ color: "primary.contrastText" }}
+                                  >
+                                    {item.name}
+                                  </TableCell>
+                                  <TableCell
+                                    sx={{ color: "primary.contrastText" }}
+                                  >
+                                    {item.size}
+                                  </TableCell>
+                                  <TableCell
+                                    sx={{ color: "primary.contrastText" }}
+                                  >
+                                    {item.quantity}
+                                  </TableCell>
+                                  <TableCell
+                                    sx={{ color: "primary.contrastText" }}
+                                  >
+                                    {item.unit}
+                                  </TableCell>
+                                  <TableCell
+                                    sx={{ color: "primary.contrastText" }}
+                                  >
+                                    {formatCurrency(item.pricePerUnit)}
+                                  </TableCell>
+                                  <TableCell
+                                    sx={{
+                                      color: "primary.contrastText",
+                                      fontWeight: "bold",
+                                    }}
+                                  >
+                                    {formatCurrency(
+                                      item.quantity * item.pricePerUnit,
+                                    )}
+                                  </TableCell>
+                                </TableRow>
+                              ),
+                          )}
+                        </TableBody>
+                      </Table>
+
+                      {/* Total Cost */}
+                      <Box
+                        mt={3}
+                        display="flex"
+                        justifyContent="space-between"
+                        p={2}
+                        sx={{ ...glassBoxStyles, borderRadius: 2 }}
+                      >
+                        <Typography color="text.disabled">
+                          Total Fish Cost
                         </Typography>
-                        <Typography color="text.secondary">
-                          {estimator.hybridChoice.regularHybrid &&
-                            "✓ Regular Hybrid"}
-                          {estimator.hybridChoice.specklebelly &&
-                            "✓ Specklebelly"}
+                        <Typography color="text.primary" fontWeight="bold">
+                          {formatCurrency(estimator.alaCarteTotal || 0)}
                         </Typography>
                       </Box>
-                    </>
+                    </Box>
+                  )}
+
+                {/* No data message */}
+                {pondInfo.pondType === "old" &&
+                  !estimator.adultFishData &&
+                  !estimator.feedBassData &&
+                  !estimator.grassCarpData &&
+                  !estimator.alaCarteData && (
+                    <Typography color="text.secondary" align="center">
+                      No estimator data available
+                    </Typography>
                   )}
               </Box>
             </Box>
-
             {/* Availability */}
             <Box sx={{ mb: 3 }}>
               <Typography
@@ -547,7 +935,6 @@ export function Quote() {
                 </Grid>
               </Box>
             </Box>
-
             {/* Note */}
             <Box sx={{ mb: 3 }}>
               <Typography

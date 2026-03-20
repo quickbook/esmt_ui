@@ -19,15 +19,16 @@ import { glassBoxStyles } from "../utils/glassStyles";
 
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-export function FeedBassEstimator() {
-  const navigate = useNavigate();
-  const [fishData, setFishData] = useState([
+import { useEstimateForm } from "../contexts/EstimateFormContext";
+
+const apiData = [
     {
       name: "Intermediate Bream",
       unit: "Fish",
       recommendation:
         "Recommended 1000 to 2000 per acre after harvest of 8 to 15 inch bass.",
       quantity: 0,
+      price: 1.2,
     },
     {
       name: "Fathead Minnows",
@@ -35,6 +36,7 @@ export function FeedBassEstimator() {
       recommendation:
         "Recommended 100 plus pounds per acre in established ponds. Comes down to how much you want to spend.",
       quantity: 0,
+      price: 3.6,
     },
     {
       name: "Golden Shiners",
@@ -42,8 +44,15 @@ export function FeedBassEstimator() {
       recommendation:
         "Recommended 100 plus pounds per acre in established ponds. Comes down to how much you want to spend.",
       quantity: 0,
+      price: 4.3,
     },
-  ]);
+  ]
+
+export function FeedBassEstimator() {
+  const navigate = useNavigate();
+  const { data, updateSection } = useEstimateForm();
+
+  const [fishData, setFishData] = useState(apiData || []);
 
   const [totalCostMore12000, setTotalCostMore12000] = useState(0);
   const [totalCostLess12000, setTotalCostLess12000] = useState(0);
@@ -56,11 +65,15 @@ export function FeedBassEstimator() {
 
     const totalBream = breamCount + minnowsPounds + shinersPounds;
 
+    const totalCost =
+      breamCount * fishData[0].price +
+      minnowsPounds * fishData[0].price +
+      shinersPounds * fishData[0].price;
     if (totalBream > 12000 || minnowsPounds > 600 || shinersPounds > 600) {
-      setTotalCostMore12000(totalBream * 0.5); // Simplified pricing
+      setTotalCostMore12000(totalCost + 100); // Simplified pricing
       setTotalCostLess12000(0);
     } else {
-      setTotalCostLess12000(totalBream * 0.5);
+      setTotalCostLess12000(totalCost);
       setTotalCostMore12000(0);
     }
   }, [fishData]);
@@ -72,6 +85,13 @@ export function FeedBassEstimator() {
   };
 
   const handleNext = () => {
+    updateSection("estimator", {
+      pondType: "feed-bass",
+      feedBassData: fishData,
+      totalCostLess12000,
+      totalCostMore12000,
+      totalPrice: totalCostLess12000 + totalCostMore12000,
+    });
     navigate("/estimate/availability");
   };
 
@@ -81,7 +101,7 @@ export function FeedBassEstimator() {
 
   return (
     <Box sx={{ minHeight: "84vh", py: 4, px: { xs: 0, md: "1rem 2rem" } }}>
-      <Container >
+      <Container>
         <Paper
           sx={{
             p: { xs: 2, md: "1.5rem 4rem" },
@@ -180,7 +200,7 @@ export function FeedBassEstimator() {
                           placeholder="0"
                           inputProps={{ min: 0, step: 1 }}
                           sx={{
-                            width: {xs: 60, md:"50%"},
+                            width: { xs: 60, md: "50%" },
                             "& input": { textAlign: "center" },
                             backgroundColor: "#FFF7CC",
                             "& .MuiInputBase-input": {
@@ -217,30 +237,8 @@ export function FeedBassEstimator() {
               display="flex"
               justifyContent="space-between"
               alignItems="center"
-              flexDirection={{xs:'column', md:'row'}}
-              gap={{xs:2,md:0}}
-              p={2}
-              sx={{
-                ...glassBoxStyles,
-                borderRadius: 2,
-              }}
-            >
-              <Typography fontWeight="500" color="text.disabled">
-                Total Cost Estimate More than 12,000 bream or 600 pounds of
-                minnows/shiners
-              </Typography>
-
-              <Typography fontWeight="bold" color="text.primary">
-                $ {totalCostMore12000.toFixed(2)} - Delivery included
-              </Typography>
-            </Box>
-
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              flexDirection={{xs:'column', md:'row'}}
-              gap={{xs:2,md:0}}
+              flexDirection={{ xs: "column", md: "row" }}
+              gap={{ xs: 2, md: 0 }}
               p={2}
               sx={{
                 ...glassBoxStyles,
@@ -254,6 +252,28 @@ export function FeedBassEstimator() {
 
               <Typography fontWeight="bold" color="text.primary">
                 $ {totalCostLess12000.toFixed(2)} - Delivery included
+              </Typography>
+            </Box>
+
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              flexDirection={{ xs: "column", md: "row" }}
+              gap={{ xs: 2, md: 0 }}
+              p={2}
+              sx={{
+                ...glassBoxStyles,
+                borderRadius: 2,
+              }}
+            >
+              <Typography fontWeight="500" color="text.disabled">
+                Total Cost Estimate More than 12,000 bream or 600 pounds of
+                minnows/shiners
+              </Typography>
+
+              <Typography fontWeight="bold" color="text.primary">
+                $ {totalCostMore12000.toFixed(2)} - Delivery included
               </Typography>
             </Box>
           </Box>
