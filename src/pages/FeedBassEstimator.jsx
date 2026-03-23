@@ -22,31 +22,31 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { useEstimateForm } from "../contexts/EstimateFormContext";
 
 const apiData = [
-    {
-      name: "Intermediate Bream",
-      unit: "Fish",
-      recommendation:
-        "Recommended 1000 to 2000 per acre after harvest of 8 to 15 inch bass.",
-      quantity: 0,
-      price: 1.2,
-    },
-    {
-      name: "Fathead Minnows",
-      unit: "Pounds",
-      recommendation:
-        "Recommended 100 plus pounds per acre in established ponds. Comes down to how much you want to spend.",
-      quantity: 0,
-      price: 3.6,
-    },
-    {
-      name: "Golden Shiners",
-      unit: "Pounds",
-      recommendation:
-        "Recommended 100 plus pounds per acre in established ponds. Comes down to how much you want to spend.",
-      quantity: 0,
-      price: 4.3,
-    },
-  ]
+  {
+    name: "Intermediate Bream",
+    unit: "Fish",
+    recommendation:
+      "Recommended 1000 to 2000 per acre after harvest of 8 to 15 inch bass.",
+    quantity: 0,
+    price: 1.2,
+  },
+  {
+    name: "Fathead Minnows",
+    unit: "Pounds",
+    recommendation:
+      "Recommended 100 plus pounds per acre in established ponds. Comes down to how much you want to spend.",
+    quantity: 0,
+    price: 3.6,
+  },
+  {
+    name: "Golden Shiners",
+    unit: "Pounds",
+    recommendation:
+      "Recommended 100 plus pounds per acre in established ponds. Comes down to how much you want to spend.",
+    quantity: 0,
+    price: 4.3,
+  },
+];
 
 export function FeedBassEstimator() {
   const navigate = useNavigate();
@@ -98,6 +98,10 @@ export function FeedBassEstimator() {
   const handleBack = () => {
     navigate("/estimate/pond-info");
   };
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <Box sx={{ minHeight: "84vh", py: 4, px: { xs: 0, md: "1rem 2rem" } }}>

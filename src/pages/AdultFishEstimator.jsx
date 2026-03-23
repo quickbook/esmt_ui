@@ -118,6 +118,11 @@ export function AdultFishEstimator() {
     navigate("/estimate/pond-info");
   };
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+
   return (
     <Box sx={{ minHeight: "84vh", py: 4, px: { xs: 0, md: "1rem 2rem" } }}>
       <Container>

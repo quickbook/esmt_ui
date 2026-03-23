@@ -35,11 +35,11 @@ export function Availability() {
   }, []);
 
   return (
-    <Box sx={{ minHeight: "84vh", p: 2 }}>
+    <Box sx={{ minHeight: "84vh", padding:{xs:"1rem 0" , md:2} }}>
       <Container>
         <Paper
           sx={{
-            padding: { xs: 3, md: "1.2rem 2rem" },
+            padding: { xs: 2, md: "2rem" },
             borderRadius: 3,
             backdropFilter: "blur(16px) saturate(180%)",
             backgroundColor: "rgba(255, 255, 255, 0.15)",
@@ -189,7 +189,7 @@ export function Availability() {
           </Grid>
 
           {/* Buttons */}
-          <Box display="flex" justifyContent="space-between" mt={{xs: 2, md: 4}}>
+          <Box display="flex" justifyContent="space-between" mt={4}>
             <Button
               variant="contained"
               startIcon={<ArrowLeftIcon />}

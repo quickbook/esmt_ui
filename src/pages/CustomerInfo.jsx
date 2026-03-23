@@ -147,7 +147,7 @@ export function CustomerInfo() {
                   fullWidth
                   size="small"
 
-                  label="Enter your full name"
+                  placeholder="Enter your full name"
                   value={formData.fullName}
                   onChange={(e) => handleChange("fullName", e.target.value)}
                   sx={{ mb: 3, ...textFieldSx }}
@@ -169,7 +169,7 @@ export function CustomerInfo() {
                 <TextField
                   fullWidth
                   size="small"
-                  label="Enter your email address"
+                  placeholder="Enter your email address"
                   type="email"
                   //placeholder="john@email.com"
                   value={formData.email}
@@ -193,7 +193,7 @@ export function CustomerInfo() {
                 <TextField
                   fullWidth
                   size="small"
-                  label="Enter your phone number"
+                  placeholder="Enter your phone number"
                   type="tel"
                   //placeholder="123-456-7890"
                   value={formData.phone}
@@ -217,7 +217,7 @@ export function CustomerInfo() {
                 <TextField
                   fullWidth
                   size="small"
-                  label="Enter your working email address"
+                  placeholder="Enter your working email address"
                   type="email"
                   value={formData.quoteEmail}
                   onChange={(e) => handleChange("quoteEmail", e.target.value)}
@@ -240,7 +240,7 @@ export function CustomerInfo() {
                 <TextField
                   fullWidth
                   size="small"
-                  label="Enter your physical address"
+                  placeholder="Enter your physical address"
                  
                   //placeholder="Your home address"
                   value={formData.address}
@@ -262,7 +262,6 @@ export function CustomerInfo() {
               </Typography>
               <Select
                 fullWidth
-                autoFocus
                 size="small"
                 value={formData.hearAbout}
                 onChange={(e) => handleChange("hearAbout", e.target.value)}

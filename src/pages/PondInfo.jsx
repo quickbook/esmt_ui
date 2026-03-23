@@ -30,7 +30,7 @@ export const newPondOptions = [
   {
     value: "fishing-pond",
     label:
-      "I want to fish for a variety of fsh (bass, bream, crappie, catish).",
+      "I want to fish for a variety of fish (bass, bream, crappie, catfish).",
   },
   {
     value: "catfish-pond",
@@ -45,7 +45,7 @@ export const newPondOptions = [
 export const oldPondOptions = [
   {
     value: "adult-fish",
-    label: "I want to add catchable/adult fsh to my existng pond ",
+    label: "I want to add catchable/adult fish to my existng pond ",
   },
   {
     value: "feed-bass",
@@ -60,7 +60,7 @@ export const oldPondOptions = [
 export const alaCarteOption = {
   value: "ala-carte",
   label:
-    "I want to create my own custom fish stocking  from your ala carte menu",
+    "I want to create my own custom fish stocking from your ala carte menu",
 };
 
 export function PondInfo() {
@@ -245,7 +245,7 @@ export function PondInfo() {
                 slotProps={{
                   input: {
                     endAdornment: (
-                      <InputAdornment position="end">acres</InputAdornment>
+                      <InputAdornment position="end" ><span style={{color: "#2c2c2c"}}>acres</span></InputAdornment>
                     ),
                   },
                 }}
@@ -283,7 +283,7 @@ export function PondInfo() {
                 slotProps={{
                   input: {
                     endAdornment: (
-                      <InputAdornment position="end">miles</InputAdornment>
+                      <InputAdornment position="end"><span style={{color: "#2c2c2c"}}>miles</span></InputAdornment>
                     ),
                   },
                 }}
@@ -345,9 +345,10 @@ export function PondInfo() {
                 {["new", "old"].map((type) => (
                   <Box
                     key={type}
-                    onClick={() =>
+                    onClick={() =>{
+                      updateSection("pondInfo", { selectedOption: "", hasFish: "" });
                       updateSection("pondInfo", { pondType: type })
-                    }
+                    }}
                     sx={{
                       display: "flex",
                       justifyContent: "center",

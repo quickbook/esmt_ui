@@ -290,7 +290,6 @@ const generateApiData = (pondType) => {
       [100, 50, 25, 200, 120, 80],
       [200, 100, 50, 300, 80, 40],
       [300, 150, 75, 400, 90, 45],
-      [500, 250, 150, 600, 200, 100],
     ];
     return stocks[optionIndex] || stocks[0];
   };
@@ -529,7 +528,7 @@ export function PondEstimator() {
                 color="primary.contrastText"
                 mb={2}
               >
-                Select the option that best describes your pond. A
+                Select the option that best fits your budget. A
                 representative will contact you to confirm the estimate and
                 discuss stocking options prior to delivery.
               </Typography>
@@ -546,7 +545,7 @@ export function PondEstimator() {
             >
               <Table>
                 <TableHead>
-                  <TableRow sx={{ background: "rgba(255,255,255,0.2)" }}>
+                  <TableRow sx={{ backgroundColor: "#537D9660" }}>
                     <TableCell>Option</TableCell>
                     <TableCell>Size</TableCell>
                     <TableCell>Price</TableCell>
@@ -576,7 +575,7 @@ export function PondEstimator() {
                         sx={{
                           backgroundColor: selectedOptions.includes(i)
                             ? "rgba(43, 161, 146, 0.25)"
-                            : "transparent",
+                            : "rgba(0, 0, 0, 0.2)",
                         }}
                       >
                         <TableCell>{opt.label}</TableCell>
@@ -589,7 +588,7 @@ export function PondEstimator() {
                           />
                         </TableCell>
                         {config.columns.map((_, idx) => (
-                          <TableCell key={idx} align="center">
+                          <TableCell key={idx}>
                             {!isFourthRow ? apiData.stock[i][idx] : ""}
                           </TableCell>
                         ))}
@@ -603,7 +602,7 @@ export function PondEstimator() {
                 sx={{
                   background: selectedOptions.includes(3)
                     ? "rgba(43, 161, 146, 0.25)"
-                    : "transparent",
+                    : "rgba(0, 0, 0, 0.2)",
                 }}
               >
                 <TableHead>
@@ -629,7 +628,7 @@ export function PondEstimator() {
               </Table>
             </Box>
 
-            <Box mt={4} p={3} border={"1px solid"} borderRadius={2}>
+            <Box mt={4} p={3} border={"1px solid"} borderRadius={2} bgcolor={"rgba(0, 0, 0, 0.2)"}>
               <Typography fontWeight="bold" sx={{ color: "text.primary" }}>
                 Optional Add-ons
               </Typography>

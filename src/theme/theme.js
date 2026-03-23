@@ -236,27 +236,65 @@ const theme = createTheme({
 export const textFieldSx = {
   "& .MuiOutlinedInput-root": {
     color: "#000",
-    borderRadius: 2,
+    borderRadius: 1,
+    height: 42, // 👈 overall height
+
     "& fieldset": {
       borderWidth: 2,
-      borderColor: "primary.main",
+    },
+
+    "& input": {
+      //padding: "12px 14px", // 👈 adjust padding for proper alignment
+      color: "#000"
     },
   },
-  //label size
+
+  // ✅ endAdornment color
+  "& .MuiInputAdornment-root": {
+    color: "#secondary.main", // 👈 your green
+  },
+
+  // label size
   "& .MuiInputLabel-root": {
     fontSize: "0.875rem",
-    color: "#6B7280",
+    color: "secondary.main",
+    pt: '2px'
   },
-  "& .MuiInputLabel-root.Mui-focused": { color: "#44A194"},
-  //placeholder color
-  "& .MuiInputBase-input::placeholder": { color: "#000" },
+
+  "& .MuiInputLabel-root.Mui-focused": {
+    color: "secondary.main",
+  },
+
+  // placeholder color
+  "& .MuiInputBase-input::placeholder": {
+    color: "#000",
+  },
 };
 
 export const selectSx = {
   mb: 4,
   color: "primary.contrastText",
-  border: "1px solid",
-  ".MuiSelect-icon": { color: "primary.contrastText" },
+
+  // icon color
+  ".MuiSelect-icon": {
+    color: "primary.contrastText",
+  },
+
+  // default border
+  "& .MuiOutlinedInput-notchedOutline": {
+    borderColor: "primary.contrastText",
+  },
+
+  // hover border
+  "&:hover .MuiOutlinedInput-notchedOutline": {
+    borderColor: "primary.main",
+  },
+
+  // focused border
+  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+    borderColor: "primary.main",
+    borderWidth: 2,
+  },
 };
 
 export const menuItemSx = {
@@ -264,14 +302,15 @@ export const menuItemSx = {
   overflowWrap: "break-word", // Alternative for better browser support
   whiteSpace: "normal", // Allow wrapping
   color: "#000000",
-  bgcolor: "rgba(255, 255, 255, 0.25)",
+  fontWeight: 600,
+  bgcolor: "rgba(255, 255, 255, 0.5)",
   "&:hover": {
-    bgcolor: "rgba(255, 255, 255, 0.35)",
+    bgcolor: "rgba(255, 255, 255, 0.3)",
   },
   "&.Mui-selected": {
-    bgcolor: "rgba(255, 255, 255, 0.45)",
+    bgcolor: "rgba(255, 255, 255, 0.6)",
     "&:hover": {
-      bgcolor: "rgba(255, 255, 255, 0.45)",
+      bgcolor: "rgba(255, 255, 255, 0.4)",
     },
   },
 };

@@ -19,16 +19,18 @@ function App() {
           backgroundAttachment: "fixed",
           backgroundRepeat: "no-repeat",
           position: "relative",
+          zIndex: 0,
+
           "&::before": {
             content: '""',
-            position: "fixed",
+            position: "absolute",
             top: 0,
             left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.1)",
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.3)", // 👈 dark fade
             pointerEvents: "none",
-            zIndex: -10,
+            zIndex: 0,
           },
         }}
       >

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Stepper } from "../components/Stepper";
 import React from "react";
 import {
   Box,
@@ -14,446 +13,169 @@ import {
   TableCell,
   TextField,
   Button,
+  Grid,
 } from "@mui/material";
 import { glassBoxStyles } from "../utils/glassStyles";
-import { useEstimateForm } from "../contexts/EstimateFormContext";
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-import { fishPricing } from "../utils/pricing";
+import { useEstimateForm } from "../contexts/EstimateFormContext";
 
 export function AlaCarteEstimator() {
   const navigate = useNavigate();
-  const { data, updateSection } = useEstimateForm();
+  const { updateSection } = useEstimateForm();
 
-  const [fishItems, setFishItems] = useState([
-    // Bluegill
-    {
-      category: "Bluegill",
-      name: "Bluegill",
-      size: "1 to 3 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 0.1,
-    },
-    {
-      category: "Bluegill",
-      name: "Bluegill",
-      size: "3 to 4 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 0.22,
-    },
-    {
-      category: "Bluegill",
-      name: "Bluegill",
-      size: "4 to 5 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 0.65,
-    },
-    {
-      category: "Bluegill",
-      name: "Bluegill",
-      size: "5 to 6 inch",
-      unit: "pounds",
-      quantity: 0,
-      pricePerUnit: 8,
-    },
+  // Group fish data into two columns
+  const leftColumnCategories = [
+    "Bluegill",
+    "Redear",
+    "Black Crappie",
+    "Hybrid Crappie",
+    "Minnows & Shiners",
+    "Hybrid Bream",
+    "Catfish",
+  ];
 
-    // Redear
-    {
-      category: "Redear",
-      name: "Redear",
-      size: "1 to 3 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 0.15,
-    },
-    {
-      category: "Redear",
-      name: "Redear",
-      size: "3 to 4 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 0.32,
-    },
-    {
-      category: "Redear",
-      name: "Redear",
-      size: "4 to 5 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 0.8,
-    },
-    {
-      category: "Redear",
-      name: "Redear",
-      size: "5 to 6 inch",
-      unit: "pounds",
-      quantity: 0,
-      pricePerUnit: 9,
-    },
+  const rightColumnCategories = [
+    "Northern Bass",
+    "Florida Bass",
+    "F1 Hybrid Bass",
+    "Grass Carp",
+    "Specklebelly Bream",
+  ];
 
-    // Black Crappie
-    {
-      category: "Black Crappie",
-      name: "Black Crappie",
-      size: "1 to 3 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 0.34,
-    },
-    {
-      category: "Black Crappie",
-      name: "Black Crappie",
-      size: "3 to 4 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 0.43,
-    },
-    {
-      category: "Black Crappie",
-      name: "Black Crappie",
-      size: "4 to 5 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 0.75,
-    },
-    {
-      category: "Black Crappie",
-      name: "Black Crappie",
-      size: "5 to 6 inch",
-      unit: "pounds",
-      quantity: 0,
-      pricePerUnit: 9,
-    },
+  const fishCategories = {
+    Bluegill: [
+      { size: "1-3 inch", unit: "fish", price: 0.1 },
+      { size: "3-4 inch", unit: "fish", price: 0.22 },
+      { size: "4-5 inch", unit: "fish", price: 0.65 },
+      { size: "5-6 inch", unit: "pounds", price: 8 },
+    ],
+    Redear: [
+      { size: "1-3 inch", unit: "fish", price: 0.15 },
+      { size: "3-4 inch", unit: "fish", price: 0.32 },
+      { size: "4-5 inch", unit: "fish", price: 0.8 },
+      { size: "5-6 inch", unit: "pounds", price: 9 },
+    ],
+    "Black Crappie": [
+      { size: "1-3 inch", unit: "fish", price: 0.34 },
+      { size: "3-4 inch", unit: "fish", price: 0.43 },
+      { size: "4-5 inch", unit: "fish", price: 0.75 },
+      { size: "5-6 inch", unit: "pounds", price: 9 },
+    ],
+    "Hybrid Crappie": [
+      { size: "1-3 inch", unit: "fish", price: 0.39 },
+      { size: "3-4 inch", unit: "fish", price: 0.65 },
+      { size: "4-5 inch", unit: "fish", price: 1.1 },
+    ],
+    "Hybrid Bream": [
+      { size: "1-3 inch", unit: "fish", price: 0.1 },
+      { size: "3-4 inch", unit: "fish", price: 0.22 },
+      { size: "4-5 inch", unit: "fish", price: 0.65 },
+      { size: "5-6 inch", unit: "pounds", price: 8 },
+    ],
+    "Catfish": [
+      { size: "3-5 inch", unit: "fish", price: 0.13 },
+      { size: "5-7 inch", unit: "fish", price: 0.3 },
+      { size: "7-9 inch", unit: "fish", price: 0.6 },
+      { size: "1 pound plus", unit: "pounds", price: 1.75 },
+    ],
+    "Northern Bass": [
+      { size: "1-3 inch", unit: "fish", price: 0.38 },
+      { size: "3-4 inch", unit: "fish", price: 0.95 },
+      { size: "4-5 inch", unit: "fish", price: 1.25 },
+      { size: "5-7 inch", unit: "fish", price: 2.15 },
+      { size: "7-9 inch", unit: "fish", price: 3.15 },
+      { size: "10-12 inch", unit: "pounds", price: 12.5 },
+      { size: "12-15 inch", unit: "pounds", price: 10 },
+    ],
+    "Florida Bass": [
+      { size: "1-3 inch", unit: "fish", price: 0.5 },
+      { size: "3-4 inch", unit: "fish", price: 1.05 },
+      { size: "4-5 inch", unit: "fish", price: 1.9 },
+      { size: "5-7 inch", unit: "fish", price: 2.75 },
+      { size: "7-9 inch", unit: "fish", price: 3.8 },
+    ],
+    "F1 Hybrid Bass": [
+      { size: "1-3 inch", unit: "fish", price: 0.5 },
+      { size: "3-4 inch", unit: "fish", price: 1.05 },
+      { size: "4-5 inch", unit: "fish", price: 1.9 },
+      { size: "5-7 inch", unit: "fish", price: 2.75 },
+      { size: "7-9 inch", unit: "fish", price: 3.8 },
+    ],
+    "Minnows & Shiners": [
+      { size: "1-3 inch", unit: "pounds", name: "Minnows", price: 6.5 },
+      { size: "3-5 inch", unit: "pounds", name: "Shiners", price: 7 },
+    ],
+    "Grass Carp": [
+      { size: "8-10 inch", unit: "fish", price: 5.75 },
+      { size: "12 inch", unit: "fish", price: 7.25 },
+    ],
+    "Specklebelly Bream": [
+      { size: "1-3 inch", unit: "fish", price: 0.1 },
+      { size: "3-4 inch", unit: "fish", price: 0.22 },
+      { size: "4-5 inch", unit: "fish", price: 0.65 },
+      { size: "5-6 inch", unit: "pounds", price: 8 },
+    ],
+  };
 
-    // Hybrid Crappie
-    {
-      category: "Hybrid Crappie",
-      name: "Hybrid Crappie",
-      size: "1 to 3 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 0.39,
-    },
-    {
-      category: "Hybrid Crappie",
-      name: "Hybrid Crappie",
-      size: "3 to 4 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 0.65,
-    },
-    {
-      category: "Hybrid Crappie",
-      name: "Hybrid Crappie",
-      size: "4 to 5 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 1.1,
-    },
-
-    // Hybrid Bream
-    {
-      category: "Hybrid Bream",
-      name: "Hybrid Bream",
-      size: "1 to 3 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 0.1,
-    },
-    {
-      category: "Hybrid Bream",
-      name: "Hybrid Bream",
-      size: "3 to 4 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 0.22,
-    },
-    {
-      category: "Hybrid Bream",
-      name: "Hybrid Bream",
-      size: "4 to 5 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 0.65,
-    },
-    {
-      category: "Hybrid Bream",
-      name: "Hybrid Bream",
-      size: "5 to 6 inch",
-      unit: "pounds",
-      quantity: 0,
-      pricePerUnit: 8,
-    },
-
-    // Catfish
-    {
-      category: "Catfish",
-      name: "Catfish",
-      size: "3 to 5 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 0.13,
-    },
-    {
-      category: "Catfish",
-      name: "Catfish",
-      size: "5 to 7 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 0.3,
-    },
-    {
-      category: "Catfish",
-      name: "Catfish",
-      size: "7 to 9 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 0.6,
-    },
-    {
-      category: "Catfish",
-      name: "Catfish",
-      size: "1 pound plus",
-      unit: "pounds",
-      quantity: 0,
-      pricePerUnit: 1.75,
-    },
-
-    // Bass (Northern/Florida)
-    {
-      category: "Bass",
-      name: "Northern Bass",
-      size: "1 to 3 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 0.38,
-    },
-    {
-      category: "Bass",
-      name: "Northern Bass",
-      size: "3 to 4 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 0.95,
-    },
-    {
-      category: "Bass",
-      name: "Northern Bass",
-      size: "4 to 5 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 1.25,
-    },
-    {
-      category: "Bass",
-      name: "Northern Bass",
-      size: "5 to 7 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 2.15,
-    },
-    {
-      category: "Bass",
-      name: "Northern Bass",
-      size: "7 to 9 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 3.15,
-    },
-    {
-      category: "Bass",
-      name: "Northern Bass",
-      size: "10 to 12 inch",
-      unit: "pounds",
-      quantity: 0,
-      pricePerUnit: 12.5,
-    },
-    {
-      category: "Bass",
-      name: "Northern Bass",
-      size: "12 to 15 inch",
-      unit: "pounds",
-      quantity: 0,
-      pricePerUnit: 10,
-    },
-
-    // Florida Bass
-    {
-      category: "Bass",
-      name: "Florida Bass",
-      size: "1 to 3 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 0.5,
-    },
-    {
-      category: "Bass",
-      name: "Florida Bass",
-      size: "3 to 4 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 1.05,
-    },
-    {
-      category: "Bass",
-      name: "Florida Bass",
-      size: "4 to 5 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 1.9,
-    },
-    {
-      category: "Bass",
-      name: "Florida Bass",
-      size: "5 to 7 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 2.75,
-    },
-    {
-      category: "Bass",
-      name: "Florida Bass",
-      size: "7 to 9 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 3.8,
-    },
-
-    // Minnows & Shiners
-    {
-      category: "Minnows",
-      name: "Minnows",
-      size: "1 to 3 inch",
-      unit: "pounds",
-      quantity: 0,
-      pricePerUnit: 6.5,
-    },
-    {
-      category: "Shiners",
-      name: "Shiners",
-      size: "3 to 5 inch",
-      unit: "pounds",
-      quantity: 0,
-      pricePerUnit: 7,
-    },
-
-    // Grass Carp
-    {
-      category: "Grass Carp",
-      name: "Triploid Grass Carp",
-      size: "8 to 10 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 5.75,
-    },
-    {
-      category: "Grass Carp",
-      name: "Triploid Grass Carp",
-      size: "12 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 7.25,
-    },
-
-    // F1 Hybrid Bass
-    {
-      category: "F1 Bass",
-      name: "F1 Hybrid Bass",
-      size: "1 to 3 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 0.5,
-    },
-    {
-      category: "F1 Bass",
-      name: "F1 Hybrid Bass",
-      size: "3 to 4 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 1.05,
-    },
-    {
-      category: "F1 Bass",
-      name: "F1 Hybrid Bass",
-      size: "4 to 5 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 1.9,
-    },
-    {
-      category: "F1 Bass",
-      name: "F1 Hybrid Bass",
-      size: "5 to 7 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 2.75,
-    },
-    {
-      category: "F1 Bass",
-      name: "F1 Hybrid Bass",
-      size: "7 to 9 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 3.8,
-    },
-
-    // Specklebelly Bream
-    {
-      category: "Specklebelly Bream",
-      name: "Specklebelly Bream",
-      size: "1 to 3 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 0.1,
-    },
-    {
-      category: "Specklebelly Bream",
-      name: "Specklebelly Bream",
-      size: "3 to 4 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 0.22,
-    },
-    {
-      category: "Specklebelly Bream",
-      name: "Specklebelly Bream",
-      size: "4 to 5 inch",
-      unit: "fish",
-      quantity: 0,
-      pricePerUnit: 0.65,
-    },
-    {
-      category: "Specklebelly Bream",
-      name: "Specklebelly Bream",
-      size: "5 to 6 inch",
-      unit: "pounds",
-      quantity: 0,
-      pricePerUnit: 8,
-    },
-  ]);
-
+  // Initialize quantities
+  const [quantities, setQuantities] = useState({});
   const [totalCost, setTotalCost] = useState(0);
 
   useEffect(() => {
-    const total = fishItems.reduce((sum, item) => {
-      return sum + item.quantity * item.pricePerUnit;
-    }, 0);
-    setTotalCost(total);
-  }, [fishItems]);
+    const initialQuantities = {};
+    Object.keys(fishCategories).forEach((category) => {
+      fishCategories[category].forEach((item, idx) => {
+        const key = `${category}_${item.size}_${idx}`;
+        initialQuantities[key] = 0;
+      });
+    });
+    setQuantities(initialQuantities);
+  }, []);
 
-  const handleQuantityChange = (index, value) => {
-    const newFishItems = [...fishItems];
-    newFishItems[index].quantity = parseFloat(value) || 0;
-    setFishItems(newFishItems);
+  useEffect(() => {
+    let total = 0;
+    Object.keys(fishCategories).forEach((category) => {
+      fishCategories[category].forEach((item, idx) => {
+        const key = `${category}_${item.size}_${idx}`;
+        const quantity = quantities[key] || 0;
+        total += quantity * item.price;
+      });
+    });
+    setTotalCost(total);
+  }, [quantities]);
+
+  const handleQuantityChange = (category, item, idx, value) => {
+    const key = `${category}_${item.size}_${idx}`;
+    setQuantities((prev) => ({
+      ...prev,
+      [key]: parseFloat(value) || 0,
+    }));
   };
 
   const handleNext = () => {
+    const alaCarteData = [];
+    Object.keys(fishCategories).forEach((category) => {
+      fishCategories[category].forEach((item, idx) => {
+        const key = `${category}_${item.size}_${idx}`;
+        const quantity = quantities[key] || 0;
+        if (quantity > 0) {
+          alaCarteData.push({
+            category: category,
+            name: item.name || category,
+            size: item.size,
+            unit: item.unit,
+            quantity: quantity,
+            pricePerUnit: item.price,
+            total: quantity * item.price,
+          });
+        }
+      });
+    });
+
     updateSection("estimator", {
       pondType: "ala-carte",
-      alaCarteData: fishItems,
+      alaCarteData: alaCarteData,
       alaCarteTotal: totalCost,
       totalPrice: totalCost,
     });
@@ -464,18 +186,105 @@ export function AlaCarteEstimator() {
     navigate("/estimate/pond-info");
   };
 
-  // Group items by category for better display
-  const groupedItems = {};
-  fishItems.forEach((item) => {
-    if (!groupedItems[item.category]) {
-      groupedItems[item.category] = [];
-    }
-    groupedItems[item.category].push(item);
-  });
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  const renderCategoryTable = (category, i) => (
+    <Box key={i} mb={3}>
+      <Typography
+        fontWeight="bold"
+        sx={{ color: "primary.light", mb: 1, fontSize: "0.9rem" }}
+      >
+        {category}
+      </Typography>
+      <Table size="small">
+        <TableHead>
+          <TableRow sx={{ backgroundColor: "#537D96" }}>
+            <TableCell sx={{ color: "white", fontSize: "0.75rem", py: 0.5 }}>
+              Size
+            </TableCell>
+            <TableCell sx={{ color: "white", fontSize: "0.75rem", py: 0.5 }}>
+              Unit
+            </TableCell>
+            <TableCell sx={{ color: "white", fontSize: "0.75rem", py: 0.5 }}>
+              Price
+            </TableCell>
+            <TableCell sx={{ color: "white", fontSize: "0.75rem", py: 0.5 }}>
+              Qty
+            </TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {fishCategories[category].map((item, idx) => {
+            const key = `${category}_${item.size}_${idx}`;
+            return (
+              <TableRow key={idx}>
+                <TableCell
+                  sx={{
+                    fontSize: "0.75rem",
+                    py: 0.5,
+                    color: "primary.contrastText",
+                  }}
+                >
+                  {item.size}
+                </TableCell>
+                <TableCell
+                  sx={{
+                    fontSize: "0.75rem",
+                    py: 0.5,
+                    color: "primary.contrastText",
+                    textTransform: "capitalize",
+                  }}
+                >
+                  {item.unit}
+                </TableCell>
+                <TableCell
+                  sx={{
+                    fontSize: "0.75rem",
+                    py: 0.5,
+                    color: "primary.contrastText",
+                  }}
+                >
+                  ${item.price.toFixed(2)}
+                </TableCell>
+                <TableCell sx={{ py: 0.5 }}>
+                  <TextField
+                    type="number"
+                    size="small"
+                    value={quantities[key] || ""}
+                    onChange={(e) =>
+                      handleQuantityChange(category, item, idx, e.target.value)
+                    }
+                    placeholder="0"
+                    inputProps={{
+                      min: 0,
+                      step: 1,
+                      style: { fontSize: "0.75rem", padding: "4px" },
+                    }}
+                    sx={{
+                      width: 70,
+                      "& input": { textAlign: "center" },
+                      backgroundColor: "#FFF7CC",
+                      "& .MuiInputBase-input": {
+                        color: "primary.dark",
+                        fontWeight: 600,
+                      },
+                      borderRadius: 1,
+                    }}
+                  />
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+    </Box>
+  );
 
   return (
     <Box sx={{ minHeight: "84vh", py: 4, px: { xs: 0, md: "2rem" } }}>
-      <Container>
+      <Container maxWidth="xl">
         <Paper
           sx={{
             p: { xs: 2, md: "1.5rem 4rem" },
@@ -487,8 +296,7 @@ export function AlaCarteEstimator() {
             color: "primary.contrastText",
           }}
         >
-          <Box textAlign="center" mb={4}>
-            {/* Page Counter */}
+          <Box textAlign="center" mb={3}>
             <Typography
               sx={{
                 textAlign: "center",
@@ -498,7 +306,6 @@ export function AlaCarteEstimator() {
             >
               Page 3 / 5
             </Typography>
-            {/* Label */}
             <Typography
               sx={{
                 mt: 1,
@@ -512,106 +319,32 @@ export function AlaCarteEstimator() {
             </Typography>
           </Box>
 
-          {/* Title */}
-          {/* <Typography
-            variant="h4"
-            fontWeight="bold"
-            color="primary.contrastText"
-            mb={1}
-          >
-            Ala Carte Fish Estimator
-          </Typography> */}
-
-          <Typography color="primary.contrastText" mb={2}>
+          <Typography color="primary.contrastText" mb={2} fontSize="0.9rem">
             Enter the Quantity of Fish You Wish To Purchase
           </Typography>
 
-          {/* Table */}
-          <Box sx={{ overflowX: "auto" }}>
-            <Table size="small">
-              <TableHead>
-                <TableRow sx={{ backgroundColor: "#537D96" }}>
-                  <TableCell sx={{ color: "white", fontWeight: "bold" }}>
-                    Size
-                  </TableCell>
-                  <TableCell sx={{ color: "white", fontWeight: "bold" }}>
-                    Species
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      color: "white",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Quantity
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      color: "white",
-                      fontWeight: "bold",
-                      textAlign: "center",
-                    }}
-                  >
-                    Unit
-                  </TableCell>
-                </TableRow>
-              </TableHead>
+          {/* Two Column Layout */}
+          <Grid container spacing={3}>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Box>
+                {leftColumnCategories.map((category, i) =>
+                  renderCategoryTable(category, i),
+                )}
+              </Box>
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Box>
+                {rightColumnCategories.map((category, i) =>
+                  renderCategoryTable(category, i),
+                )}
+              </Box>
+            </Grid>
+          </Grid>
 
-              <TableBody>
-                {fishItems.map((item, index) => (
-                  <TableRow key={index} hover>
-                    <TableCell sx={{ color: "primary.contrastText" }}>
-                      {item.size}
-                    </TableCell>
-
-                    <TableCell
-                      sx={{ fontWeight: 500, color: "primary.contrastText" }}
-                    >
-                      {item.name}
-                    </TableCell>
-
-                    <TableCell>
-                      <TextField
-                        type="number"
-                        size="small"
-                        value={item.quantity || ""}
-                        onChange={(e) =>
-                          handleQuantityChange(index, e.target.value)
-                        }
-                        placeholder="0"
-                        inputProps={{ min: 0, step: 1 }}
-                        sx={{
-                          width: { md: "50%" },
-                          "& input": { textAlign: "center" },
-                          backgroundColor: "#FFF7CC",
-                          "& .MuiInputBase-input": {
-                            color: "primary.dark",
-                            fontWeight: 600,
-                          },
-                          borderRadius: 1,
-                        }}
-                      />
-                    </TableCell>
-
-                    <TableCell
-                      align="center"
-                      sx={{
-                        color: "primary.contrastText",
-                        textTransform: "capitalize",
-                      }}
-                    >
-                      {item.unit}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Box>
-
-          {/* Estimate Box */}
+          {/* Total Cost Box */}
           <Box
-            mt={4}
-            p={3}
+            mt={3}
+            p={2}
             sx={{
               ...glassBoxStyles,
               border: "2px solid #44A194",
@@ -623,14 +356,9 @@ export function AlaCarteEstimator() {
               justifyContent="space-between"
               alignItems="center"
             >
-              <Typography
-                fontSize={16}
-                fontWeight="bold"
-                color="primary.contrastText"
-              >
+              <Typography fontWeight="bold" color="primary.contrastText">
                 Fish Cost Estimate
               </Typography>
-
               <Typography
                 fontSize={{ xs: 20, md: 24 }}
                 fontWeight="bold"
@@ -639,10 +367,9 @@ export function AlaCarteEstimator() {
                 $ {totalCost.toFixed(2)} - Delivery Included
               </Typography>
             </Box>
-
             <Typography
               textAlign="center"
-              fontSize="1rem"
+              fontSize="0.9rem"
               color="primary.contrastText"
               fontWeight={600}
               mt={1}
@@ -653,24 +380,22 @@ export function AlaCarteEstimator() {
 
           {/* Info Box */}
           <Box
-            mt={3}
-            p={3}
+            mt={2}
+            p={2}
             sx={{
               ...glassBoxStyles,
               border: "1px solid rgba(236,143,141,0.3)",
               textAlign: "center",
             }}
           >
-            <Typography fontSize={12} color="primary.contrastText">
-              Estimated Price is calculated using pond size, fish size and
-              distance from Lonoke, Arkansas.
-              <br />A Representative will contact you to confirm the estimate
-              prior to fish delivery.
+            <Typography fontSize={11} color="primary.contrastText">
+              Estimated Price includes delivery. A representative will contact
+              you to confirm the estimate prior to fish delivery.
             </Typography>
           </Box>
 
           {/* Buttons */}
-          <Box display="flex" justifyContent="space-between" mt={6}>
+          <Box display="flex" justifyContent="space-between" mt={3}>
             <Button
               variant="contained"
               startIcon={<ArrowLeftIcon />}
@@ -683,7 +408,6 @@ export function AlaCarteEstimator() {
             >
               Back
             </Button>
-
             <Button
               variant="contained"
               endIcon={<ArrowRightIcon />}
