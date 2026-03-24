@@ -210,7 +210,7 @@ export function AlaCarteEstimator() {
             <TableCell sx={{ color: "white", fontSize: "0.75rem", py: 0.5 }}>
               Price
             </TableCell>
-            <TableCell sx={{ color: "white", fontSize: "0.75rem", py: 0.5 }}>
+            <TableCell align="center" sx={{ color: "white", fontSize: "0.75rem", py: 0.5 }}>
               Qty
             </TableCell>
           </TableRow>
@@ -248,7 +248,7 @@ export function AlaCarteEstimator() {
                 >
                   ${item.price.toFixed(2)}
                 </TableCell>
-                <TableCell sx={{ py: 0.5 }}>
+                <TableCell align="center" sx={{ py: 0.5 }}>
                   <TextField
                     type="number"
                     size="small"
@@ -263,7 +263,7 @@ export function AlaCarteEstimator() {
                       style: { fontSize: "0.75rem", padding: "4px" },
                     }}
                     sx={{
-                      width: 70,
+                      width: {xs:70, md: 100},
                       "& input": { textAlign: "center" },
                       backgroundColor: "#FFF7CC",
                       "& .MuiInputBase-input": {
@@ -324,7 +324,7 @@ export function AlaCarteEstimator() {
           </Typography>
 
           {/* Two Column Layout */}
-          <Grid container spacing={3}>
+          <Grid container spacing={4}>
             <Grid size={{ xs: 12, md: 6 }}>
               <Box>
                 {leftColumnCategories.map((category, i) =>
