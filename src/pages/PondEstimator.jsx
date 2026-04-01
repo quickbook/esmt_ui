@@ -23,315 +23,31 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { textFieldSx } from "../theme/theme";
 import { useEstimateForm } from "../contexts/EstimateFormContext";
 
-const pondConfigs = {
-  "trophy-bass": {
-    title: "Trophy Bass Pond Estimator",
-    description:
-      "Grow Bass over 10 pounds, Slow fishing long term growth. Best to Stock Bass in June for best Growth potential Stock others first.",
-    stockDesc:
-      "Bluegill, Redear and Minnows stocked in fall or spring and Bass stocked in June",
-    columns: [
-      "Head-Bluegill",
-      "Head-Redear",
-      "Head-Bass",
-      "Pounds-Minnows",
-      "Pounds-Shinners",
-    ],
-    breakdownHeaders: [
-      {
-        label: "5 to 6 inch Bluegill",
-        type: "pounds",
-        fishName: "Bluegill",
-        unit: "pounds",
-      },
-      {
-        label: "3 to 4 inch Bluegill",
-        type: "head",
-        fishName: "Bluegill",
-        unit: "head",
-      },
-      {
-        label: "1 to 3 inch Bluegill",
-        type: "head",
-        fishName: "Bluegill",
-        unit: "head",
-      },
-      {
-        label: "5 to 6 inch Redear",
-        type: "pounds",
-        fishName: "Redear",
-        unit: "pounds",
-      },
-      {
-        label: "3 to 4 inch Redear",
-        type: "head",
-        fishName: "Redear",
-        unit: "head",
-      },
-      {
-        label: "1 to 3 inch Redear",
-        type: "head",
-        fishName: "Redear",
-        unit: "head",
-      },
-      { label: "Minnows", type: "pounds", fishName: "Minnows", unit: "pounds" },
-      {
-        label: "12 to 15 inch Bass",
-        type: "pounds",
-        fishName: "Bass",
-        unit: "pounds",
-      },
-    ],
-  },
-  "catfish-pond": {
-    title: "Catfish Pond Estimator",
-    description:
-      "Grow Catfish up to 5 pounds. Small ponds with low management. Can be stocked year round so long as not to hot for redear.",
-    stockDesc: "All fish stocked at same time.",
-    columns: ["Head-Redear", "Pounds-Minnows", "Head-Catfish"],
-    breakdownHeaders: [
-      {
-        label: "5 to 6 inch Redear",
-        type: "pounds",
-        fishName: "Redear",
-        unit: "pounds",
-      },
-      { label: "Minnows", type: "pounds", fishName: "Minnows", unit: "pounds" },
-      {
-        label: "12 to 15 inch Catfish",
-        type: "pounds",
-        fishName: "Catfish",
-        unit: "pounds",
-      },
-    ],
-  },
-  "fishing-pond": {
-    title: "Fishing Pond Estimator",
-    description:
-      "Grow quality bass, bream, crappie and catfish. Great for kids. All fish can be stocked at same time Crappie do best October to April.",
-    stockDesc:
-      "Crappie are not available May through September, Hybrid Crappie can be substituted for Black Crappie if they are available, Not all sizes of hybrid crappie are available at all times.",
-    columns: [
-      "Head-Bluegill",
-      "Head-Redear",
-      "Head-Bass",
-      "Pounds-Minnows",
-      "Head-Catfish",
-      "Head-Crappie",
-    ],
-    breakdownHeaders: [
-      {
-        label: "5 to 6 inch Bluegill",
-        type: "pounds",
-        fishName: "Bluegill",
-        unit: "pounds",
-      },
-      {
-        label: "3 to 4 inch Bluegill",
-        type: "head",
-        fishName: "Bluegill",
-        unit: "head",
-      },
-      {
-        label: "1 to 3 inch Bluegill",
-        type: "head",
-        fishName: "Bluegill",
-        unit: "head",
-      },
-      {
-        label: "5 to 6 inch Redear",
-        type: "pounds",
-        fishName: "Redear",
-        unit: "pounds",
-      },
-      {
-        label: "3 to 4 inch Redear",
-        type: "head",
-        fishName: "Redear",
-        unit: "head",
-      },
-      {
-        label: "1 to 3 inch Redear",
-        type: "head",
-        fishName: "Redear",
-        unit: "head",
-      },
-      { label: "Minnows", type: "pounds", fishName: "Minnows", unit: "pounds" },
-      {
-        label: "12 to 15 inch Bass",
-        type: "pounds",
-        fishName: "Bass",
-        unit: "pounds",
-      },
-      {
-        label: "12 to 15 inch Catfish",
-        type: "pounds",
-        fishName: "Catfish",
-        unit: "pounds",
-      },
-      {
-        label: "5 to 6 inch Crappie",
-        type: "head",
-        fishName: "Crappie",
-        unit: "head",
-      },
-    ],
-  },
-  "hybrid-bream": {
-    title: "Hybrid Bream Pond Estimator",
-    description:
-      "Grow Bream up to 1 pound. Small ponds with low management. 80 to 90% male reduced spawning reduces competition makes big bream.",
-    stockDesc: "All fish stocked at same time.",
-    columns: [
-      "Head-Hybrid Bream",
-      "Head-Redear",
-      "Head-Bass",
-      "Pounds-Minnows",
-      "Head-Catfish",
-    ],
-    breakdownHeaders: [
-      {
-        label: "5 to 6 inch Hybrid",
-        type: "pounds",
-        fishName: "Hybrid Bream",
-        unit: "pounds",
-      },
-      {
-        label: "5 to 6 inch Redear",
-        type: "pounds",
-        fishName: "Redear",
-        unit: "pounds",
-      },
-      { label: "Minnows", type: "pounds", fishName: "Minnows", unit: "pounds" },
-      {
-        label: "12 to 15 inch Bass",
-        type: "pounds",
-        fishName: "Bass",
-        unit: "pounds",
-      },
-      {
-        label: "12 to 15 inch Catfish",
-        type: "pounds",
-        fishName: "Catfish",
-        unit: "pounds",
-      },
-    ],
-  },
-  "bass-pond": {
-    title: "Bass Pond Estimator",
-    description:
-      "Grow Bass over 5 pounds. Will require regular bass harvest to maintain balance. Best to Stock Bass in June for best Growth potential Stock others first.",
-    stockDesc:
-      "Bluegill, Redear and Minnows stocked in fall or spring and Bass stocked in June",
-    columns: ["Head-Bluegill", "Head-Redear", "Head-Bass", "Pounds-Minnows"],
-    breakdownHeaders: [
-      {
-        label: "5 to 6 inch Bluegill",
-        type: "pounds",
-        fishName: "Bluegill",
-        unit: "pounds",
-      },
-      {
-        label: "3 to 4 inch Bluegill",
-        type: "head",
-        fishName: "Bluegill",
-        unit: "head",
-      },
-      {
-        label: "1 to 3 inch Bluegill",
-        type: "head",
-        fishName: "Bluegill",
-        unit: "head",
-      },
-      {
-        label: "5 to 6 inch Redear",
-        type: "pounds",
-        fishName: "Redear",
-        unit: "pounds",
-      },
-      {
-        label: "3 to 4 inch Redear",
-        type: "head",
-        fishName: "Redear",
-        unit: "head",
-      },
-      {
-        label: "1 to 3 inch Redear",
-        type: "head",
-        fishName: "Redear",
-        unit: "head",
-      },
-      { label: "Minnows", type: "pounds", fishName: "Minnows", unit: "pounds" },
-      {
-        label: "12 to 15 inch Bass",
-        type: "pounds",
-        fishName: "Bass",
-        unit: "pounds",
-      },
-    ],
-  },
-};
-
-// Generate API data based on pond type (keeping UI values same)
-const generateApiData = (pondType) => {
-  const config = pondConfigs[pondType];
-
-  // Same UI values as before
-  const baseOptions = [
-    { label: "Small Fish Option", size: "1-3 inch", price: 120 },
-    { label: "Medium Fish Option", size: "3-4 inch", price: 220 },
-    { label: "Large Fish Option", size: "4-5 inch", price: 350 },
-    { label: "1 Year Old Population", size: "1 inch to Catchable", price: 500 },
-  ];
-
-  // Generate stock values (same as before for UI)
-  const generateStockValues = (optionIndex) => {
-    const stocks = [
-      [100, 50, 25, 200, 120, 80],
-      [200, 100, 50, 300, 80, 40],
-      [300, 150, 75, 400, 90, 45],
-    ];
-    return stocks[optionIndex] || stocks[0];
-  };
-
-  // Generate breakdown values with fish names and units (for data structure)
-  const generateBreakdownValues = () => {
-    const values = [50, 100, 200, 30, 60, 120, 500, 25, 20, 10, 40];
-
-    return config.breakdownHeaders.map((header, index) => ({
-      fishName: header.fishName,
-      size: header.label,
-      unit: header.unit,
-      quantity: values[index] || Math.floor(Math.random() * 100 + 50),
-      total: 0, // Will be calculated
-    }));
-  };
-
-  return {
-    options: baseOptions,
-    stock: [0, 1, 2, 3].map((i) => generateStockValues(i)),
-    breakdownValues: generateBreakdownValues(),
-    grassCarpPrice: 5.75,
-    notes: ["$750 minimum"],
-  };
-};
+import { pondEstimateApi, pondConfigs } from "../api/AllapiData";
 
 export function PondEstimator() {
   const navigate = useNavigate();
   const { type } = useParams();
   const config = pondConfigs[type];
   const { data, updateSection } = useEstimateForm();
-
   const [selectedOptions, setSelectedOptions] = useState(
-    data.estimator.selectedOptionIndices || [],
+    data.estimator.selectedOptionCodes || [],
   );
   const [apiData, setApiData] = useState(null);
-  const [grassCarpSelected, setGrassCarpSelected] = useState(
-    data.estimator.grassCarp?.selected || false,
-  );
-  const [grassCarpQty, setGrassCarpQty] = useState(
-    data.estimator.grassCarp?.quantity || 1,
-  );
+  const [addons, setAddons] = useState(() => {
+    const source = data.estimator.addons?.length
+      ? data.estimator.addons
+      : (pondEstimateApi?.addons || []).map((addon) => ({
+          code: addon.addonCode || addon.code,
+          name: addon.fishName || addon.name || "Unknown Add-on",
+          quantity: addon.quantity || 1,
+          unitPrice: addon.unitPrice || addon.price || 0,
+          selected: addon.selected || false,
+          eligibleStates: addon.eligibleStates || [],
+          total: (addon.quantity || 1) * (addon.unitPrice || addon.price || 0),
+        }));
+    return source;
+  });
   const [regularHybrid, setRegularHybrid] = useState(
     data.estimator.hybridChoice?.regularHybrid || false,
   );
@@ -340,21 +56,113 @@ export function PondEstimator() {
   );
 
   useEffect(() => {
-    setSelectedOptions(data.estimator.selectedOptionIndices || []);
-    setGrassCarpSelected(data.estimator.grassCarp?.selected || false);
-    setGrassCarpQty(data.estimator.grassCarp?.quantity || 1);
+    setSelectedOptions(data.estimator.selectedOptionCodes || []);
     setRegularHybrid(data.estimator.hybridChoice?.regularHybrid || false);
     setSpecklebelly(data.estimator.hybridChoice?.specklebelly || false);
-  }, [data.estimator]);
 
-  const handleToggle = (i) => {
+    if (data.estimator.addons?.length) {
+      setAddons(
+        data.estimator.addons.map((addon) => ({
+          code: addon.code || addon.addonCode,
+          name: addon.name || addon.fishName || "Unknown Add-on",
+          quantity: addon.quantity || 1,
+          unitPrice: addon.unitPrice || addon.price || 0,
+          selected: true,
+          eligibleStates: addon.eligibleStates || [],
+          total: (addon.quantity || 1) * (addon.unitPrice || addon.price || 0),
+        })),
+      );
+    } else if (pondEstimateApi?.addons?.length) {
+      setAddons(
+        pondEstimateApi.addons.map((addon) => ({
+          code: addon.addonCode || addon.code,
+          name: addon.fishName || addon.name || "Unknown Add-on",
+          quantity: addon.quantity || 1,
+          unitPrice: addon.unitPrice || addon.price || 0,
+          selected: addon.selected || false,
+          eligibleStates: addon.eligibleStates || [],
+          total: (addon.quantity || 1) * (addon.unitPrice || addon.price || 0),
+        })),
+      );
+    }
+  }, [data.estimator, pondEstimateApi]);
+
+
+
+  // // 🔹 Helpers
+  // const getFishQuantity = (pkg, column) => {
+  //   const [, fishNameRaw] = column.split("-");
+  //   const fishName = fishNameRaw.toLowerCase();
+
+  //   const match = pkg.fishItems?.find((f) =>
+  //     f.fishType.toLowerCase().includes(fishName),
+  //   );
+
+  //   return match?.quantity || 0;
+  // };
+
+  // const getBreakdownQuantity = (pkg, header) => {
+  //   if (!pkg) return 0;
+
+  //   const size = header.label.replace(header.fishName + " ", "");
+
+  //   const match = pkg.fishItems.find(
+  //     (f) => f.fishType === header.fishName && f.size === size,
+  //   );
+
+  //   return match?.quantity || 0;
+  // };
+
+  const handleToggle = (pkg, index) => {
     setSelectedOptions((prev) => {
-      const next = prev.includes(i)
-        ? prev.filter((idx) => idx !== i)
-        : [...prev, i];
-      updateSection("estimator", { selectedOptionIndices: next });
-      return next;
+      const exists = prev.includes(pkg.packageCode);
+
+      const nextCodes = exists
+        ? prev.filter((c) => c !== pkg.packageCode)
+        : [...prev, pkg.packageCode];
+
+      // 👇 Maintain indices for backward compatibility
+      const nextIndices = apiData.packages
+        .map((p, i) => (nextCodes.includes(p.packageCode) ? i : null))
+        .filter((i) => i !== null);
+
+      updateSection("estimator", {
+        selectedOptionCodes: nextCodes,
+        selectedOptionIndices: nextIndices,
+      });
+
+      return nextCodes;
     });
+  };
+
+  const handleAddonToggle = (code) => {
+    setAddons((prev) =>
+      prev.map((addon) =>
+        addon.code === code
+          ? {
+              ...addon,
+              selected: !addon.selected,
+              total:
+                (addon.quantity || 0) * (addon.unitPrice || 0),
+            }
+          : addon,
+      ),
+    );
+  };
+
+  const handleAddonQtyChange = (code, qty) => {
+    const safeQty = Number(qty) <= 0 ? 0 : Number(qty);
+    setAddons((prev) =>
+      prev.map((addon) =>
+        addon.code === code
+          ? {
+              ...addon,
+              quantity: safeQty,
+              total: safeQty * (addon.unitPrice || 0),
+            }
+          : addon,
+      ),
+    );
   };
 
   const handleBack = () => {
@@ -362,110 +170,114 @@ export function PondEstimator() {
   };
 
   const handleNext = () => {
-    // Create detailed selected options with fish information
-    const selectedOptionDetails = selectedOptions.map((i) => {
-      const option = apiData.options[i];
+    const selectedOptionDetails = selectedOptions.map((code) => {
+      const pkg = apiData.packages.find((p) => p.packageCode === code);
+      const isYear1 = pkg.packageCode === "YEAR1";
 
-      // For the 4th option (1 Year Old Population), include detailed breakdown
-      if (i === 3) {
-        const breakdownWithTotals = apiData.breakdownValues.map((item) => ({
-          ...item,
+      if (isYear1) {
+        const breakdown = pkg.fishItems.map((item) => ({
+          fishName: item.fishType,
+          size: item.size,
+          unit: item.unitType,
+          quantity: item.quantity,
           total:
-            item.unit === "pounds"
-              ? item.quantity * 5.75 // Price per pound
-              : item.quantity * 2.5, // Price per head
+            item.unitType === "POUNDS"
+              ? item.quantity * 5.75
+              : item.quantity * 2.5,
         }));
 
         return {
-          ...option,
+          label: pkg.packageName,
+          price: pkg.estimatedPrice,
           pondType: type,
           isMaturePopulation: true,
-          breakdown: breakdownWithTotals,
-          // Use the package price, not the sum of breakdown
-          calculatedTotal: option.price,
+          breakdown,
+          calculatedTotal: pkg.estimatedPrice,
         };
       }
 
-      // For regular options, create stock details with fish names
-      const stockColumns = config.columns;
-      const stockDetails = stockColumns.map((col, idx) => {
-        const [unit, fishName] = col.split("-");
-        const quantity = apiData.stock[i]?.[idx] || 0;
-
-        return {
-          fishName: fishName,
-          unit: unit.toLowerCase(),
-          quantity: quantity,
-          size: option.size,
-          // Don't calculate price here, just show quantities
-        };
-      });
+      const stockDetails = pkg.fishItems.map((item) => ({
+        fishName: item.fishType,
+        unit: item.unitType.toLowerCase(),
+        quantity: item.quantity,
+        size: item.size,
+      }));
 
       return {
-        ...option,
+        label: pkg.packageName,
+        price: pkg.estimatedPrice,
         pondType: type,
-        stockDetails: stockDetails,
-        // Use the package price from API, not calculated from quantities
-        calculatedTotal: option.price,
+        stockDetails,
+        calculatedTotal: pkg.estimatedPrice,
       };
     });
 
-    const grassCarpTotal = grassCarpSelected
-      ? apiData.grassCarpPrice * grassCarpQty
-      : 0;
+    const selectedAddons = addons
+      .filter((item) => item.selected)
+      .map((item) => ({
+        ...item,
+        total: (item.quantity || 0) * (item.unitPrice || 0),
+      }));
 
-    // Calculate total price from all selections using the package prices
-    const optionsTotal = selectedOptionDetails.reduce(
-      (sum, option) => sum + (option.calculatedTotal || option.price || 0),
+    const addonTotal = selectedAddons.reduce(
+      (sum, item) => sum + (item.total || 0),
       0,
     );
 
-    const finalData = {
+    const optionsTotal = selectedOptionDetails.reduce(
+      (sum, opt) => sum + opt.calculatedTotal,
+      0,
+    );
+
+    updateSection("estimator", {
       pondType: type,
-      pondTypeTitle: config.title,
+      pondTypeTitle: apiData?.title,
       selectedOptionIndices: selectedOptions,
       selectedOptions: selectedOptionDetails,
-      grassCarp: {
-        selected: grassCarpSelected,
-        quantity: grassCarpQty,
-        pricePerFish: apiData.grassCarpPrice,
-        total: grassCarpTotal,
-        description: "8 to 10 inch TRIPLOID GRASS CARP",
-      },
-      hybridChoice:
-        config.title === "Hybrid Bream Pond Estimator"
-          ? {
-              regularHybrid,
-              specklebelly,
-              selected: regularHybrid
-                ? "regular"
-                : specklebelly
-                  ? "specklebelly"
-                  : "none",
-            }
-          : null,
-      breakdown: selectedOptions.includes(3) ? apiData.breakdownValues : [],
-      totalPrice: optionsTotal + grassCarpTotal,
-      stockingDescription: config.stockDesc,
-    };
+      addons: selectedAddons,
+      totalPrice: optionsTotal + addonTotal,
+      stockingDescription: apiData.infoNotes?.join(", "),
+    });
 
-    updateSection("estimator", finalData);
     navigate("/estimate/availability");
   };
 
+  const year1Package = apiData?.packages.find((p) => p.packageCode === "YEAR1");
+  const tableColumns = apiData?.packages?.[0]?.fishItems || [];
+
   // Generate API data based on pond type
+  // useEffect(() => {
+  //   if (type) {
+  //     const data = generateApiData(type);
+  //     setApiData(data);
+  //   }
+  // }, [type]);
+
   useEffect(() => {
-    if (type) {
-      const data = generateApiData(type);
-      setApiData(data);
-    }
-  }, [type]);
+    if (!type) return;
+
+    const fetchData = async () => {
+      try {
+        // 🔴 Replace this with real API call
+        const response = pondEstimateApi;
+
+        setApiData(response);
+
+        // if no context stored option yet, seed it from API addon
+        // no-op for initial addon sync; existing addon initialization handled in addons state.
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchData();
+  }, [type, data.estimator.grassCarp]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  if (!apiData || !config) return null;
+  if (!apiData) return null;
 
   return (
     <Box
@@ -503,7 +315,7 @@ export function PondEstimator() {
                   fontWeight: 500,
                 }}
               >
-                {config.title}
+                {apiData?.title}
               </Typography>
             </Box>
 
@@ -521,16 +333,16 @@ export function PondEstimator() {
 
             <Box>
               <Typography fontWeight="bold" color="primary.contrastText" mb={2}>
-                Note: {config.description}
+                Note: {apiData?.description}
               </Typography>
               <Typography
                 fontSize="0.875rem"
                 color="primary.contrastText"
                 mb={2}
               >
-                Select the option that best fits your budget. A
-                representative will contact you to confirm the estimate and
-                discuss stocking options prior to delivery.
+                Select the option that best fits your budget. A representative
+                will contact you to confirm the estimate and discuss stocking
+                options prior to delivery.
               </Typography>
             </Box>
 
@@ -556,42 +368,54 @@ export function PondEstimator() {
                       <br />
                       Option
                     </TableCell>
-                    {config.columns.map((c) => (
-                      <TableCell key={c}>
-                        {c.split("-").map((s, i) => (
-                          <div key={i + s}>{s}</div>
-                        ))}
+                    {tableColumns.map((item, i) => (
+                      <TableCell key={i} align="center">
+                        {item.unitType === "FISH" ? "Head" : "Pounds"}
+                        <br />
+                        {item.fishType}
                       </TableCell>
                     ))}
                   </TableRow>
                 </TableHead>
 
                 <TableBody>
-                  {apiData.options.map((opt, i) => {
-                    const isFourthRow = i === 3;
+                  {apiData.packages.map((pkg, i) => {
+                    const isYear1 = pkg.packageCode === "YEAR1";
                     return (
                       <TableRow
                         key={i}
                         sx={{
-                          backgroundColor: selectedOptions.includes(i)
+                          backgroundColor: selectedOptions.includes(
+                            pkg.packageCode,
+                          )
                             ? "rgba(43, 161, 146, 0.25)"
                             : "rgba(0, 0, 0, 0.2)",
                         }}
                       >
-                        <TableCell>{opt.label}</TableCell>
-                        <TableCell>{opt.size}</TableCell>
-                        <TableCell>${opt.price}</TableCell>
+                        <TableCell>{pkg.packageName}</TableCell>
+                        <TableCell>
+                          {pkg.packageCode === "YEAR1"
+                            ? "1 inch to Catchable"
+                            : pkg.fishItems?.[0]?.size || "-"}
+                        </TableCell>
+                        <TableCell>${pkg.estimatedPrice}</TableCell>
                         <TableCell>
                           <Checkbox
-                            checked={selectedOptions.includes(i)}
-                            onChange={() => handleToggle(i)}
+                            checked={selectedOptions.includes(pkg.packageCode)}
+                            onChange={() => handleToggle(pkg, i)}
                           />
                         </TableCell>
-                        {config.columns.map((_, idx) => (
-                          <TableCell key={idx}>
-                            {!isFourthRow ? apiData.stock[i][idx] : ""}
-                          </TableCell>
-                        ))}
+                        {tableColumns.map((colItem, idx) => {
+                          const match = pkg.fishItems?.find(
+                            (f) => f.fishType === colItem.fishType,
+                          );
+
+                          return (
+                            <TableCell key={idx} align="center">
+                              {!isYear1 ? match?.quantity || 0 : ""}
+                            </TableCell>
+                          );
+                        })}
                       </TableRow>
                     );
                   })}
@@ -600,27 +424,35 @@ export function PondEstimator() {
 
               <Table
                 sx={{
-                  background: selectedOptions.includes(3)
+                  background: selectedOptions.includes("YEAR1")
                     ? "rgba(43, 161, 146, 0.25)"
                     : "rgba(0, 0, 0, 0.2)",
                 }}
               >
                 <TableHead>
                   <TableRow>
-                    {config.breakdownHeaders.map((h, i) => (
+                    {year1Package?.fishItems.map((item, i) => (
                       <TableCell key={i} align="center">
-                        {h.type === "pounds" ? "Pounds" : "Head"}
+                        {/* Unit */}
+                        {item.unitType === "FISH" ? "Head" : "Pounds"}
                         <br />
-                        {h.label}
+
+                        {/* Fish Name */}
+                        {item.fishType}
+                        <br />
+
+                        {/* Size */}
+                        <span style={{ fontSize: "0.75rem" }}>{item.size}</span>
                       </TableCell>
                     ))}
                   </TableRow>
                 </TableHead>
+
                 <TableBody>
                   <TableRow>
-                    {config.breakdownHeaders.map((_, i) => (
+                    {year1Package?.fishItems.map((item, i) => (
                       <TableCell key={i} align="center">
-                        {apiData.breakdownValues[i]?.quantity || 0}
+                        {item.quantity}
                       </TableCell>
                     ))}
                   </TableRow>
@@ -628,111 +460,77 @@ export function PondEstimator() {
               </Table>
             </Box>
 
-            <Box mt={4} p={3} border={"1px solid"} borderRadius={2} bgcolor={"rgba(0, 0, 0, 0.2)"}>
-              <Typography fontWeight="bold" sx={{ color: "text.primary" }}>
-                Optional Add-ons
-              </Typography>
-
+            {addons && addons.length > 0 && (
               <Box
-                display="flex"
-                alignItems="center"
-                justifyContent="space-between"
-                flexDirection={{ xs: "column", md: "row" }}
-                gap={2}
-                mt={2}
-                px={1}
-                py={2}
-                bgcolor={
-                  grassCarpSelected ? "rgba(43, 161, 146, 0.25)" : "transparent"
-                }
+                mt={4}
+                p={3}
+                border="1px solid"
+                borderRadius={2}
+                bgcolor="rgba(0, 0, 0, 0.2)"
               >
-                <Typography
-                  fontWeight="bold"
-                  sx={{ color: "text.primary" }}
-                  fontSize={"0.875rem"}
-                >
-                  ADD 8 to 10 inch TRIPLOID GRASS CARP
+                <Typography fontWeight="bold" sx={{ color: "text.primary" }}>
+                  Optional Add-ons
                 </Typography>
-                <TextField
-                  type="number"
-                  size="small"
-                  value={grassCarpQty}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    const nextQty = Number(value) < 0 ? 0 : value;
-                    setGrassCarpQty(nextQty);
-                  }}
-                  sx={{ ...textFieldSx, width: { xs: 60, md: 80 } }}
-                />
-                <Typography fontSize={16} color="text.primary" width={60}>
-                  ${ (apiData.grassCarpPrice * grassCarpQty).toFixed(2) }
-                </Typography>
-                <Checkbox
-                  sx={{ color: "text.primary" }}
-                  checked={grassCarpSelected}
-                  onChange={(e) => setGrassCarpSelected(e.target.checked)}
-                />
-                <Typography fontSize={13} color="text.secondary">
-                  ARKANSAS, MISSOURI, MISSISSIPPI, OKLAHOMA, TENNESSEE ONLY
-                </Typography>
-              </Box>
 
-              {config.title === "Hybrid Bream Pond Estimator" && (
-                <Box>
-                  <Typography
-                    sx={{
-                      fontSize: "0.75rem",
-                      color: "text.secondary",
-                      mb: 1.5,
-                    }}
-                  >
-                    Specklebelly can be substituted for regular hybrid bream.
-                  </Typography>
+                {addons.map((addon) => (
                   <Box
-                    sx={{ display: "flex", flexDirection: "column", gap: 1 }}
+                    key={addon.code}
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    flexDirection={{ xs: "column", md: "row" }}
+                    gap={2}
+                    mt={2}
+                    px={1}
+                    py={2}
+                    bgcolor={addon.selected ? "rgba(43, 161, 146, 0.25)" : "transparent"}
+                    borderRadius={1}
                   >
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={regularHybrid}
-                          onChange={(e) => {
-                            const checked = e.target.checked;
-                            setRegularHybrid(checked);
-                            if (checked) setSpecklebelly(false);
-                          }}
-                        />
-                      }
-                      label={
-                        <Typography
-                          sx={{ fontSize: "0.8rem", color: "text.primary" }}
-                        >
-                          Customer wants regular hybrids
-                        </Typography>
-                      }
+                    <Typography
+                      fontWeight="bold"
+                      sx={{ color: "text.primary" }}
+                      fontSize="0.875rem"
+                    >
+                      ADD {addon.name}
+                    </Typography>
+
+                    <TextField
+                      type="number"
+                      size="small"
+                      value={addon.quantity}
+                      onChange={(e) => {
+                        const value = Number(e.target.value);
+                        handleAddonQtyChange(addon.code, Number.isNaN(value) ? 0 : value);
+                      }}
+                      sx={{ ...textFieldSx, width: { xs: 60, md: 80 } }}
+                      inputProps={{ min: 0 }}
                     />
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={specklebelly}
-                          onChange={(e) => {
-                            const checked = e.target.checked;
-                            setSpecklebelly(checked);
-                            if (checked) setRegularHybrid(false);
-                          }}
-                        />
-                      }
-                      label={
-                        <Typography
-                          sx={{ fontSize: "0.8rem", color: "text.primary" }}
-                        >
-                          Customer wants specklebelly
-                        </Typography>
-                      }
+
+                    <Typography fontSize={16} color="text.primary" width={80}>
+                      {addon.unitPrice
+                        ? `$${((addon.quantity || 0) * addon.unitPrice).toFixed(2)}`
+                        : "$0.00"}
+                    </Typography>
+
+                    <Checkbox
+                      sx={{ color: "text.primary" }}
+                      checked={addon.selected}
+                      onChange={() => handleAddonToggle(addon.code)}
                     />
+
+                    {addon.eligibleStates?.length > 0 && (
+                      <Typography
+                        fontSize={13}
+                        color="text.secondary"
+                        textTransform="uppercase"
+                      >
+                        {addon.eligibleStates.join(", ")} only
+                      </Typography>
+                    )}
                   </Box>
-                </Box>
-              )}
-            </Box>
+                ))}
+              </Box>
+            )}
 
             <Box
               sx={{
@@ -750,16 +548,23 @@ export function PondEstimator() {
                   color: "text.primary",
                 }}
               >
-                $750 minimum
+                {apiData.minimumOrderAmount} minimum
               </Typography>
               <Typography sx={{ fontSize: "0.75rem", color: "text.primary" }}>
-                {config.stockDesc}
+                {apiData.infoNotes.map((i) => (
+                  <>
+                    {i}
+                    <br />
+                  </>
+                ))}
               </Typography>
               <Typography sx={{ fontSize: "0.75rem", color: "text.primary" }}>
-                Estimated Price is calculated using pond size, fish size and
-                distance from Lonoke, Arkansas.
-                <br />A Representative will contact you to confirm the estimate
-                prior to fish delivery.
+                {apiData.disclaimerNotes.map((i) => (
+                  <>
+                    {i}
+                    <br />
+                  </>
+                ))}
               </Typography>
             </Box>
 

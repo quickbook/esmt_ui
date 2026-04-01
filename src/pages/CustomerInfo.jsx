@@ -17,32 +17,21 @@ import { useNavigate } from "react-router-dom";
 import { menuItemSx, selectSx, textFieldSx } from "../theme/theme";
 import { motion } from "framer-motion";
 import { useEstimateForm } from "../contexts/EstimateFormContext";
+import { useSelector } from "react-redux";
+
 
 export function CustomerInfo() {
   const navigate = useNavigate();
+  const leadSource = useSelector((state) => state.domain.leadSources);
   const { data, updateSection } = useEstimateForm();
   const formData = data.customer;
-
-  const hearAboutOptions = [
-    "AGFC Guidebook",
-    "Farm Bureau Magazine",
-    "First Electric Magazine",
-    "Website",
-    "Event Sponsorship",
-    "Return Customer",
-    "Arkansans Great Outdoors",
-    "Neighbor",
-    "Facebook",
-    "Instagram",
-    "YouTube",
-    "State Fair",
-  ];
 
   const handleChange = (field, value) => {
     updateSection("customer", { [field]: value });
   };
 
   const handleBack = () => {
+    console.log("Customer info:",formData)
     navigate("/");
   };
 
@@ -271,9 +260,9 @@ export function CustomerInfo() {
                 <MenuItem disabled value="" sx={{ ...menuItemSx }}>
                   Select option
                 </MenuItem>
-                {hearAboutOptions.map((option, index) => (
-                  <MenuItem key={index} value={option} sx={{ ...menuItemSx }}>
-                    {option}
+                {leadSource.map((option, index) => (
+                  <MenuItem key={index} value={option.code} sx={{ ...menuItemSx }}>
+                    {option.name}
                   </MenuItem>
                 ))}
               </Select>

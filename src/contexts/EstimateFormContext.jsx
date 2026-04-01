@@ -29,6 +29,7 @@ export const initialEstimateFormData = {
   estimator: {
     pondType: "",
     selectedOptionIndices: [],
+    selectedOptionCodes: [],
     selectedOptions: [],
     grassCarp: {
       selected: false,

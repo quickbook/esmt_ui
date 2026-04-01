@@ -5,7 +5,6 @@ import { PondInfo } from "../pages/PondInfo";
 import { Availability } from "../pages/Availability";
 import { Quote } from "../pages/Quote";
 import { Login } from "../pages/Login";
-import { PondSelection } from "../pages/PondSelection";
 import { AdultFishEstimator } from "../pages/AdultFishEstimator";
 import { FeedBassEstimator } from "../pages/FeedBassEstimator";
 import { GrassCarpEstimator } from "../pages/GrassCarpEstimator";
@@ -73,22 +72,21 @@ const Router = () => {
         <Route path="/estimate/signup" element={<Signup />} />
         <Route path="/estimate/customer-info" element={<CustomerInfo />} />
         <Route path="/estimate/pond-info" element={<PondInfo />} />
-        {/* <Route path="/estimate/pond-selection" element={<PondSelection />} /> */}
         <Route path="/estimate/estimator/:type" element={<PondEstimator />} />
         <Route
-          path="/estimate/estimator/adult-fish"
+          path="/estimate/estimator/ADD_CATCHABLE_FISH"
           element={<AdultFishEstimator />}
         />
         <Route
-          path="/estimate/estimator/feed-bass"
+          path="/estimate/estimator/FEED_POND_BASS"
           element={<FeedBassEstimator />}
         />
         <Route
-          path="/estimate/estimator/grass-carp"
+          path="/estimate/estimator/STOCK_GRASS_CARP"
           element={<GrassCarpEstimator />}
         />
         <Route
-          path="/estimate/estimator/ala-carte"
+          path="/estimate/estimator/CUSTOM_STOCKING"
           element={<AlaCarteEstimator />}
         />
         <Route path="/estimate/availability" element={<Availability />} />

@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
-import { Stepper } from "../components/Stepper";
 import React from "react";
 import {
   Box,

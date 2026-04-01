@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Stepper } from "../components/Stepper";
 import React from "react";
 import {
   Box,
@@ -137,7 +136,6 @@ export function AdultFishEstimator() {
             color: "primary.contrastText",
           }}
         >
-          {/* Stepper */}
           <Box textAlign="center" mb={4}>
             {/* Page Counter */}
             <Typography

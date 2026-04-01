@@ -23,48 +23,13 @@ import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import { glassBoxStyles } from "../utils/glassStyles";
 import { menuItemSx, selectSx, textFieldSx } from "../theme/theme";
 import { useEstimateForm } from "../contexts/EstimateFormContext";
-
-export const newPondOptions = [
-  { value: "trophy-bass", label: "I want to fish for trophy bass." },
-  { value: "bass-pond", label: "I want to fish for quality bass and bream." },
-  {
-    value: "fishing-pond",
-    label:
-      "I want to fish for a variety of fish (bass, bream, crappie, catfish).",
-  },
-  {
-    value: "catfish-pond",
-    label: "I want to fish for catfish.",
-  },
-  {
-    value: "hybrid-bream",
-    label: "I want to fish for big bream in a small pond.",
-  },
-];
-
-export const oldPondOptions = [
-  {
-    value: "adult-fish",
-    label: "I want to add catchable/adult fish to my existng pond ",
-  },
-  {
-    value: "feed-bass",
-    label: "I want to feed the bass in my pond ",
-  },
-  {
-    value: "grass-carp",
-    label: "I want to stock grass carp to eat the weeds in my pond ",
-  },
-];
-
-export const alaCarteOption = {
-  value: "ala-carte",
-  label:
-    "I want to create my own custom fish stocking from your ala carte menu",
-};
+import { useSelector } from "react-redux";
 
 export function PondInfo() {
   const navigate = useNavigate();
+  const pondAccessOptions = useSelector((state) => state.domain.pondAccess);
+  const fishTypes = useSelector((state) => state.domain.fishSpecies);
+  const pondTypeOptions = useSelector((state) => state.domain.pondOptions);
   const { data, updateSection } = useEstimateForm();
   const {
     pondSize,
@@ -79,49 +44,12 @@ export function PondInfo() {
   const [snackOpen, setSnackOpen] = useState(false);
   const [snackMessage, setSnackMessage] = useState("");
 
-  const pondAccessOptions = [
-    "Good solid road/driveway to the pond",
-    "Gravel road",
-    "Dirt road",
-    "4 wheeler trail",
-    "Cross cow pasture/lawn/field",
-    "Do not deliver if it rained in the last week",
-    "I have a tractor/bulldozer to pull you out",
-  ];
-
-  const fishSpecies = [
-    "Bass",
-    "Bluegill Sunfish",
-    "Redear",
-    "Black Crappie",
-    "Channel Catfish",
-    "Hybrid Bream",
-    "Golden Shiners",
-    "Fathead Minnows",
-    "Green Sunfish",
-    "White Crappie",
-    "Blue Catfish",
-    "Flathead Catfish",
-    "Mud Catfish / Bullhead Catfish",
-    "Gar",
-    "Hybrid Crappie",
-    "Grinnel / Bowfin",
-    "Shad",
-    "Specklebelly Bream",
-  ];
 
   const getOptions = () => {
-    if (pondType === "new") return [...newPondOptions, alaCarteOption];
-    if (pondType === "old") return [...oldPondOptions, alaCarteOption];
+    if (pondType === "new") return [...(pondTypeOptions?.NEW || [])];
+    if (pondType === "old") return [...(pondTypeOptions?.OLD || [])];
     return [];
   };
-
-  const steps = [
-    "Do you have a new pond or an old pond?",
-    "Are there any fish in the pond now?",
-    "Select fish species in your pond",
-    "Which statement fits your interest?",
-  ];
 
   const handleChange = (field, value) => {
     updateSection("pondInfo", { [field]: value });
@@ -151,7 +79,9 @@ export function PondInfo() {
     }
 
     navigate(`/estimate/estimator/${selectedOption}`);
+    console.log("pond info:", data.pondInfo)
   };
+
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -316,8 +246,8 @@ export function PondInfo() {
                 </MenuItem>
 
                 {pondAccessOptions.map((option, index) => (
-                  <MenuItem key={index} value={option} sx={{ ...menuItemSx }}>
-                    {option}
+                  <MenuItem key={index} value={option.code} sx={{ ...menuItemSx }}>
+                    {option.name}
                   </MenuItem>
                 ))}
               </Select>
@@ -456,22 +386,22 @@ export function PondInfo() {
                   gap={2}
                   mb={4}
                 >
-                  {fishSpecies.map((fish) => (
+                  {fishTypes.map((fish) => (
                     <FormControlLabel
-                      key={fish}
+                      key={fish.code}
                       control={
                         <Checkbox
-                          checked={selectedFish.includes(fish)}
+                          checked={selectedFish.includes(fish.code)}
                           sx={{ color: "primary.contrastText" }}
                           onChange={(e) => {
                             const next = e.target.checked
-                              ? [...selectedFish, fish]
-                              : selectedFish.filter((f) => f !== fish);
+                              ? [...selectedFish, fish.code]
+                              : selectedFish.filter((f) => f !== fish.code);
                             updateSection("pondInfo", { selectedFish: next });
                           }}
                         />
                       }
-                      label={fish}
+                      label={fish.name}
                       sx={{
                         color: "primary.contrastText",
                         ".MuiFormControlLabel-label": {
@@ -554,11 +484,11 @@ export function PondInfo() {
 
                   {getOptions().map((opt) => (
                     <MenuItem
-                      key={opt.value}
-                      value={opt.value}
+                      key={opt.code}
+                      value={opt.code}
                       sx={{ ...menuItemSx }}
                     >
-                      {opt.label}
+                      {opt.name}
                     </MenuItem>
                   ))}
                 </Select>

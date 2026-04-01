@@ -156,3 +156,49 @@ export const pondConfigs = {
     ],
   },
 };
+
+export const hearAboutOptions = [
+  "AGFC Guidebook",
+  "Farm Bureau Magazine",
+  "First Electric Magazine",
+  "Website",
+  "Event Sponsorship",
+  "Return Customer",
+  "Arkansans Great Outdoors",
+  "Neighbor",
+  "Facebook",
+  "Instagram",
+  "YouTube",
+  "State Fair",
+];
+
+export const pondAccessOptions = [
+  "Good solid road/driveway to the pond",
+  "Gravel road",
+  "Dirt road",
+  "4 wheeler trail",
+  "Cross cow pasture/lawn/field",
+  "Do not deliver if it rained in the last week",
+  "I have a tractor/bulldozer to pull you out",
+];
+
+export const fishSpecies = [
+  "Bass",
+  "Bluegill Sunfish",
+  "Redear",
+  "Black Crappie",
+  "Channel Catfish",
+  "Hybrid Bream",
+  "Golden Shiners",
+  "Fathead Minnows",
+  "Green Sunfish",
+  "White Crappie",
+  "Blue Catfish",
+  "Flathead Catfish",
+  "Mud Catfish / Bullhead Catfish",
+  "Gar",
+  "Hybrid Crappie",
+  "Grinnel / Bowfin",
+  "Shad",
+  "Specklebelly Bream",
+];

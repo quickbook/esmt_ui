@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Stepper } from "../components/Stepper";
 import { useEstimateForm } from "../contexts/EstimateFormContext";
 import {
   Box,
@@ -20,17 +19,24 @@ import {
 import { ArrowLeft, CheckCircle, FileText, Mail } from "lucide-react";
 import { glassBoxStyles } from "../utils/glassStyles";
 import { mockEstimateOptionsApiData, pondConfigs } from "../api/mockApiData";
-import { newPondOptions, oldPondOptions } from "./PondInfo";
+import { useSelector } from "react-redux";
 
 export function Quote() {
   const navigate = useNavigate();
   const { data, reset } = useEstimateForm();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const pondOptions = useSelector(
+    (state) => state.domain.pondOptions || { NEW: [], OLD: [] },
+  );
+  const newPondOptions = pondOptions.NEW || [];
+  const oldPondOptions = pondOptions.OLD || [];
 
   const customer = data.customer;
   const pondInfo = data.pondInfo;
   const estimator = data.estimator;
   const availability = data.availability;
+  const today = new Date();
+  const validity = new Date(today.setDate(today.getDate() + 30));
 
   const apiData = mockEstimateOptionsApiData;
   const pondType =
@@ -136,6 +142,27 @@ export function Quote() {
 
           {/* Data Sections */}
           <Box sx={{ mb: 4 }}>
+            {/* Quote header */}
+            <Box
+              sx={{
+                mb: 2,
+                p: 2,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                borderRadius: 2,
+                backgroundColor: "rgba(68, 161, 148, 0.1)",
+                border: "1px solid rgba(68, 161, 148, 0.3)",
+              }}
+            >
+              <Typography variant="subtitle1" fontWeight={600}>
+                Quote ID: {estimator.quoteId || `Q-${new Date().getTime()}`}
+              </Typography>
+              <Typography variant="subtitle1" fontWeight={600}>
+                Date: {new Date().toLocaleDateString()}
+              </Typography>
+            </Box>
+
             {/* Customer Info */}
             <Box sx={{ mb: 3 }}>
               <Typography
@@ -313,7 +340,7 @@ export function Quote() {
               </Box>
             </Box>
             {/* Pond Estimator Details */}
-            
+
             {/* Pond Estimator Details */}
             <Box sx={{ mb: 3 }}>
               <Typography
@@ -400,7 +427,12 @@ export function Quote() {
                                   >
                                     {item.fishName}:{" "}
                                     <strong>
-                                      {item.quantity} {item.unit}
+                                      {item.quantity}{" "}
+                                      {item.unit.toUpperCase() === "FISH"
+                                        ? "Head"
+                                        : item.unit.toUpperCase() === "POUNDS"
+                                          ? "Pounds"
+                                          : item.unit}
                                     </strong>
                                   </Typography>
                                 </Grid>
@@ -427,7 +459,12 @@ export function Quote() {
                                   >
                                     {item.fishName}:{" "}
                                     <strong>
-                                      {item.quantity} {item.unit}
+                                      {item.quantity}{" "}
+                                      {item.unit === "FISH"
+                                        ? "Head"
+                                        : item.unit === "POUNDS"
+                                          ? "Pounds"
+                                          : item.unit}
                                     </strong>
                                   </Typography>
                                 </Grid>
@@ -444,6 +481,43 @@ export function Quote() {
                       </Box>
                     );
                   })}
+
+                {/* Add-ons */}
+                {estimator.addons && estimator.addons.length > 0 && (
+                  <Box sx={{ mb: 3 }}>
+                    <Typography
+                      variant="h6"
+                      fontWeight={600}
+                      sx={{ color: "primary.light", mb: 2 }}
+                    >
+                      Add-ons
+                    </Typography>
+                    {estimator.addons.map((addon, idx) => (
+                      <Box
+                        key={idx}
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          flexDirection: { xs: "column", sm: "row" },
+                          mb: 1,
+                          p: 2,
+                          border: "1px solid rgba(255,255,255,0.1)",
+                          borderRadius: 2,
+                        }}
+                      >
+                        <Typography color="text.primary" fontWeight={600}>
+                          {addon.name}
+                        </Typography>
+                        <Typography color="text.primary" fontWeight={500}>
+                          Quantity: {addon.quantity}
+                        </Typography>
+                        <Typography color="text.primary" fontWeight={700}>
+                          Total: {formatCurrency(addon.total)}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                )}
 
                 {/* Adult Fish Estimator */}
                 {pondInfo.selectedOption === "adult-fish" &&
@@ -608,7 +682,11 @@ export function Quote() {
                                   <TableCell
                                     sx={{ color: "primary.contrastText" }}
                                   >
-                                    {fish.unit}
+                                    {fish.unit === "FISH"
+                                      ? "Head"
+                                      : fish.unit === "POUNDS"
+                                        ? "Pounds"
+                                        : fish.unit}
                                   </TableCell>
                                   <TableCell
                                     sx={{ color: "primary.contrastText" }}
@@ -717,7 +795,11 @@ export function Quote() {
                                   <TableCell
                                     sx={{ color: "primary.contrastText" }}
                                   >
-                                    {fish.unit}
+                                    {fish.unit === "FISH"
+                                      ? "Head"
+                                      : fish.unit === "POUNDS"
+                                        ? "Pounds"
+                                        : fish.unit}
                                   </TableCell>
                                   <TableCell
                                     sx={{ color: "primary.contrastText" }}
@@ -836,7 +918,11 @@ export function Quote() {
                                   <TableCell
                                     sx={{ color: "primary.contrastText" }}
                                   >
-                                    {item.unit}
+                                    {item.unit === "FISH"
+                                      ? "Head"
+                                      : item.unit === "POUNDS"
+                                        ? "Pounds"
+                                        : item.unit}
                                   </TableCell>
                                   <TableCell
                                     sx={{ color: "primary.contrastText" }}
@@ -1035,7 +1121,7 @@ export function Quote() {
               {
                 icon: <CheckCircle size={24} color="#44A194" />,
                 label: "Valid Until",
-                value: "March 30, 2026",
+                value: validity.toLocaleDateString(),
               },
             ].map((card) => (
               <Grid size={{ xs: 12, sm: 6 }} key={card.label}>

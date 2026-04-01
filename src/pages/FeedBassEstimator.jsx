@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Stepper } from "../components/Stepper";
 import React from "react";
 import {
   Box,
