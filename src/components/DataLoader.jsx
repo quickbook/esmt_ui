@@ -20,7 +20,7 @@ export default function DataLoader({ children }) {
   useEffect(() => {
     // Log loading state
     if (isLoading) {
-      console.log('📊 Loading domain data...', loading);
+      //console.log('📊 Loading domain data...', loading);
     } else if (hasError) {
       console.error('❌ Domain data loading failed:', error);
     } else if (allLoaded) {

@@ -25,8 +25,11 @@ export const API_ENDPOINTS = {
     POND_ACCESS: "/api/domain/pond-access",
     FISH_SPECIES: "/api/domain/fish-types",
     POND_TYPES: "/api/domain/pond-purpose/by-pond-type",
-  }
-
+  }, 
+  POST:{
+    POND_ESTIMATE: "/api/v1/quotes/estimate",
+  },
+ 
   // Pond related endpoints
   // POND: {
   //   GET_ALL: '/ponds',

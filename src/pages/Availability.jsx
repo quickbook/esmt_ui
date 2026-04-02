@@ -1,6 +1,5 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import React from "react";
 import {
   Box,
   Container,
@@ -9,11 +8,13 @@ import {
   TextField,
   Button,
   LinearProgress,
-  Grid
+  Grid,
+  FormHelperText,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-import { glassBoxStyles } from "../utils/glassStyles";
 import { useEstimateForm } from "../contexts/EstimateFormContext";
 
 export function Availability() {
@@ -21,8 +22,101 @@ export function Availability() {
   const { data, updateSection } = useEstimateForm();
   const { availableDate, availableTime } = data.availability;
 
+  // State for validation errors
+  const [errors, setErrors] = useState({
+    availableDate: false,
+    availableTime: false,
+  });
+  
+  // State to track if validation has been attempted
+  const [validationAttempted, setValidationAttempted] = useState(false);
+  const [snackOpen, setSnackOpen] = useState(false);
+  const [snackMessage, setSnackMessage] = useState("");
+
+  const handleChange = (field, value) => {
+    updateSection("availability", { [field]: value });
+    // Clear error for this field when user makes a change
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: false }));
+    }
+  };
+
+  // Validation function
+  const validateForm = () => {
+    const newErrors = {
+      availableDate: !availableDate,
+      availableTime: !availableTime,
+    };
+    
+    // Additional date validation (must be within 24-72 hours)
+    if (availableDate && !isValidDateRange(availableDate)) {
+      newErrors.availableDate = true;
+    }
+    
+    setErrors(newErrors);
+    return !Object.values(newErrors).some(error => error === true);
+  };
+
+  // Check if date is within 24-72 hours from now
+  const isValidDateRange = (dateString) => {
+    const selectedDate = new Date(dateString);
+    const now = new Date();
+    
+    // Set time to midnight for date comparison
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const selected = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+    
+    const diffDays = Math.ceil((selected - today) / (1000 * 60 * 60 * 24));
+    
+    // Check if date is within 1-3 days (24-72 hours)
+    return diffDays >= 1 && diffDays <= 3;
+  };
+
+  // Helper function to get error message
+  const getErrorMessage = (field) => {
+    if (!validationAttempted && !errors[field]) return "";
+    
+    switch(field) {
+      case "availableDate":
+        if (!availableDate) return "Preferred contact date is required";
+        if (!isValidDateRange(availableDate)) {
+          return "Please select a date within 24-72 hours (1-3 days from today)";
+        }
+        return "";
+      case "availableTime":
+        if (!availableTime) return "Preferred contact time is required";
+        return "";
+      default:
+        return "";
+    }
+  };
+
+  // Get minimum date (tomorrow) and maximum date (3 days from now)
+  const getMinDate = () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split('T')[0];
+  };
+  
+  const getMaxDate = () => {
+    const maxDate = new Date();
+    maxDate.setDate(maxDate.getDate() + 4);
+    return maxDate.toISOString().split('T')[0];
+  };
+
   const handleNext = () => {
-    navigate("/estimate/quote");
+    setValidationAttempted(true);
+    
+    if (validateForm()) {
+      navigate("/estimate/quote");
+    } else {
+      // Show snackbar for first error encountered
+      const firstError = Object.keys(errors).find(key => errors[key]);
+      if (firstError) {
+        setSnackMessage(getErrorMessage(firstError));
+        setSnackOpen(true);
+      }
+    }
   };
 
   const handleBack = () => {
@@ -34,7 +128,7 @@ export function Availability() {
   }, []);
 
   return (
-    <Box sx={{ minHeight: "84vh", padding:{xs:"1rem 0" , md:2} }}>
+    <Box sx={{ minHeight: "84vh", padding: { xs: "1rem 0", md: 2 } }}>
       <Container>
         <Paper
           sx={{
@@ -115,7 +209,7 @@ export function Availability() {
                   color="primary.light"
                   mb={1}
                 >
-                  Preferred Contact Date
+                  Preferred Contact Date <span style={{ color: "#f44336" }}>*</span>
                 </Typography>
 
                 <TextField
@@ -123,9 +217,13 @@ export function Availability() {
                   fullWidth
                   size="medium"
                   value={availableDate}
-                  onChange={(e) =>
-                    updateSection("availability", { availableDate: e.target.value })
-                  }
+                  onChange={(e) => handleChange("availableDate", e.target.value)}
+                  error={errors.availableDate && validationAttempted}
+                  helperText={getErrorMessage("availableDate")}
+                  inputProps={{
+                    min: getMinDate(),
+                    max: getMaxDate(),
+                  }}
                   InputLabelProps={{ shrink: true }}
                   sx={{
                     "& .MuiInputBase-input": {
@@ -134,6 +232,12 @@ export function Availability() {
                     },
                   }}
                 />
+                <Typography
+                  variant="caption"
+                  sx={{ mt: 1, display: "block", color: "text.secondary" }}
+                >
+                  Please select a date within 24-72 hours (1-3 days from today)
+                </Typography>
               </Box>
             </Grid>
 
@@ -146,7 +250,7 @@ export function Availability() {
                   color="primary.light"
                   mb={1}
                 >
-                  Preferred Contact Time
+                  Preferred Contact Time <span style={{ color: "#f44336" }}>*</span>
                 </Typography>
 
                 <TextField
@@ -154,9 +258,9 @@ export function Availability() {
                   fullWidth
                   size="medium"
                   value={availableTime}
-                  onChange={(e) =>
-                    updateSection("availability", { availableTime: e.target.value })
-                  }
+                  onChange={(e) => handleChange("availableTime", e.target.value)}
+                  error={errors.availableTime && validationAttempted}
+                  helperText={getErrorMessage("availableTime")}
                   InputLabelProps={{ shrink: true }}
                   sx={{
                     "& .MuiInputBase-input": {
@@ -175,6 +279,7 @@ export function Availability() {
                   border: "1px solid #dcdcdc",
                   borderRadius: 2,
                   p: 2,
+                  backgroundColor: "rgba(255, 255, 255, 0.05)",
                 }}
               >
                 <Typography fontSize={14} color="text.secondary">
@@ -225,6 +330,22 @@ export function Availability() {
               </Typography>
             </Button>
           </Box>
+          
+          <Snackbar
+            open={snackOpen}
+            autoHideDuration={3000}
+            onClose={() => setSnackOpen(false)}
+            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          >
+            <Alert
+              severity="warning"
+              variant="filled"
+              sx={{ width: "100%" }}
+              onClose={() => setSnackOpen(false)}
+            >
+              {snackMessage}
+            </Alert>
+          </Snackbar>
         </Paper>
       </Container>
     </Box>

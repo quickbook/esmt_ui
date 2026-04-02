@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Box,
@@ -22,22 +22,21 @@ import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { textFieldSx } from "../theme/theme";
 import { useEstimateForm } from "../contexts/EstimateFormContext";
-
-import { pondEstimateApi, pondConfigs } from "../api/AllapiData";
+import { useSelector } from "react-redux";
 
 export function PondEstimator() {
   const navigate = useNavigate();
   const { type } = useParams();
-  const config = pondConfigs[type];
   const { data, updateSection } = useEstimateForm();
+  const pondEstimateData = useSelector((state) => state.pondEstimate.data);
   const [selectedOptions, setSelectedOptions] = useState(
     data.estimator.selectedOptionCodes || [],
   );
-  const [apiData, setApiData] = useState(null);
+  const [apiData, setApiData] = useState(pondEstimateData || null);
   const [addons, setAddons] = useState(() => {
     const source = data.estimator.addons?.length
       ? data.estimator.addons
-      : (pondEstimateApi?.addons || []).map((addon) => ({
+      : (pondEstimateData?.addons || []).map((addon) => ({
           code: addon.addonCode || addon.code,
           name: addon.fishName || addon.name || "Unknown Add-on",
           quantity: addon.quantity || 1,
@@ -72,9 +71,9 @@ export function PondEstimator() {
           total: (addon.quantity || 1) * (addon.unitPrice || addon.price || 0),
         })),
       );
-    } else if (pondEstimateApi?.addons?.length) {
+    } else if (pondEstimateData?.addons?.length) {
       setAddons(
-        pondEstimateApi.addons.map((addon) => ({
+        pondEstimateData.addons.map((addon) => ({
           code: addon.addonCode || addon.code,
           name: addon.fishName || addon.name || "Unknown Add-on",
           quantity: addon.quantity || 1,
@@ -85,33 +84,7 @@ export function PondEstimator() {
         })),
       );
     }
-  }, [data.estimator, pondEstimateApi]);
-
-
-
-  // // 🔹 Helpers
-  // const getFishQuantity = (pkg, column) => {
-  //   const [, fishNameRaw] = column.split("-");
-  //   const fishName = fishNameRaw.toLowerCase();
-
-  //   const match = pkg.fishItems?.find((f) =>
-  //     f.fishType.toLowerCase().includes(fishName),
-  //   );
-
-  //   return match?.quantity || 0;
-  // };
-
-  // const getBreakdownQuantity = (pkg, header) => {
-  //   if (!pkg) return 0;
-
-  //   const size = header.label.replace(header.fishName + " ", "");
-
-  //   const match = pkg.fishItems.find(
-  //     (f) => f.fishType === header.fishName && f.size === size,
-  //   );
-
-  //   return match?.quantity || 0;
-  // };
+  }, [data.estimator, pondEstimateData]);
 
   const handleToggle = (pkg, index) => {
     setSelectedOptions((prev) => {
@@ -122,7 +95,7 @@ export function PondEstimator() {
         : [...prev, pkg.packageCode];
 
       // 👇 Maintain indices for backward compatibility
-      const nextIndices = apiData.packages
+      const nextIndices = apiData?.packages
         .map((p, i) => (nextCodes.includes(p.packageCode) ? i : null))
         .filter((i) => i !== null);
 
@@ -142,8 +115,7 @@ export function PondEstimator() {
           ? {
               ...addon,
               selected: !addon.selected,
-              total:
-                (addon.quantity || 0) * (addon.unitPrice || 0),
+              total: (addon.quantity || 0) * (addon.unitPrice || 0),
             }
           : addon,
       ),
@@ -171,7 +143,7 @@ export function PondEstimator() {
 
   const handleNext = () => {
     const selectedOptionDetails = selectedOptions.map((code) => {
-      const pkg = apiData.packages.find((p) => p.packageCode === code);
+      const pkg = apiData?.packages.find((p) => p.packageCode === code);
       const isYear1 = pkg.packageCode === "YEAR1";
 
       if (isYear1) {
@@ -180,10 +152,6 @@ export function PondEstimator() {
           size: item.size,
           unit: item.unitType,
           quantity: item.quantity,
-          total:
-            item.unitType === "POUNDS"
-              ? item.quantity * 5.75
-              : item.quantity * 2.5,
         }));
 
         return {
@@ -206,6 +174,17 @@ export function PondEstimator() {
       return {
         label: pkg.packageName,
         price: pkg.estimatedPrice,
+        size:
+          pkg.fishItems?.[0]?.size ||
+          (pkg.packageCode === "SMALL"
+            ? "1 to 3 inch"
+            : pkg.packageCode === "MEDIUM"
+              ? "3 to 4 inch"
+              : pkg.packageCode === "LARGE"
+                ? "4 to 5 inch"
+                : pkg.packageCode === "YEAR1"
+                  ? "1 inch to Catchable"
+                  : "—"),
         pondType: type,
         stockDetails,
         calculatedTotal: pkg.estimatedPrice,
@@ -236,7 +215,7 @@ export function PondEstimator() {
       selectedOptions: selectedOptionDetails,
       addons: selectedAddons,
       totalPrice: optionsTotal + addonTotal,
-      stockingDescription: apiData.infoNotes?.join(", "),
+      stockingDescription:  apiData.description+" "+apiData?.infoNotes?.join(", "),
     });
 
     navigate("/estimate/availability");
@@ -245,33 +224,25 @@ export function PondEstimator() {
   const year1Package = apiData?.packages.find((p) => p.packageCode === "YEAR1");
   const tableColumns = apiData?.packages?.[0]?.fishItems || [];
 
-  // Generate API data based on pond type
   // useEffect(() => {
-  //   if (type) {
-  //     const data = generateApiData(type);
-  //     setApiData(data);
-  //   }
-  // }, [type]);
+  //   if (!type) return;
 
-  useEffect(() => {
-    if (!type) return;
+  //   const fetchData = async () => {
+  //     try {
+  //       // 🔴 Replace this with real API call
+  //       const response = pondEstimateData;
 
-    const fetchData = async () => {
-      try {
-        // 🔴 Replace this with real API call
-        const response = pondEstimateApi;
+  //       setApiData(response);
 
-        setApiData(response);
+  //       // if no context stored option yet, seed it from API addon
+  //       // no-op for initial addon sync; existing addon initialization handled in addons state.
+  //     } catch (err) {
+  //       console.error(err);
+  //     }
+  //   };
 
-        // if no context stored option yet, seed it from API addon
-        // no-op for initial addon sync; existing addon initialization handled in addons state.
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    fetchData();
-  }, [type, data.estimator.grassCarp]);
+  //   fetchData();
+  // }, [type, data.estimator.grassCarp]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -379,7 +350,7 @@ export function PondEstimator() {
                 </TableHead>
 
                 <TableBody>
-                  {apiData.packages.map((pkg, i) => {
+                  {apiData?.packages.map((pkg, i) => {
                     const isYear1 = pkg.packageCode === "YEAR1";
                     return (
                       <TableRow
@@ -396,7 +367,14 @@ export function PondEstimator() {
                         <TableCell>
                           {pkg.packageCode === "YEAR1"
                             ? "1 inch to Catchable"
-                            : pkg.fishItems?.[0]?.size || "-"}
+                            : pkg.fishItems?.[0]?.size ||
+                              (pkg.packageCode === "SMALL"
+                                ? "1 to 3 inch"
+                                : pkg.packageCode === "MEDIUM"
+                                  ? "3 to 4 inch"
+                                  : pkg.packageCode === "LARGE"
+                                    ? "4 to 5 inch"
+                                    : "—")}
                         </TableCell>
                         <TableCell>${pkg.estimatedPrice}</TableCell>
                         <TableCell>
@@ -483,7 +461,11 @@ export function PondEstimator() {
                     mt={2}
                     px={1}
                     py={2}
-                    bgcolor={addon.selected ? "rgba(43, 161, 146, 0.25)" : "transparent"}
+                    bgcolor={
+                      addon.selected
+                        ? "rgba(43, 161, 146, 0.25)"
+                        : "transparent"
+                    }
                     borderRadius={1}
                   >
                     <Typography
@@ -500,7 +482,10 @@ export function PondEstimator() {
                       value={addon.quantity}
                       onChange={(e) => {
                         const value = Number(e.target.value);
-                        handleAddonQtyChange(addon.code, Number.isNaN(value) ? 0 : value);
+                        handleAddonQtyChange(
+                          addon.code,
+                          Number.isNaN(value) ? 0 : value,
+                        );
                       }}
                       sx={{ ...textFieldSx, width: { xs: 60, md: 80 } }}
                       inputProps={{ min: 0 }}
@@ -529,6 +514,62 @@ export function PondEstimator() {
                     )}
                   </Box>
                 ))}
+
+                {apiData?.title === "Hybrid Bream Pond Estimator" && (
+                  <Box>
+                    <Typography
+                      sx={{
+                        fontSize: "0.75rem",
+                        color: "text.secondary",
+                        mb: 1.5,
+                      }}
+                    >
+                      Specklebelly can be substituted for regular hybrid bream.
+                    </Typography>
+                    <Box
+                      sx={{ display: "flex", flexDirection: "column", gap: 1 }}
+                    >
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={regularHybrid}
+                            onChange={(e) => {
+                              const checked = e.target.checked;
+                              setRegularHybrid(checked);
+                              if (checked) setSpecklebelly(false);
+                            }}
+                          />
+                        }
+                        label={
+                          <Typography
+                            sx={{ fontSize: "0.8rem", color: "text.primary" }}
+                          >
+                            Customer wants regular hybrids
+                          </Typography>
+                        }
+                      />
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={specklebelly}
+                            onChange={(e) => {
+                              const checked = e.target.checked;
+                              setSpecklebelly(checked);
+                              if (checked) setRegularHybrid(false);
+                            }}
+                          />
+                        }
+                        label={
+                          <Typography
+                            sx={{ fontSize: "0.8rem", color: "text.primary" }}
+                          >
+                            Customer wants specklebelly
+                          </Typography>
+                        }
+                      />
+                    </Box>
+                  </Box>
+                )}
               </Box>
             )}
 
@@ -548,22 +589,22 @@ export function PondEstimator() {
                   color: "text.primary",
                 }}
               >
-                {apiData.minimumOrderAmount} minimum
+                {apiData?.minimumOrderAmount} minimum
               </Typography>
               <Typography sx={{ fontSize: "0.75rem", color: "text.primary" }}>
-                {apiData.infoNotes.map((i) => (
-                  <>
+                {apiData?.infoNotes.map((i, k) => (
+                  <span key={k}>
                     {i}
                     <br />
-                  </>
+                  </span>
                 ))}
               </Typography>
               <Typography sx={{ fontSize: "0.75rem", color: "text.primary" }}>
-                {apiData.disclaimerNotes.map((i) => (
-                  <>
+                {apiData?.disclaimerNotes.map((i, k) => (
+                  <span key={k}>
                     {i}
                     <br />
-                  </>
+                  </span>
                 ))}
               </Typography>
             </Box>

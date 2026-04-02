@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Container,
@@ -9,6 +9,7 @@ import {
   Select,
   MenuItem,
   Grid,
+  FormHelperText,
 } from "@mui/material";
 import { glassBoxStyles } from "../utils/glassStyles";
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
@@ -19,30 +20,97 @@ import { motion } from "framer-motion";
 import { useEstimateForm } from "../contexts/EstimateFormContext";
 import { useSelector } from "react-redux";
 
-
 export function CustomerInfo() {
   const navigate = useNavigate();
   const leadSource = useSelector((state) => state.domain.leadSources);
   const { data, updateSection } = useEstimateForm();
   const formData = data.customer;
+  
+  // State for validation errors
+  const [errors, setErrors] = useState({
+    fullName: false,
+    email: false,
+    phone: false,
+    quoteEmail: false,
+    address: false,
+    hearAbout: false,
+  });
+  
+  // State to track if validation has been attempted
+  const [validationAttempted, setValidationAttempted] = useState(false);
 
   const handleChange = (field, value) => {
     updateSection("customer", { [field]: value });
+    // Clear error for this field when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: false }));
+    }
+  };
+
+  // Validation function
+  const validateForm = () => {
+    const newErrors = {
+      fullName: !formData.fullName?.trim(),
+      email: !formData.email?.trim() || !isValidEmail(formData.email),
+      phone: !formData.phone?.trim(),
+      quoteEmail: !formData.quoteEmail?.trim() || !isValidEmail(formData.quoteEmail),
+      address: !formData.address?.trim(),
+      hearAbout: !formData.hearAbout,
+    };
+    
+    setErrors(newErrors);
+    return !Object.values(newErrors).some(error => error === true);
+  };
+  
+  // Email validation helper
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@([^\s@]+\.)+[^\s@]+$/;
+    return emailRegex.test(email);
   };
 
   const handleBack = () => {
-    console.log("Customer info:",formData)
+    console.log("Customer info:", formData);
     navigate("/");
   };
 
   const handleNext = () => {
-    console.log("FORM DATA:", formData);
-    navigate("/estimate/pond-info");
+    setValidationAttempted(true);
+    
+    if (validateForm()) {
+      console.log("FORM DATA:", formData);
+      navigate("/estimate/pond-info");
+    }
   };
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Helper function to get error message
+  const getErrorMessage = (field, value) => {
+    if (!validationAttempted && !errors[field]) return "";
+    
+    switch(field) {
+      case "fullName":
+        return !formData.fullName?.trim() ? "Full name is required" : "";
+      case "email":
+        if (!formData.email?.trim()) return "Email address is required";
+        if (!isValidEmail(formData.email)) return "Please enter a valid email address";
+        return "";
+      case "phone":
+        return !formData.phone?.trim() ? "Phone number is required" : "";
+      case "quoteEmail":
+        if (!formData.quoteEmail?.trim()) return "Quote email is required";
+        if (!isValidEmail(formData.quoteEmail)) return "Please enter a valid email address";
+        return "";
+      case "address":
+        return !formData.address?.trim() ? "Physical address is required" : "";
+      case "hearAbout":
+        return !formData.hearAbout ? "Please select how you heard about us" : "";
+      default:
+        return "";
+    }
+  };
 
   return (
     <Box
@@ -111,16 +179,12 @@ export function CustomerInfo() {
             }}
           />
 
-          {/* <Typography
-            variant="h3"
-            fontWeight="bold"
-            color="text.disabled"
-            mb={6}
-            //textAlign={"center"}
+          <Grid
+            container
+            spacing={3}
+            rowGap={0}
+            sx={{ flex: 1, overflow: "hidden" }}
           >
-            Tell Us About You
-          </Typography> */}
-          <Grid container spacing={3} rowGap={0} sx={{ flex: 1, overflow: "hidden" }}>
             <Grid size={{ xs: 12, md: 6 }}>
               {/* Full Name */}
               <Box mb={1}>
@@ -130,15 +194,17 @@ export function CustomerInfo() {
                   color="primary.contrastText"
                   mb={1}
                 >
-                  What is your name?
+                  What is your name? <span style={{ color: "#f44336" }}>*</span>
                 </Typography>
                 <TextField
+                  required
                   fullWidth
                   size="small"
-
                   placeholder="Enter your full name"
                   value={formData.fullName}
                   onChange={(e) => handleChange("fullName", e.target.value)}
+                  error={errors.fullName && validationAttempted}
+                  helperText={getErrorMessage("fullName")}
                   sx={{ mb: 3, ...textFieldSx }}
                 />
               </Box>
@@ -153,16 +219,18 @@ export function CustomerInfo() {
                   color="primary.contrastText"
                   mb={1}
                 >
-                  What is your mailing address?
+                  What is your mailing address? <span style={{ color: "#f44336" }}>*</span>
                 </Typography>
                 <TextField
+                  required
                   fullWidth
                   size="small"
                   placeholder="Enter your email address"
                   type="email"
-                  //placeholder="john@email.com"
                   value={formData.email}
                   onChange={(e) => handleChange("email", e.target.value)}
+                  error={errors.email && validationAttempted}
+                  helperText={getErrorMessage("email")}
                   sx={{ mb: 3, ...textFieldSx }}
                 />
               </Box>
@@ -177,16 +245,18 @@ export function CustomerInfo() {
                   color="primary.contrastText"
                   mb={1}
                 >
-                  What is your phone number?
+                  What is your phone number? <span style={{ color: "#f44336" }}>*</span>
                 </Typography>
                 <TextField
+                  required
                   fullWidth
                   size="small"
                   placeholder="Enter your phone number"
                   type="tel"
-                  //placeholder="123-456-7890"
                   value={formData.phone}
                   onChange={(e) => handleChange("phone", e.target.value)}
+                  error={errors.phone && validationAttempted}
+                  helperText={getErrorMessage("phone")}
                   sx={{ mb: 3, ...textFieldSx }}
                 />
               </Box>
@@ -201,15 +271,18 @@ export function CustomerInfo() {
                   color="primary.contrastText"
                   mb={1}
                 >
-                  What is an email address I can send a written quote to?
+                  What is an email address I can send a written quote to? <span style={{ color: "#f44336" }}>*</span>
                 </Typography>
                 <TextField
+                  required
                   fullWidth
                   size="small"
                   placeholder="Enter your working email address"
                   type="email"
                   value={formData.quoteEmail}
                   onChange={(e) => handleChange("quoteEmail", e.target.value)}
+                  error={errors.quoteEmail && validationAttempted}
+                  helperText={getErrorMessage("quoteEmail")}
                   sx={{ mb: 3, ...textFieldSx }}
                 />
               </Box>
@@ -224,16 +297,17 @@ export function CustomerInfo() {
                   color="primary.contrastText"
                   mb={1}
                 >
-                  Where is the physical address of the pond?
+                  Where is the physical address of the pond? <span style={{ color: "#f44336" }}>*</span>
                 </Typography>
                 <TextField
+                  required
                   fullWidth
                   size="small"
                   placeholder="Enter your physical address"
-                 
-                  //placeholder="Your home address"
                   value={formData.address}
                   onChange={(e) => handleChange("address", e.target.value)}
+                  error={errors.address && validationAttempted}
+                  helperText={getErrorMessage("address")}
                   sx={{ mb: 3, ...textFieldSx }}
                 />
               </Box>
@@ -246,8 +320,8 @@ export function CustomerInfo() {
                 fontWeight="bold"
                 color="primary.contrastText"
                 mb={1}
-                >
-                How did you hear about us?
+              >
+                How did you hear about us? <span style={{ color: "#f44336" }}>*</span>
               </Typography>
               <Select
                 fullWidth
@@ -255,22 +329,32 @@ export function CustomerInfo() {
                 value={formData.hearAbout}
                 onChange={(e) => handleChange("hearAbout", e.target.value)}
                 displayEmpty
+                error={errors.hearAbout && validationAttempted}
                 sx={{ ...selectSx }}
               >
                 <MenuItem disabled value="" sx={{ ...menuItemSx }}>
                   Select option
                 </MenuItem>
                 {leadSource.map((option, index) => (
-                  <MenuItem key={index} value={option.code} sx={{ ...menuItemSx }}>
+                  <MenuItem
+                    key={index}
+                    value={option.id}
+                    sx={{ ...menuItemSx }}
+                  >
                     {option.name}
                   </MenuItem>
                 ))}
               </Select>
+              {errors.hearAbout && validationAttempted && (
+                <FormHelperText error sx={{ mt: 1 }}>
+                  {getErrorMessage("hearAbout")}
+                </FormHelperText>
+              )}
             </Grid>
           </Grid>
 
           {/* Buttons */}
-          <Box display="flex" justifyContent="space-between">
+          <Box display="flex" justifyContent="space-between" mt={1}>
             <Button
               onClick={handleBack}
               sx={{

@@ -123,7 +123,7 @@ export const fetchLeadSources = () => async (dispatch) => {
   try {
     const response = await axiosClient.get(getFullUrl(API_ENDPOINTS.DOMAIN.LEAD_SOURCE));
     dispatch(fetchLeadSourcesSuccess(response.data));
-    console.log('📊 Lead sources loaded:', response.data);
+    //console.log('📊 Lead sources loaded:', response.data);
   } catch (error) {
     const message = error.response?.data?.message || error.message;
     dispatch(fetchLeadSourcesFailure(message));
@@ -136,7 +136,7 @@ export const fetchPondAccess = () => async (dispatch) => {
   try {
     const response = await axiosClient.get(getFullUrl(API_ENDPOINTS.DOMAIN.POND_ACCESS));
     dispatch(fetchPondAccessSuccess(response.data));
-    console.log('🏞️ Pond access options loaded:', response.data);
+    //console.log('🏞️ Pond access options loaded:', response.data);
   } catch (error) {
     const message = error.response?.data?.message || error.message;
     dispatch(fetchPondAccessFailure(message));
@@ -149,7 +149,7 @@ export const fetchFishSpecies = () => async (dispatch) => {
   try {
     const response = await axiosClient.get(getFullUrl(API_ENDPOINTS.DOMAIN.FISH_SPECIES));
     dispatch(fetchFishSpeciesSuccess(response.data));
-    console.log('🐟 Fish species loaded:', response.data);
+    //console.log('🐟 Fish species loaded:', response.data);
   } catch (error) {
     const message = error.response?.data?.message || error.message;
     dispatch(fetchFishSpeciesFailure(message));
@@ -162,7 +162,7 @@ export const fetchPondOptions = () => async (dispatch) => {
   try {
     const response = await axiosClient.get(getFullUrl(API_ENDPOINTS.DOMAIN.POND_TYPES));
     dispatch(fetchPondOptionsSuccess(response.data));
-    console.log('🌾 Pond options loaded:', response.data);
+    //console.log('🌾 Pond options loaded:', response.data);
   } catch (error) {
     const message = error.response?.data?.message || error.message;
     dispatch(fetchPondOptionsFailure(message));

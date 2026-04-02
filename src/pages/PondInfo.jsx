@@ -17,19 +17,26 @@ import {
   FormControlLabel,
   Checkbox,
   Grid,
+  FormHelperText,
+  Backdrop,
+  CircularProgress,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import { glassBoxStyles } from "../utils/glassStyles";
 import { menuItemSx, selectSx, textFieldSx } from "../theme/theme";
 import { useEstimateForm } from "../contexts/EstimateFormContext";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { postEstimate } from "../api/endpoints/pondEstimateApi";
 
 export function PondInfo() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const pondAccessOptions = useSelector((state) => state.domain.pondAccess);
   const fishTypes = useSelector((state) => state.domain.fishSpecies);
   const pondTypeOptions = useSelector((state) => state.domain.pondOptions);
+  const leadSources = useSelector((state) => state.domain.leadSources);
+  const quoteLoading = useSelector((state) => state.pondEstimate.loading);
   const { data, updateSection } = useEstimateForm();
   const {
     pondSize,
@@ -43,7 +50,20 @@ export function PondInfo() {
 
   const [snackOpen, setSnackOpen] = useState(false);
   const [snackMessage, setSnackMessage] = useState("");
-
+  
+  // State for validation errors
+  const [errors, setErrors] = useState({
+    pondSize: false,
+    distance: false,
+    pondAccess: false,
+    pondType: false,
+    hasFish: false,
+    selectedFish: false,
+    selectedOption: false,
+  });
+  
+  // State to track if validation has been attempted
+  const [validationAttempted, setValidationAttempted] = useState(false);
 
   const getOptions = () => {
     if (pondType === "new") return [...(pondTypeOptions?.NEW || [])];
@@ -53,35 +73,154 @@ export function PondInfo() {
 
   const handleChange = (field, value) => {
     updateSection("pondInfo", { [field]: value });
+    // Clear error for this field when user makes a change
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: false }));
+    }
+  };
+
+  // Validation function
+  const validateForm = () => {
+    const newErrors = {
+      pondSize: !pondSize || pondSize <= 0,
+      distance: !distance || distance <= 0,
+      pondAccess: !pondAccess,
+      pondType: !pondType,
+      hasFish: pondType === "old" ? !hasFish : false,
+      selectedFish: (pondType === "old" && hasFish === "yes") ? selectedFish.length === 0 : false,
+      selectedOption: (pondType === "new" || (pondType === "old" && hasFish)) ? !selectedOption : false,
+    };
+    
+    setErrors(newErrors);
+    return !Object.values(newErrors).some(error => error === true);
+  };
+
+  // Helper function to get error message
+  const getErrorMessage = (field) => {
+    if (!validationAttempted && !errors[field]) return "";
+    
+    switch(field) {
+      case "pondSize":
+        if (!pondSize) return "Pond size is required";
+        if (pondSize <= 0) return "Please enter a valid pond size greater than 0";
+        return "";
+      case "distance":
+        if (!distance) return "Distance is required";
+        if (distance <= 0) return "Please enter a valid distance greater than 0";
+        return "";
+      case "pondAccess":
+        return "Please select pond access type";
+      case "pondType":
+        return "Please select if this is a new or old pond";
+      case "hasFish":
+        return "Please select if there are fish in the pond";
+      case "selectedFish":
+        return "Please select at least one fish species";
+      case "selectedOption":
+        return "Please select your interest";
+      default:
+        return "";
+    }
   };
 
   const handleBack = () => {
     navigate("/estimate/customer-info");
   };
 
-  const handleNext = () => {
-    if (!pondType) {
-      setSnackMessage("Please select pond type");
-      setSnackOpen(true);
-      return;
-    }
+  const handleNext = async () => {
+    setValidationAttempted(true);
+    
+    if (validateForm()) {
+      try {
+        // Find hearAboutUsCode from leadSources
+        const hearAboutSource = leadSources.find(
+          source => source.id === data.customer.hearAbout
+        );
+        const hearAboutUsCode = hearAboutSource?.code || 1;
 
-    if (pondType === "old" && !hasFish) {
-      setSnackMessage("Please select if fish exist");
-      setSnackOpen(true);
-      return;
-    }
+        // Find pondAccessCode from pondAccessOptions
+        const accessOption = pondAccessOptions.find(
+          option => option.id === pondAccess
+        );
+        const pondAccessCode = accessOption?.id || pondAccess;
 
-    if (!selectedOption) {
-      setSnackMessage("Please select your interest");
-      setSnackOpen(true);
-      return;
-    }
+        // Build the estimate payload
+        const estimatePayload = {
+          fullName: data.customer.fullName,
+          email: data.customer.email,
+          phoneNumber: data.customer.phone,
+          address: data.customer.address,
+          hearAboutUsCode: hearAboutUsCode,
+          pondSurfaceAcres: parseFloat(pondSize),
+          distanceFromLonokeMiles: parseFloat(distance),
+          pondAccessCode: pondAccessCode,
+          pondCondition: pondType.toUpperCase(),
+          quoteType: selectedOption,
+        };
 
-    navigate(`/estimate/estimator/${selectedOption}`);
-    console.log("pond info:", data.pondInfo)
+        console.log("📤 Posting estimate:", estimatePayload);
+
+        // Call the API
+        const response = await postEstimate(estimatePayload);
+
+        console.log("✅ Estimate response:", response);
+
+        // Store the quote ID in the estimator context
+        updateSection("estimator", {
+          quoteId: response.id || response.quoteId,
+        });
+
+        // Navigate to pond estimator after successful API call
+        navigate(`/estimate/estimator/${selectedOption}`);
+      } catch (error) {
+        console.error("❌ Error posting estimate:", error);
+        setSnackMessage("Failed to create estimate. Please try again.");
+        setSnackOpen(true);
+      }
+    } else {
+      // Show snackbar for first error encountered
+      const firstError = Object.keys(errors).find(key => errors[key]);
+      if (firstError) {
+        setSnackMessage(getErrorMessage(firstError));
+        setSnackOpen(true);
+      }
+    }
   };
 
+  const handlePondTypeChange = (type) => {
+    // Reset dependent fields when pond type changes
+    updateSection("pondInfo", { 
+      selectedOption: "", 
+      hasFish: "",
+      selectedFish: []
+    });
+    updateSection("pondInfo", { pondType: type });
+    
+    // Clear relevant errors
+    setErrors(prev => ({ 
+      ...prev, 
+      pondType: false,
+      hasFish: false,
+      selectedFish: false,
+      selectedOption: false 
+    }));
+  };
+
+  const handleHasFishChange = (answer) => {
+    updateSection("pondInfo", { hasFish: answer });
+    
+    // Reset selected fish and interest when hasFish changes
+    if (answer === "no") {
+      updateSection("pondInfo", { selectedFish: [], selectedOption: "" });
+      setErrors(prev => ({ ...prev, selectedFish: false, selectedOption: false }));
+    } else {
+      updateSection("pondInfo", { selectedOption: "" });
+      setErrors(prev => ({ ...prev, selectedOption: false }));
+    }
+    
+    // Clear hasFish error
+    setErrors(prev => ({ ...prev, hasFish: false }));
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -162,7 +301,7 @@ export function PondInfo() {
                 color="primary.contrastText"
                 mb={{ xs: 2, md: 4.7 }}
               >
-                How big is your pond in surface acres?
+                How big is your pond in surface acres? <span style={{ color: "#f44336" }}>*</span>
               </Typography>
 
               <TextField
@@ -172,10 +311,12 @@ export function PondInfo() {
                 placeholder="e.g. 1.5"
                 value={pondSize}
                 onChange={(e) => handleChange("pondSize", e.target.value)}
+                error={errors.pondSize && validationAttempted}
+                helperText={getErrorMessage("pondSize")}
                 slotProps={{
                   input: {
                     endAdornment: (
-                      <InputAdornment position="end" ><span style={{color: "#2c2c2c"}}>acres</span></InputAdornment>
+                      <InputAdornment position="end"><span style={{color: "#2c2c2c"}}>acres</span></InputAdornment>
                     ),
                   },
                 }}
@@ -191,7 +332,7 @@ export function PondInfo() {
                 color="primary.contrastText"
                 mb={1}
               >
-                How many miles is your pond from Lonoke, Arkansas?
+                How many miles is your pond from Lonoke, Arkansas? <span style={{ color: "#f44336" }}>*</span>
               </Typography>
               <Typography
                 variant="body2"
@@ -210,6 +351,8 @@ export function PondInfo() {
                 placeholder="e.g. 2.0"
                 value={distance}
                 onChange={(e) => handleChange("distance", e.target.value)}
+                error={errors.distance && validationAttempted}
+                helperText={getErrorMessage("distance")}
                 slotProps={{
                   input: {
                     endAdornment: (
@@ -229,7 +372,7 @@ export function PondInfo() {
                 color="primary.contrastText"
                 mb={1}
               >
-                How is access to the pond?
+                How is access to the pond? <span style={{ color: "#f44336" }}>*</span>
               </Typography>
 
               <Select
@@ -239,6 +382,7 @@ export function PondInfo() {
                 autoFocus
                 onChange={(e) => handleChange("pondAccess", e.target.value)}
                 displayEmpty
+                error={errors.pondAccess && validationAttempted}
                 sx={{ ...selectSx }}
               >
                 <MenuItem disabled value="" sx={{ ...menuItemSx }}>
@@ -246,11 +390,16 @@ export function PondInfo() {
                 </MenuItem>
 
                 {pondAccessOptions.map((option, index) => (
-                  <MenuItem key={index} value={option.code} sx={{ ...menuItemSx }}>
+                  <MenuItem key={index} value={option.id} sx={{ ...menuItemSx }}>
                     {option.name}
                   </MenuItem>
                 ))}
               </Select>
+              {errors.pondAccess && validationAttempted && (
+                <FormHelperText error sx={{ mt: 1 }}>
+                  {getErrorMessage("pondAccess")}
+                </FormHelperText>
+              )}
             </Grid>
 
             <Grid size={{ xs: 12, md: 6 }}>
@@ -261,7 +410,7 @@ export function PondInfo() {
                 color="primary.contrastText"
                 mb={1}
               >
-                Is this an old pond or a new pond?
+                Is this an old pond or a new pond? <span style={{ color: "#f44336" }}>*</span>
               </Typography>
 
               <Box
@@ -275,10 +424,7 @@ export function PondInfo() {
                 {["new", "old"].map((type) => (
                   <Box
                     key={type}
-                    onClick={() =>{
-                      updateSection("pondInfo", { selectedOption: "", hasFish: "" });
-                      updateSection("pondInfo", { pondType: type })
-                    }}
+                    onClick={() => handlePondTypeChange(type)}
                     sx={{
                       display: "flex",
                       justifyContent: "center",
@@ -289,7 +435,6 @@ export function PondInfo() {
                       borderColor:
                         pondType === type ? "primary.contrastText" : "#537D96",
                       borderRadius: 2,
-                      //p: 1,
                       cursor: "pointer",
                       textAlign: "center",
                     }}
@@ -307,6 +452,11 @@ export function PondInfo() {
                   </Box>
                 ))}
               </Box>
+              {errors.pondType && validationAttempted && (
+                <FormHelperText error sx={{ mt: -1, mb: 1 }}>
+                  {getErrorMessage("pondType")}
+                </FormHelperText>
+              )}
             </Grid>
 
             {/* FISH IN POND */}
@@ -318,7 +468,7 @@ export function PondInfo() {
                   color="primary.contrastText"
                   mb={1}
                 >
-                  Are there any fish in the pond now?
+                  Are there any fish in the pond now? <span style={{ color: "#f44336" }}>*</span>
                 </Typography>
 
                 <Box
@@ -332,9 +482,7 @@ export function PondInfo() {
                   {["yes", "no"].map((ans) => (
                     <Box
                       key={ans}
-                      onClick={() =>
-                        updateSection("pondInfo", { hasFish: ans })
-                      }
+                      onClick={() => handleHasFishChange(ans)}
                       sx={{
                         display: "flex",
                         justifyContent: "center",
@@ -345,7 +493,6 @@ export function PondInfo() {
                         borderColor:
                           hasFish === ans ? "primary.contrastText" : "#537D96",
                         borderRadius: 2,
-                        //p: 1,
                         cursor: "pointer",
                         textAlign: "center",
                       }}
@@ -355,6 +502,11 @@ export function PondInfo() {
                     </Box>
                   ))}
                 </Box>
+                {errors.hasFish && validationAttempted && (
+                  <FormHelperText error sx={{ mt: -1, mb: 1 }}>
+                    {getErrorMessage("hasFish")}
+                  </FormHelperText>
+                )}
               </Grid>
             )}
 
@@ -367,7 +519,7 @@ export function PondInfo() {
                   color="primary.contrastText"
                   mb={2}
                 >
-                  What kind of fish are in the pond?
+                  What kind of fish are in the pond? <span style={{ color: "#f44336" }}>*</span>
                 </Typography>
                 <Typography
                   variant="body2"
@@ -384,7 +536,7 @@ export function PondInfo() {
                   display="grid"
                   gridTemplateColumns={{ xs: "1fr 1fr", md: "1fr 1fr 1fr 1fr" }}
                   gap={2}
-                  mb={4}
+                  mb={2}
                 >
                   {fishTypes.map((fish) => (
                     <FormControlLabel
@@ -397,7 +549,11 @@ export function PondInfo() {
                             const next = e.target.checked
                               ? [...selectedFish, fish.code]
                               : selectedFish.filter((f) => f !== fish.code);
-                            updateSection("pondInfo", { selectedFish: next });
+                            handleChange("selectedFish", next);
+                            // Clear error when at least one fish is selected
+                            if (next.length > 0 && errors.selectedFish) {
+                              setErrors(prev => ({ ...prev, selectedFish: false }));
+                            }
                           }}
                         />
                       }
@@ -411,6 +567,11 @@ export function PondInfo() {
                     />
                   ))}
                 </Box>
+                {errors.selectedFish && validationAttempted && (
+                  <FormHelperText error sx={{ mt: 1, mb: 2 }}>
+                    {getErrorMessage("selectedFish")}
+                  </FormHelperText>
+                )}
               </Grid>
             )}
 
@@ -423,7 +584,7 @@ export function PondInfo() {
                   color="primary.contrastText"
                   mb={1}
                 >
-                  Which statement fits your interest?
+                  Which statement fits your interest? <span style={{ color: "#f44336" }}>*</span>
                 </Typography>
                 <Select
                   fullWidth
@@ -473,9 +634,10 @@ export function PondInfo() {
                     });
 
                     // Update the selected option
-                    updateSection("pondInfo", { selectedOption: newValue });
+                    handleChange("selectedOption", newValue);
                   }}
                   displayEmpty
+                  error={errors.selectedOption && validationAttempted}
                   sx={{ ...selectSx }}
                 >
                   <MenuItem disabled value="" sx={{ ...menuItemSx }}>
@@ -492,6 +654,11 @@ export function PondInfo() {
                     </MenuItem>
                   ))}
                 </Select>
+                {errors.selectedOption && validationAttempted && (
+                  <FormHelperText error sx={{ mt: 1 }}>
+                    {getErrorMessage("selectedOption")}
+                  </FormHelperText>
+                )}
               </Grid>
             )}
           </Grid>
@@ -500,6 +667,7 @@ export function PondInfo() {
           <Box display="flex" justifyContent="space-between" mt={2}>
             <Button
               onClick={handleBack}
+              disabled={quoteLoading}
               sx={{
                 backgroundColor: "text.secondary",
                 color: "secondary.main",
@@ -511,14 +679,26 @@ export function PondInfo() {
             <Button
               variant="contained"
               onClick={handleNext}
+              disabled={quoteLoading}
               sx={{
                 background: "#44A194",
                 "&:hover": { background: "#537D96" },
               }}
             >
-              Continue
+              {quoteLoading ? "Creating Estimate..." : "Continue"}
             </Button>
           </Box>
+
+          {/* Loading Backdrop */}
+          <Backdrop
+            sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={quoteLoading}
+          >
+            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+              <CircularProgress color="inherit" />
+              <Typography variant="h6">Creating your estimate...</Typography>
+            </Box>
+          </Backdrop>
           <Snackbar
             open={snackOpen}
             autoHideDuration={3000}

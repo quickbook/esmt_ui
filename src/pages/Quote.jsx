@@ -18,13 +18,23 @@ import {
 } from "@mui/material";
 import { ArrowLeft, CheckCircle, FileText, Mail } from "lucide-react";
 import { glassBoxStyles } from "../utils/glassStyles";
-import { mockEstimateOptionsApiData, pondConfigs } from "../api/mockApiData";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { clearPondEstimateData } from "../redux/Slices/pondEstimateSlice";
 
 export function Quote() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { data, reset } = useEstimateForm();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const hearAboutOptions = useSelector(
+    (state) => state.domain.leadSources || [],
+  );
+  const pondAccessOptions = useSelector(
+    (state) => state.domain.pondAccess || [],
+  );
+  const fishSpeciesOptions = useSelector(
+    (state) => state.domain.fishSpecies || [],
+  );
   const pondOptions = useSelector(
     (state) => state.domain.pondOptions || { NEW: [], OLD: [] },
   );
@@ -37,11 +47,6 @@ export function Quote() {
   const availability = data.availability;
   const today = new Date();
   const validity = new Date(today.setDate(today.getDate() + 30));
-
-  const apiData = mockEstimateOptionsApiData;
-  const pondType =
-    estimator.pondType || pondInfo.selectedOption || "trophy-bass";
-  const config = pondConfigs[pondType] || pondConfigs["trophy-bass"];
 
   const grassCarp = estimator.grassCarp || {
     selected: false,
@@ -68,6 +73,7 @@ export function Quote() {
 
     setTimeout(() => {
       reset();
+      dispatch(clearPondEstimateData());
       navigate("/");
     }, 3000);
   };
@@ -78,25 +84,6 @@ export function Quote() {
 
   const formatCurrency = (amount) => {
     return `$${amount.toFixed(2)}`;
-  };
-
-  // Helper function to format column headers for display
-  const formatColumnHeader = (col) => {
-    const parts = col.split("-");
-    const unit = parts[0];
-    const fish = parts.slice(1).join(" ");
-    return { unit, fish };
-  };
-
-  // Get stock quantities for each option
-  const getStockQuantities = (opt) => {
-    if (!opt.stock || !config) return [];
-
-    return config.columns.map((col, colIdx) => {
-      const { unit, fish } = formatColumnHeader(col);
-      const quantity = opt.stock[colIdx] || 0;
-      return { fish, unit, quantity };
-    });
   };
 
   return (
@@ -200,6 +187,18 @@ export function Quote() {
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <Typography variant="body2" color="text.disabled">
+                      Email to send a written quote
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      color="text.primary"
+                      fontWeight={500}
+                    >
+                      {customer.quoteEmail || "—"}
+                    </Typography>
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <Typography variant="body2" color="text.disabled">
                       Phone
                     </Typography>
                     <Typography
@@ -220,6 +219,20 @@ export function Quote() {
                       fontWeight={500}
                     >
                       {customer.address || "—"}
+                    </Typography>
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <Typography variant="body2" color="text.disabled">
+                      How did you hear about us?
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      color="text.primary"
+                      fontWeight={500}
+                    >
+                      {hearAboutOptions.find(
+                        (option) => option.id === customer.hearAbout,
+                      )?.name || "—"}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -269,7 +282,9 @@ export function Quote() {
                       color="text.primary"
                       fontWeight={500}
                     >
-                      {pondInfo.pondAccess || "—"}
+                      {pondAccessOptions.find(
+                        (option) => option.id === pondInfo.pondAccess,
+                      )?.name || "—"}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -298,7 +313,7 @@ export function Quote() {
                       {pondInfo.pondType
                         ? pondInfo.pondType === "new"
                           ? "New Pond"
-                          : "Existing Pond"
+                          : "Old Pond"
                         : "—"}
                     </Typography>
                   </Grid>
@@ -312,7 +327,12 @@ export function Quote() {
                         color="text.primary"
                         fontWeight={500}
                       >
-                        {pondInfo.selectedFish.join(", ")}
+                        {fishSpeciesOptions
+                          .filter((option) =>
+                            pondInfo.selectedFish.includes(option.code),
+                          )
+                          .map((option) => option.name)
+                          .join(", ") || "None"}
                       </Typography>
                     </Grid>
                   )}
@@ -327,12 +347,12 @@ export function Quote() {
                     >
                       {pondInfo.pondType === "new"
                         ? newPondOptions.find(
-                            (op) => op.value === pondInfo.selectedOption,
-                          )?.label
+                            (op) => op.code === pondInfo.selectedOption,
+                          )?.name
                         : pondInfo.pondType === "old"
                           ? oldPondOptions.find(
-                              (op) => op.value === pondInfo.selectedOption,
-                            )?.label
+                              (op) => op.code === pondInfo.selectedOption,
+                            )?.name
                           : "-"}
                     </Typography>
                   </Grid>
@@ -353,15 +373,16 @@ export function Quote() {
                 }}
               >
                 {pondInfo.pondType === "new"
-                  ? (estimator.pondTypeTitle || estimator.pondType || "Pond") +
-                    " Estimator"
-                  : pondInfo.selectedOption === "adult-fish"
+                  ? estimator.pondTypeTitle ||
+                    estimator.pondType ||
+                    "Pond Estimator"
+                  : pondInfo.selectedOption === "ADD_CATCHABLE_FISH"
                     ? "Adult Fish Estimator"
-                    : pondInfo.selectedOption === "feed-bass"
+                    : pondInfo.selectedOption === "FEED_POND_BASS"
                       ? "Feed Bass Estimator"
-                      : pondInfo.selectedOption === "grass-carp"
+                      : pondInfo.selectedOption === "STOCK_GRASS_CARP"
                         ? "Grass Carp Estimator"
-                        : pondInfo.selectedOption === "ala-carte"
+                        : pondInfo.selectedOption === "CUSTOM_STOCKING"
                           ? "Ala Carte Estimator"
                           : "Pond Estimator"}
               </Typography>
@@ -382,13 +403,14 @@ export function Quote() {
                           sx={{
                             display: "flex",
                             justifyContent: "space-between",
-                            alignItems: "center",
+                            alignItems: {sm:"center"},
+                            flexDirection: { xs: "column", sm: "row" },
                             mb: 2,
                             pb: 1,
                             borderBottom: "1px solid rgba(255,255,255,0.1)",
                           }}
                         >
-                          <Box>
+                          <Box>                          
                             <Typography
                               color="text.primary"
                               fontWeight={600}
@@ -420,7 +442,7 @@ export function Quote() {
                             </Typography>
                             <Grid container spacing={2}>
                               {opt.stockDetails.map((item, i) => (
-                                <Grid size={{ xs: 6, sm: 4 }} key={i}>
+                                <Grid size={{ xs: 12, sm: 4 }} key={i}>
                                   <Typography
                                     color="text.primary"
                                     variant="body2"
@@ -448,7 +470,7 @@ export function Quote() {
                               variant="subtitle2"
                               gutterBottom
                             >
-                              Mature Population Breakdown:
+                              Stock Quantities:
                             </Typography>
                             <Grid container spacing={2}>
                               {opt.breakdown.map((item, i) => (
@@ -472,7 +494,6 @@ export function Quote() {
                             </Grid>
                           </Box>
                         )}
-
                         {idx < selectedOptions.length - 1 && (
                           <Divider
                             sx={{ my: 3, borderColor: "rgba(255,255,255,0.1)" }}
@@ -520,7 +541,7 @@ export function Quote() {
                 )}
 
                 {/* Adult Fish Estimator */}
-                {pondInfo.selectedOption === "adult-fish" &&
+                {pondInfo.selectedOption === "ADD_CATCHABLE_FISH" &&
                   estimator.adultFishData && (
                     <Box>
                       <Table size="small">
@@ -631,7 +652,7 @@ export function Quote() {
                   )}
 
                 {/* Feed Bass Estimator */}
-                {pondInfo.selectedOption === "feed-bass" &&
+                {pondInfo.selectedOption === "FEED_POND_BASS" &&
                   estimator.feedBassData && (
                     <Box>
                       <Table size="small">
@@ -744,7 +765,7 @@ export function Quote() {
                   )}
 
                 {/* Grass Carp Estimator */}
-                {pondInfo.selectedOption === "grass-carp" &&
+                {pondInfo.selectedOption === "STOCK_GRASS_CARP" &&
                   estimator.grassCarpData && (
                     <Box>
                       <Table size="small">
@@ -857,7 +878,7 @@ export function Quote() {
                   )}
 
                 {/* Ala Carte Estimator */}
-                {pondInfo.selectedOption === "ala-carte" &&
+                {pondInfo.selectedOption === "CUSTOM_STOCKING" &&
                   estimator.alaCarteData && (
                     <Box>
                       <Table size="small">
