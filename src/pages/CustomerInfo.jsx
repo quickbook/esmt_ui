@@ -69,7 +69,6 @@ export function CustomerInfo() {
   };
 
   const handleBack = () => {
-    console.log("Customer info:", formData);
     navigate("/");
   };
 

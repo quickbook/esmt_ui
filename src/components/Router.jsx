@@ -18,6 +18,7 @@ import TopBar from "./TopBar";
 import ErrorPage from "../pages/ErrorPage";
 import { useEffect, useState } from "react";
 import { Fab, Zoom } from "@mui/material";
+import AdminDashboard from "../admin/AdminDashboard";
 
 const Router = () => {
   // Scroll logic
@@ -91,6 +92,7 @@ const Router = () => {
         />
         <Route path="/estimate/availability" element={<Availability />} />
         <Route path="/estimate/quote" element={<Quote />} />
+        <Route path="/estimate/admin" element={<AdminDashboard />} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
         {/* Scroll Down Button */}

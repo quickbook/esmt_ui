@@ -1,4 +1,3 @@
-import { zhCN } from "@mui/material/locale";
 import { createTheme } from "@mui/material/styles";
 
 const theme = createTheme({

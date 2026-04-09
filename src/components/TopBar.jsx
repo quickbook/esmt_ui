@@ -56,13 +56,13 @@ const TopBar = () => {
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }} onClick={handleHome} style={{ cursor: "pointer" }}>
               <Box
                 component="img"
-                sx={{ height: 38 }}
+                sx={{ height: { xs: 24, md: 38 } }}
                 alt="Glennon Fish Farms Logo"
                 src="/logo.png"
               />
               <Box
                 component="img"
-                sx={{ height: 42, width: "auto", mt: 1 }}
+                sx={{ height: { xs: 34, md: 42 }, width: "auto", mt: 1 }}
                 alt="Glennon Fish Farms"
                 src="/Label.png"
               />
@@ -110,6 +110,7 @@ const TopBar = () => {
           >
             <MenuItem onClick={handleLogin}>Login</MenuItem>
             <MenuItem onClick={handleLogout}>Sign Up</MenuItem>
+            <MenuItem onClick={() => navigate("/estimate/admin")}>admin</MenuItem>
           </Menu>
         </Toolbar>
       </Container>
