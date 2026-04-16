@@ -345,7 +345,7 @@ export function CustomerInfo() {
                 ))}
               </Select>
               {errors.hearAbout && validationAttempted && (
-                <FormHelperText error sx={{ mt: 1 }}>
+                <FormHelperText error>
                   {getErrorMessage("hearAbout")}
                 </FormHelperText>
               )}

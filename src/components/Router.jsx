@@ -19,6 +19,7 @@ import ErrorPage from "../pages/ErrorPage";
 import { useEffect, useState } from "react";
 import { Fab, Zoom } from "@mui/material";
 import AdminDashboard from "../admin/AdminDashboard";
+import { ProfilePage } from "../pages/ProfilePage";
 
 const Router = () => {
   // Scroll logic
@@ -71,6 +72,7 @@ const Router = () => {
         <Route path="/estimate" element={<HomePage />} />
         <Route path="/estimate/login" element={<Login />} />
         <Route path="/estimate/signup" element={<Signup />} />
+        <Route path="/estimate/profile" element={<ProfilePage />} />
         <Route path="/estimate/customer-info" element={<CustomerInfo />} />
         <Route path="/estimate/pond-info" element={<PondInfo />} />
         <Route path="/estimate/estimator/:type" element={<PondEstimator />} />

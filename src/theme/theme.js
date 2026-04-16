@@ -271,7 +271,7 @@ export const textFieldSx = {
 };
 
 export const selectSx = {
-  mb: 4,
+  mb: 2,
   color: "primary.contrastText",
 
   // icon color
@@ -307,7 +307,7 @@ export const menuItemSx = {
     bgcolor: "rgba(255, 255, 255, 0.3)",
   },
   "&.Mui-selected": {
-    bgcolor: "rgba(255, 255, 255, 0.6)",
+    bgcolor: "rgba(255, 255, 255, 0.2)",
     "&:hover": {
       bgcolor: "rgba(255, 255, 255, 0.4)",
     },

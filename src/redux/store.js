@@ -3,11 +3,13 @@ import authReducer from './Slices/authSlice';
 import loginReducer from './Slices/loginSlice';
 import domainReducer from './Slices/domainSlice';
 import pondEstimateReducer from './Slices/pondEstimateSlice';
+import signUpReducer from './Slices/signUpSlice';
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     login: loginReducer,
+    signUp: signUpReducer,
     domain: domainReducer,
     pondEstimate: pondEstimateReducer,
   },

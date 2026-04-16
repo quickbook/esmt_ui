@@ -245,6 +245,9 @@ export function PondEstimator() {
   // }, [type, data.estimator.grassCarp]);
 
   useEffect(() => {
+    if (!apiData) {
+      handleBack();
+    }
     window.scrollTo(0, 0);
   }, []);
 

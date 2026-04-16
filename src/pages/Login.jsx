@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Box,
   Typography,
@@ -10,19 +11,86 @@ import {
   Link,
   InputAdornment,
   Paper,
+  Snackbar,
+  Alert,
+  CircularProgress,
 } from "@mui/material";
 import { Waves, Mail, Lock } from "lucide-react";
-import { Visibility } from "@mui/icons-material";
 import { textFieldSx } from "../theme/theme";
+import { loginUser } from "../redux/Slices/loginSlice";
 
 export function Login() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const dispatch = useDispatch();
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState({});
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 
-  const handleLogin = (e) => {
+  const { status } = useSelector((state) => state.login);
+  const isLoading = status === 'loading';
+
+  const validateField = (name, value) => {
+    let error = "";
+    switch (name) {
+      case "username":
+        if (!value.trim()) error = "Username is required";
+        break;
+      case "password":
+        if (!value) error = "Password is required";
+        else if (value.length < 6) error = "Password must be at least 6 characters";
+        break;
+      default:
+        break;
+    }
+    return error;
+  };
+
+  const handleChange = (field, value) => {
+    if (field === "username") setUsername(value);
+    else if (field === "password") setPassword(value);
+    
+    const error = validateField(field, value);
+    setErrors(prev => ({ ...prev, [field]: error }));
+  };
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    navigate("/estimate/customer-info");
+
+    // Validate all fields
+    const newErrors = {};
+    const usernameError = validateField("username", username);
+    const passwordError = validateField("password", password);
+
+    if (usernameError) newErrors.username = usernameError;
+    if (passwordError) newErrors.password = passwordError;
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    try {
+      const resultAction = await dispatch(
+        loginUser({ username, password })
+      ).unwrap();
+
+      setSnackbar({
+        open: true,
+        message: resultAction?.message || "Login successful",
+        severity: "success",
+      });
+
+      setTimeout(() => {
+        navigate("/estimate/customer-info");
+      }, 1200);
+    } catch (err) {
+      setSnackbar({
+        open: true,
+        message: err || "Login failed. Please check your credentials.",
+        severity: "error",
+      });
+    }
   };
 
   return (
@@ -86,23 +154,14 @@ export function Login() {
 
           {/* Login Form */}
           <Box component="form" onSubmit={handleLogin} sx={{ p: 4 }}>
-            {/* <Typography
-              variant="h5"
-              fontWeight={600}
-              textAlign="center"
-              sx={{ color: "#537D96", mb: 3 }}
-            >
-              Welcome Back
-            </Typography> */}
-
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
-              {/* Email */}
               <TextField
-                type="email"
-                //label="Email Address"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+                placeholder="Enter your username"
+                value={username}
+                onChange={(e) => handleChange("username", e.target.value)}
+                error={!!errors.username}
+                helperText={errors.username}
                 fullWidth
                 slotProps={{
                   input: {
@@ -116,13 +175,13 @@ export function Login() {
                 sx={textFieldSx}
               />
 
-              {/* Password */}
               <TextField
                 type="password"
-                //label="Password"
                 placeholder="Enter your password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => handleChange("password", e.target.value)}
+                error={!!errors.password}
+                helperText={errors.password}
                 fullWidth
                 slotProps={{
                   input: {
@@ -136,7 +195,6 @@ export function Login() {
                 sx={textFieldSx}
               />
 
-              {/* Remember me + Forgot password */}
               <Box
                 sx={{
                   display: "flex",
@@ -174,11 +232,11 @@ export function Login() {
                 </Link>
               </Box>
 
-              {/* Submit Button */}
               <Button
                 type="submit"
                 variant="contained"
                 fullWidth
+                disabled={!username.trim() || !password || isLoading}
                 sx={{
                   py: 1.5,
                   borderRadius: 2,
@@ -193,13 +251,23 @@ export function Login() {
                     transform: "scale(1.02)",
                   },
                   transition: "all 0.2s",
+                  "&:disabled": {
+                    opacity: 0.6,
+                    cursor: "not-allowed",
+                  },
                 }}
               >
-                Sign In
+                {isLoading ? (
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <CircularProgress size={20} color="inherit" />
+                    <span>Logging in...</span>
+                  </Box>
+                ) : (
+                  "Login"
+                )}
               </Button>
             </Box>
 
-            {/* Sign up link */}
             <Typography
               variant="body2"
               textAlign="center"
@@ -215,6 +283,7 @@ export function Login() {
                   color: "#44A194",
                   "&:hover": { color: "#EC8F8D" },
                   transition: "color 0.2s",
+                  cursor: "pointer",
                 }}
               >
                 Sign up
@@ -223,7 +292,6 @@ export function Login() {
           </Box>
         </Paper>
 
-        {/* Footer */}
         <Typography
           variant="body2"
           textAlign="center"
@@ -233,6 +301,22 @@ export function Login() {
           © 2026 Fish Guru. All rights reserved.
         </Typography>
       </Box>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

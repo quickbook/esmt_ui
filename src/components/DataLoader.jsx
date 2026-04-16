@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import LoadingScreen from './LoadingScreen';
 import ErrorScreen from './ErrorScreen';
 import { fetchAllDomainData } from '../redux/Slices/domainSlice';
+import { restoreFromLocalStorage, logout } from '../redux/Slices/loginSlice';
 
 export default function DataLoader({ children }) {
   const dispatch = useDispatch();
@@ -17,8 +18,30 @@ export default function DataLoader({ children }) {
   // Check if all data has been loaded at least once
   const allLoaded = !isLoading && !hasError;
 
+  // Initialize: Load domain data and restore login session from localStorage
   useEffect(() => {
-    // Log loading state
+
+    // Restore login session from localStorage
+    const loginSessionData = localStorage.getItem('loginSession');
+    if (loginSessionData) {
+      try {
+        const parsed = JSON.parse(loginSessionData);
+        const { user, roleName } = parsed;
+
+        if (user) {
+          // Restore user session
+          dispatch(restoreFromLocalStorage({ user, roleName }));
+          console.log('✅ Session restored from localStorage');
+        }
+      } catch (error) {
+        console.error('❌ Error restoring session:', error);
+        dispatch(logout());
+      }
+    }
+  }, [dispatch]);
+
+  // Log domain data loading state
+  useEffect(() => {
     if (isLoading) {
       //console.log('📊 Loading domain data...', loading);
     } else if (hasError) {

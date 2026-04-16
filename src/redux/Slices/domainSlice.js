@@ -7,17 +7,20 @@ const initialState = {
   pondAccess: [],
   fishSpecies: [],
   pondOptions: { NEW: [], OLD: [] },
+  countries:[],
   loading: {
     leadSources: false,
     pondAccess: false,
     fishSpecies: false,
     pondOptions: false,
+    countries: false,
   },
   error: {
     leadSources: null,
     pondAccess: null,
     fishSpecies: null,
     pondOptions: null,
+    countries: null,
   },
 };
 
@@ -85,17 +88,34 @@ const domainSlice = createSlice({
       state.error.pondOptions = action.payload;
     },
 
+    // Countries
+    fetchCountriesStart(state) {
+      state.loading.countries = true;
+      state.error.countries = null;
+    },
+    fetchCountriesSuccess(state, action) {
+      state.loading.countries = false;
+      state.countries = action.payload;
+      state.error.countries = null;
+    },
+    fetchCountriesFailure(state, action) {
+      state.loading.countries = false;
+      state.error.countries = action.payload;
+    },
+
     // Clear all domain data
     clearDomainData(state) {
       state.leadSources = [];
       state.pondAccess = [];
       state.fishSpecies = [];
       state.pondOptions = { NEW: [], OLD: [] };
+      state.countries = [];
       state.error = {
         leadSources: null,
         pondAccess: null,
         fishSpecies: null,
         pondOptions: null,
+        countries: null, 
       };
     },
   },
@@ -114,6 +134,9 @@ export const {
   fetchPondOptionsStart,
   fetchPondOptionsSuccess,
   fetchPondOptionsFailure,
+  fetchCountriesStart,
+  fetchCountriesSuccess,
+  fetchCountriesFailure,
   clearDomainData,
 } = domainSlice.actions;
 
@@ -170,6 +193,20 @@ export const fetchPondOptions = () => async (dispatch) => {
   }
 };
 
+export const fetchCountries = () => async (dispatch) => {
+  dispatch(fetchCountriesStart());
+  try {
+    const response = await axiosClient.get(getFullUrl(API_ENDPOINTS.DOMAIN.COUNTRIES));
+    dispatch(fetchCountriesSuccess(response.data));
+    //console.log('🌍 Countries loaded:', response.data);
+  } catch (error) {
+    const message = error.response?.data?.message || error.message;
+    dispatch(fetchCountriesFailure(message));
+    console.error('❌ Failed to load countries:', message);
+  }
+};
+
+
 // Fetch all domain data at once
 export const fetchAllDomainData = () => async (dispatch) => {
   console.log('🔄 Fetching all domain data...');
@@ -178,6 +215,7 @@ export const fetchAllDomainData = () => async (dispatch) => {
     dispatch(fetchPondAccess()),
     dispatch(fetchFishSpecies()),
     dispatch(fetchPondOptions()),
+    dispatch(fetchCountries()),
   ]);
   console.log('✅ All domain data loaded');
 };
