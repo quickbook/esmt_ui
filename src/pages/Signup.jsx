@@ -43,6 +43,7 @@ export function Signup() {
     address: "",
     city: "",
     zipCode: "",
+    stateName: "",
     countryName: "",
   });
 
@@ -63,7 +64,7 @@ export function Signup() {
     if (status === 'succeeded') {
       setSnackbar({ open: true, message: "Account created successfully!", severity: "success" });
       setTimeout(() => {
-        navigate("/estimate/customer-info");
+        navigate("/estimate/login");
       }, 2000);
     } else if (status === 'failed') {
       setSnackbar({ open: true, message: error || "Signup failed", severity: "error" });
@@ -150,7 +151,7 @@ export function Signup() {
       address: formData.address,
       city: formData.city,
       stateName: formData.stateName,
-      countryName: formData.countryName,
+      countryCode: formData.countryName,
     };
 
     dispatch(signUpUser(payload));
