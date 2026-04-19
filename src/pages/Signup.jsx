@@ -28,7 +28,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { signUpUser } from "../redux/Slices/signUpSlice";
 import { fetchCountries } from "../redux/Slices/domainSlice";
 
-export function Signup() {
+export function Signup({ snackbar, setSnackbar }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
@@ -48,7 +48,6 @@ export function Signup() {
   });
 
   const [errors, setErrors] = useState({});
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 
   const { status, error } = useSelector((state) => state.signUp);
   const countries = useSelector((state) => state.domain.countries || []);
@@ -171,7 +170,7 @@ export function Signup() {
     { label: "Address", key: "address", type: "text", placeholder: "Enter street address", icon: <MapPin size={20} color="#9CA3AF" />, required: true },
     { label: "City", key: "city", type: "text", placeholder: "Enter city", icon: <LocationCityIcon size={20} color="#9CA3AF" />, required: true },
     { label: "ZIP Code", key: "zipCode", type: "text", placeholder: "Enter ZIP code", icon: <MapPin size={20} color="#9CA3AF" />, required: true },
-    { label: "State Name", key: "stateName", type: "text", placeholder: "Enter state name", icon: <LocationCityIcon size={20} color="#9CA3AF" />, required: false },
+    { label: "State Name", key: "stateName", type: "text", placeholder: "Enter state", icon: <LocationCityIcon size={20} color="#9CA3AF" />, required: false },
     { label: "Country", key: "countryName", type: "select", placeholder: "Select country", icon: <PublicIcon size={20} color="#9CA3AF" />, required: true, options: countries },
   ];
 

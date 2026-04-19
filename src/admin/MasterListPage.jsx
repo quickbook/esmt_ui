@@ -16,10 +16,20 @@ import {
   DialogActions,
   MenuItem,
   InputAdornment,
+  Typography,
 } from "@mui/material";
 import { Delete, Edit } from "@mui/icons-material";
 import { sizeOptions, unitOptions } from "./AdminDashboard";
 import { menuItemSx, textFieldSx } from "../theme/theme";
+
+const EMPTY_FORM = {
+  fishType: "",
+  sizeLabel: "1 to 3 inch",   // ✅ was mixing `size` and `sizeLabel`
+  price: "",
+  unitType: "price per fish",  // ✅ was mixing `unitText` and `unitType`
+  displayOrder: 0,
+  variant: "DEFAULT",
+};
 
 export default function MasterListPage({ masterListData, setMasterListData }) {
   const [selectedCategory, setSelectedCategory] = useState("ALL");
@@ -27,68 +37,61 @@ export default function MasterListPage({ masterListData, setMasterListData }) {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
+  const [form, setForm] = useState(EMPTY_FORM);
 
-  const [form, setForm] = useState({
-    fishType: "",
-    size: "1 to 3 inch",
-    price: "",
-    unitText: "price per fish",
-    displayOrder: 0,
-    variant: "DEFAULT",
-  });
+  const updateForm = (field) => (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
-  const displayItems = (data) => {
-    console.log("Updated Master List:", data);
-  };
+  // ── Filtering ──────────────────────────────────────────────────────────────
 
   const filtered = masterListData.filter((item) => {
-    const matchCategory =
-      selectedCategory === "ALL" || item.fishType === selectedCategory;
-
-    const matchSize = selectedSize === "ALL" || item.size === selectedSize;
-
-    const matchSearch = item.fishType
-      .toLowerCase()
-      .includes(search.toLowerCase());
-
+    const matchCategory = selectedCategory === "ALL" || item.fishType === selectedCategory;
+    const matchSize     = selectedSize === "ALL"     || item.sizeLabel === selectedSize; // ✅ was `item.size`
+    const matchSearch   = item.fishType.toLowerCase().includes(search.toLowerCase());
     return matchCategory && matchSize && matchSearch;
   });
 
-  const handleSave = () => {
-    let updated = [...masterListData];
+  // ── CRUD handlers ──────────────────────────────────────────────────────────
 
+  const handleOpenAdd = () => {
+    setEditIndex(null);
+    setForm(EMPTY_FORM);
+    setOpen(true);
+  };
+
+  const handleOpenEdit = (row, index) => {
+    setForm(row);
+    setEditIndex(index);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setEditIndex(null);
+    setForm(EMPTY_FORM);
+  };
+
+  const handleSave = () => {
+    const updated = [...masterListData];
     if (editIndex !== null) {
       updated[editIndex] = form;
     } else {
       updated.push(form);
     }
-
     setMasterListData(updated);
-    displayItems(updated);
-
-    setOpen(false);
-    setEditIndex(null);
-
-    setForm({
-      fishType: "",
-      size: "",
-      price: "",
-      unitText: "price per fish",
-      displayOrder: 0,
-      variant: "DEFAULT",
-    });
+    handleClose();
   };
 
   const handleDelete = (index) => {
     if (window.confirm("Are you sure you want to delete this item?")) {
-      const updated = masterListData.filter((_, i) => i !== index);
-      setMasterListData(updated);
-      displayItems(updated);
+      setMasterListData((prev) => prev.filter((_, i) => i !== index));
     }
   };
 
+  // ── Render ─────────────────────────────────────────────────────────────────
+
   return (
     <Box mt={3}>
+      {/* ── Filters + Add button ── */}
       <Box
         display="flex"
         flexDirection={{ xs: "column", sm: "row" }}
@@ -111,6 +114,7 @@ export default function MasterListPage({ masterListData, setMasterListData }) {
             sx={textFieldSx}
           />
 
+          {/* Category filter */}
           <TextField
             select
             fullWidth
@@ -119,15 +123,13 @@ export default function MasterListPage({ masterListData, setMasterListData }) {
             onChange={(e) => setSelectedCategory(e.target.value)}
             sx={textFieldSx}
           >
-            <MenuItem sx={{ ...menuItemSx }} value="ALL">
-              All Fishes
-            </MenuItem>
+            <MenuItem sx={menuItemSx} value="ALL">All Fishes</MenuItem>
             {[...new Set(masterListData.map((i) => i.fishType))].map((cat) => (
-              <MenuItem sx={{ ...menuItemSx }} key={cat} value={cat}>
-                {cat}
-              </MenuItem>
+              <MenuItem sx={menuItemSx} key={cat} value={cat}>{cat}</MenuItem>
             ))}
           </TextField>
+
+          {/* Size filter — uses sizeLabel ✅ */}
           <TextField
             select
             fullWidth
@@ -136,134 +138,124 @@ export default function MasterListPage({ masterListData, setMasterListData }) {
             onChange={(e) => setSelectedSize(e.target.value)}
             sx={textFieldSx}
           >
-            <MenuItem sx={{ ...menuItemSx }} value="ALL">
-              All Sizes
-            </MenuItem>
-
-            {[...new Set(masterListData.map((i) => i.size))].map((size) => (
-              <MenuItem sx={{ ...menuItemSx }} key={size} value={size}>
-                {size}
-              </MenuItem>
+            <MenuItem sx={menuItemSx} value="ALL">All Sizes</MenuItem>
+            {[...new Set(masterListData.map((i) => i.sizeLabel))].map((size) => ( // ✅ was `i.size`
+              <MenuItem sx={menuItemSx} key={size} value={size}>{size}</MenuItem>
             ))}
           </TextField>
         </Box>
 
         <Button
           variant="contained"
-          fullWidth={{ xs: true, sm: false }}
           sx={{ whiteSpace: "nowrap" }}
-          onClick={() => {
-            setEditIndex(null);
-            setForm({
-              fishType: "",
-              size: "1 to 3 inch",
-              price: "",
-              unitText: "price per fish",
-              displayOrder: 0,
-              variant: "DEFAULT",
-            });
-            setOpen(true);
-          }}
+          onClick={handleOpenAdd}
         >
           Add Fish +
         </Button>
       </Box>
 
+      {/* ── Table ── */}
       <Paper sx={{ mt: 3, overflowX: "auto" }}>
-        <Table sx={{ minWidth: 650 }}>
-          <TableHead>
-            <TableRow>
-              <TableCell>Fish Type</TableCell>
-              <TableCell>Size</TableCell>
-              <TableCell>Unit</TableCell>
-              <TableCell>Price ($)</TableCell>
-              <TableCell>Display Order</TableCell>
-              <TableCell>Variant</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {filtered.map((row, i) => (
-              <TableRow key={i}>
-                <TableCell>{row.fishType}</TableCell>
-                <TableCell>{row.size}</TableCell>
-                <TableCell>{row.unitText}</TableCell>
-                <TableCell>${Number(row.price || 0).toFixed(2)}</TableCell>
-                <TableCell>{row.displayOrder || i}</TableCell>
-                <TableCell>{row.variant}</TableCell>
-                <TableCell>
-                  <IconButton
-                    onClick={() => {
-                      setForm(row);
-                      setEditIndex(i);
-                      setOpen(true);
-                    }}
-                  >
-                    <Edit />
-                  </IconButton>
-
-                  <IconButton color="error" onClick={() => handleDelete(i)}>
-                    <Delete />
-                  </IconButton>
-                </TableCell>
+        {filtered.length === 0 ? (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              py: 6,
+              textAlign: "center",
+            }}
+          >
+            <Box>
+              <Typography variant="h6" color="textSecondary" gutterBottom>
+                No Fish Found
+              </Typography>
+              <Typography variant="body2" color="textSecondary">
+                No items match your search or filters. Try adjusting your criteria or add a new fish.
+              </Typography>
+            </Box>
+          </Box>
+        ) : (
+          <Table sx={{ minWidth: 650 }}>
+            <TableHead>
+              <TableRow>
+                <TableCell>Fish Type</TableCell>
+                <TableCell>Size</TableCell>
+                <TableCell>Unit</TableCell>
+                <TableCell>Price ($)</TableCell>
+                <TableCell>Display Order</TableCell>
+                <TableCell>Variant</TableCell>
+                <TableCell>Actions</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHead>
+
+            <TableBody>
+              {filtered.map((row, i) => (
+                <TableRow key={i}>
+                  <TableCell>{row.fishType}</TableCell>
+                  <TableCell>{row.sizeLabel}</TableCell>    
+                  <TableCell>{row.unitType}</TableCell>     
+                  <TableCell>${Number(row.price || 0).toFixed(2)}</TableCell>
+                  <TableCell>{row.displayOrder ?? i}</TableCell>
+                  <TableCell>{row.variant}</TableCell>
+                  <TableCell>
+                    <IconButton onClick={() => handleOpenEdit(row, i)}>
+                      <Edit />
+                    </IconButton>
+                    <IconButton color="error" onClick={() => handleDelete(i)}>
+                      <Delete />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </Paper>
 
-      {/* MODAL */}
-      <Dialog open={open} onClose={() => setOpen(false)} fullWidth>
-        <DialogTitle>
-          {editIndex !== null ? "Edit Fish" : "Add Fish"}
-        </DialogTitle>
+      {/* ── Add / Edit modal ── */}
+      <Dialog open={open} onClose={handleClose} fullWidth>
+        <DialogTitle>{editIndex !== null ? "Edit Fish" : "Add Fish"}</DialogTitle>
 
-        <DialogContent
-          sx={{ display: "flex", flexDirection: "column", gap: 2 }}
-        >
+        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, pt: "16px !important" }}>
+
+          {/* Fish name */}
           <TextField
-            sx={{ ...textFieldSx }}
+            sx={textFieldSx}
             placeholder="Fish Name"
             value={form.fishType}
-            onChange={(e) => setForm({ ...form, fishType: e.target.value })}
+            onChange={updateForm("fishType")}
           />
 
+          {/* Size — bound to sizeLabel ✅ (was `form.size`) */}
           <TextField
-            sx={{ ...textFieldSx }}
+            sx={textFieldSx}
             select
-            value={form.size || ""}
-            onChange={(e) => setForm({ ...form, size: e.target.value })}
+            value={form.sizeLabel}
+            onChange={updateForm("sizeLabel")}
           >
-            <MenuItem sx={{ ...menuItemSx }} disabled value="">
-              Select a size
-            </MenuItem>
+            <MenuItem sx={menuItemSx} disabled value="">Select a size</MenuItem>
             {sizeOptions.map((s) => (
-              <MenuItem sx={{ ...menuItemSx }} key={s} value={s}>
-                {s}
-              </MenuItem>
+              <MenuItem sx={menuItemSx} key={s} value={s}>{s}</MenuItem>
             ))}
           </TextField>
 
+          {/* Unit — bound to unitType ✅ (was `form.unitText`) */}
           <TextField
-            sx={{ ...textFieldSx }}
+            sx={textFieldSx}
             select
-            placeholder="Unit"
-            value={form.unitText}
-            onChange={(e) => setForm({ ...form, unitText: e.target.value })}
+            value={form.unitType}
+            onChange={updateForm("unitType")}
           >
-            <MenuItem sx={{ ...menuItemSx }} disabled value="">
-              Select a unit
-            </MenuItem>
+            <MenuItem sx={menuItemSx} disabled value="">Select a unit</MenuItem>
             {unitOptions.map((u) => (
-              <MenuItem sx={{ ...menuItemSx }} key={u} value={u}>
-                {u}
-              </MenuItem>
+              <MenuItem sx={menuItemSx} key={u} value={u}>{u}</MenuItem>
             ))}
           </TextField>
 
+          {/* Price */}
           <TextField
-            sx={{ ...textFieldSx }}
+            sx={textFieldSx}
             type="number"
             slotProps={{
               input: {
@@ -277,44 +269,35 @@ export default function MasterListPage({ masterListData, setMasterListData }) {
             }}
             placeholder="Price"
             value={form.price}
-            onChange={(e) => setForm({ ...form, price: e.target.value })}
+            onChange={updateForm("price")}
           />
 
+          {/* Display order */}
           <TextField
-            sx={{ ...textFieldSx }}
+            sx={textFieldSx}
             type="number"
             slotProps={{ input: { min: 0 } }}
             placeholder="Display Order"
             value={form.displayOrder}
-            onChange={(e) =>
-              setForm({ ...form, displayOrder: Number(e.target.value) })
-            }
+            onChange={(e) => setForm((prev) => ({ ...prev, displayOrder: Number(e.target.value) }))}
           />
 
+          {/* Variant */}
           <TextField
-            sx={{ ...textFieldSx }}
+            sx={textFieldSx}
             select
-            placeholder="Variant"
             value={form.variant}
-            onChange={(e) => setForm({ ...form, variant: e.target.value })}
+            onChange={updateForm("variant")}
           >
-            <MenuItem sx={{ ...menuItemSx }} value="DEFAULT">
-              Default
-            </MenuItem>
-            <MenuItem sx={{ ...menuItemSx }} value="PREMIUM">
-              Premium
-            </MenuItem>
-            <MenuItem sx={{ ...menuItemSx }} value="ECONOMY">
-              Economy
-            </MenuItem>
+            <MenuItem sx={menuItemSx} value="DEFAULT">Default</MenuItem>
+            <MenuItem sx={menuItemSx} value="PREMIUM">Premium</MenuItem>
+            <MenuItem sx={menuItemSx} value="ECONOMY">Economy</MenuItem>
           </TextField>
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancel</Button>
-          <Button variant="contained" onClick={handleSave}>
-            Save
-          </Button>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button variant="contained" onClick={handleSave}>Save</Button>
         </DialogActions>
       </Dialog>
     </Box>

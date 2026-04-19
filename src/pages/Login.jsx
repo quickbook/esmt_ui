@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -19,16 +19,27 @@ import { Waves, Mail, Lock } from "lucide-react";
 import { textFieldSx } from "../theme/theme";
 import { loginUser } from "../redux/Slices/loginSlice";
 
-export function Login() {
+export function Login({ snackbar, setSnackbar }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [errors, setErrors] = useState({});
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
-
   const { status } = useSelector((state) => state.login);
   const isLoading = status === 'loading';
+
+  useEffect(() => {
+    const savedCredentials = localStorage.getItem("rememberedCredentials");
+    if (savedCredentials) {
+      const { username: savedUsername, password: savedPassword, rememberMe: rememberMeFlag } = JSON.parse(savedCredentials);
+      if (rememberMeFlag && savedUsername) {
+        setUsername(savedUsername);
+        setPassword(savedPassword || "");
+        setRememberMe(true);
+      }
+    }
+  }, []);
 
   const validateField = (name, value) => {
     let error = "";
@@ -54,10 +65,13 @@ export function Login() {
     setErrors(prev => ({ ...prev, [field]: error }));
   };
 
+  const handleRememberMeChange = (e) => {
+    setRememberMe(e.target.checked);
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    // Validate all fields
     const newErrors = {};
     const usernameError = validateField("username", username);
     const passwordError = validateField("password", password);
@@ -74,6 +88,17 @@ export function Login() {
       const resultAction = await dispatch(
         loginUser({ username, password })
       ).unwrap();
+
+      if (rememberMe) {
+        const credentials = {
+          username,
+          password,
+          rememberMe: true
+        };
+        localStorage.setItem("rememberedCredentials", JSON.stringify(credentials));
+      } else {
+        localStorage.removeItem("rememberedCredentials");
+      }
 
       setSnackbar({
         open: true,
@@ -115,7 +140,6 @@ export function Login() {
             boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.15)",
           }}
         >
-          {/* Header */}
           <Box
             sx={{
               background: "linear-gradient(to right, #44A194, #537D96)",
@@ -152,7 +176,6 @@ export function Login() {
             </Typography>
           </Box>
 
-          {/* Login Form */}
           <Box component="form" onSubmit={handleLogin} sx={{ p: 4 }}>
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
               <TextField
@@ -206,6 +229,8 @@ export function Login() {
                   control={
                     <Checkbox
                       size="small"
+                      checked={rememberMe}
+                      onChange={handleRememberMeChange}
                       sx={{
                         color: "grey.400",
                         "&.Mui-checked": { color: "#44A194" },

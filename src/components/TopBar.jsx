@@ -159,7 +159,7 @@ const TopBar = () => {
                   <ListItemText>Profile</ListItemText>
                 </MenuItem>
 
-                {roleName === "admin" && (
+                {(roleName === "ROOT" ||roleName === "ADMIN") && (
                   <MenuItem onClick={handleAdmin}>
                     <ListItemIcon>
                       <AdminPanelSettingsIcon fontSize="small" />

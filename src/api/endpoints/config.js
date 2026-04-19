@@ -25,10 +25,16 @@ export const API_ENDPOINTS = {
     FISH_SPECIES: "/api/domain/fish-types",
     POND_TYPES: "/api/domain/pond-purpose/by-pond-type",
     COUNTRIES: "/api/domain/countries",
+    FISH_SIZES: "/api/domain/fish-sizes",
+    UNIT_TYPES: "/api/domain/unit-types",
   }, 
   POST:{
     POND_ESTIMATE: "/api/v1/quotes/estimate",
   },
+  ADMIN:{
+    MASTER_LIST: "/api/v1/fish-prices",
+    ADD_ADMIN: "/api/v1/add-admin",
+  }
 
 };
 

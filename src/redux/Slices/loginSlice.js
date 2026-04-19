@@ -7,6 +7,9 @@ const initialState = {
   user: null,
   roleName: null,
   isLoggedIn: false,
+  accessToken: null,
+  refreshToken: null,
+  expiresIn: null,
   status: 'idle',
   error: null,
 };
@@ -63,6 +66,9 @@ const loginSlice = createSlice({
       state.user = action.payload;
       state.roleName = action.payload?.roleName || null;
       state.isLoggedIn = true;
+      state.accessToken = action.payload?.accessToken || null;
+      state.refreshToken = action.payload?.refreshToken || null;
+      state.expiresIn = action.payload?.expiresIn || null;
       state.status = 'authenticated';
       state.error = null;
       console.log('✅ Login successful:', action.payload);
@@ -71,6 +77,9 @@ const loginSlice = createSlice({
       state.error = action.payload;
       state.status = 'failed';
       state.isLoggedIn = false;
+      state.accessToken = null;
+      state.refreshToken = null;
+      state.expiresIn = null;
       state.user = null;
       state.roleName = null;
     },
@@ -78,6 +87,9 @@ const loginSlice = createSlice({
       state.user = null;
       state.roleName = null;
       state.isLoggedIn = false;
+      state.accessToken = null;
+      state.refreshToken = null;
+      state.expiresIn = null;
       state.status = 'unauthenticated';
       state.error = null;
       localStorage.removeItem('loginSession');
@@ -87,6 +99,9 @@ const loginSlice = createSlice({
       state.user = user;
       state.roleName = roleName;
       state.isLoggedIn = Boolean(user);
+      state.accessToken = action.payload?.accessToken || null;
+      state.refreshToken = action.payload?.refreshToken || null;
+      state.expiresIn = action.payload?.expiresIn || null;
       state.status = 'authenticated';
       state.error = null;
     },
@@ -102,6 +117,9 @@ const loginSlice = createSlice({
         state.user = data.user || null;
         state.roleName = data.user?.roleName || null;
         state.isLoggedIn = Boolean(data.user);
+        state.accessToken = data.accessToken || null;
+        state.refreshToken = data.refreshToken || null;
+        state.expiresIn = data.expiresIn || null;
         state.status = 'authenticated';
         state.error = null;
       })
@@ -109,6 +127,9 @@ const loginSlice = createSlice({
         state.error = action.payload || action.error?.message;
         state.status = 'failed';
         state.isLoggedIn = false;
+        state.accessToken = null;
+        state.refreshToken = null;
+        state.expiresIn = null;
         state.user = null;
         state.roleName = null;
       });

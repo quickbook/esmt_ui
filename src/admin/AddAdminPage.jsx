@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -11,15 +11,25 @@ import {
   Button,
   Link,
   Grid,
+  Select,
+  MenuItem,
+  FormControl,
+  Snackbar,
+  Alert,
+  CircularProgress,
 } from "@mui/material";
 import LocationCityIcon from "@mui/icons-material/LocationCity";
-import PersonIcon from '@mui/icons-material/Person';
-import PublicIcon from '@mui/icons-material/Public';
+import PersonIcon from "@mui/icons-material/Person";
+import PublicIcon from "@mui/icons-material/Public";
 import { Waves, User, Mail, Phone, Lock, MapPin, Badge } from "lucide-react";
-import { textFieldSx } from "../theme/theme";
+import { menuItemSx, selectSx, textFieldSx } from "../theme/theme";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCountries } from "../redux/Slices/domainSlice";
 
-export default function AddAdminPage() {
+export default function AddAdminPage({ snackbar, setSnackbar }) {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const [formData, setFormData] = useState({
     // User account fields
     userName: "",
@@ -32,10 +42,15 @@ export default function AddAdminPage() {
     address: "",
     city: "",
     zipCode: "",
+    stateName: "",
     countryName: "",
   });
 
   const [errors, setErrors] = useState({});
+
+  const { status, error } = useSelector((state) => state.signUp);
+  const countries = useSelector((state) => state.domain.countries || []);
+  const isLoading = status === "loading";
 
   const validateField = (name, value) => {
     let error = "";
@@ -45,15 +60,18 @@ export default function AddAdminPage() {
         break;
       case "gmail":
         if (!value.trim()) error = "Email is required";
-        else if (!/\S+@\S+\.\S+/.test(value)) error = "Enter a valid email address";
+        else if (!/\S+@\S+\.\S+/.test(value))
+          error = "Enter a valid email address";
         break;
       case "password":
         if (!value) error = "Password is required";
-        else if (value.length < 6) error = "Password must be at least 6 characters";
+        else if (value.length < 6)
+          error = "Password must be at least 6 characters";
         break;
       case "contactNumber":
         if (!value.trim()) error = "Contact number is required";
-        else if (!/^\d{10,15}$/.test(value.replace(/\D/g, ''))) error = "Enter a valid phone number";
+        else if (!/^\d{10,15}$/.test(value.replace(/\D/g, "")))
+          error = "Enter a valid phone number";
         break;
       case "firstName":
         if (!value.trim()) error = "First name is required";
@@ -70,6 +88,10 @@ export default function AddAdminPage() {
       case "zipCode":
         if (!value.trim()) error = "ZIP code is required";
         break;
+      case "stateName":
+        // State is optional, so no validation error
+        if (!value.trim()) error = "State name cannot be empty if provided";
+        break;
       case "countryName":
         if (!value.trim()) error = "Country Name is required";
         break;
@@ -81,9 +103,9 @@ export default function AddAdminPage() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
     const error = validateField(name, value);
-    setErrors(prev => ({ ...prev, [name]: error }));
+    setErrors((prev) => ({ ...prev, [name]: error }));
   };
 
   const handleSignup = (e) => {
@@ -91,13 +113,10 @@ export default function AddAdminPage() {
 
     // Validate all fields
     const newErrors = {};
-    Object.keys(formData).forEach(key => {
+    Object.keys(formData).forEach((key) => {
       const error = validateField(key, formData[key]);
       if (error) newErrors[key] = error;
     });
-
-    // Check password match? Not in the spec but good UX
-    // The spec didn't include confirmPassword, so we'll skip that check
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -115,30 +134,155 @@ export default function AddAdminPage() {
       firstName: formData.firstName,
       address: formData.address,
       city: formData.city,
-      countryName: formData.countryName,
+      stateName: formData.stateName,
+      countryCode: formData.countryName,
     };
 
-    console.log("Signup payload:", payload);
+    console.log("Admin Signup payload:", payload);
     // Navigate to customer info page after signup
+    setSnackbar({
+      open: true,
+      message: "Admin created successfully!",
+      severity: "success",
+    });
+    setFormData({
+      // User account fields
+      userName: "",
+      gmail: "",
+      password: "",
+      contactNumber: "",
+      // Customer info fields
+      firstName: "",
+      lastName: "",
+      address: "",
+      city: "",
+      zipCode: "",
+      stateName: "",
+      countryName: "",
+    });
     navigate("/estimate/customer-info");
   };
 
   // Field configurations - split into two groups for better organization
   const accountFields = [
-    { label: "Username", key: "userName", type: "text", placeholder: "Enter your username", icon: <User size={20} color="#9CA3AF" />, required: true },
-    { label: "Email Address", key: "gmail", type: "email", placeholder: "Enter your email", icon: <Mail size={20} color="#9CA3AF" />, required: true },
-    { label: "Password", key: "password", type: "password", placeholder: "Create a password", icon: <Lock size={20} color="#9CA3AF" />, required: true },
-    { label: "Contact Number", key: "contactNumber", type: "tel", placeholder: "Enter your phone number", icon: <Phone size={20} color="#9CA3AF" />, required: true },
+    {
+      label: "Username",
+      key: "userName",
+      type: "text",
+      placeholder: "Enter your username",
+      icon: <User size={20} color="#9CA3AF" />,
+      required: true,
+    },
+    {
+      label: "Email Address",
+      key: "gmail",
+      type: "email",
+      placeholder: "Enter your email",
+      icon: <Mail size={20} color="#9CA3AF" />,
+      required: true,
+    },
+    {
+      label: "Password",
+      key: "password",
+      type: "password",
+      placeholder: "Create a password",
+      icon: <Lock size={20} color="#9CA3AF" />,
+      required: true,
+    },
+    {
+      label: "Contact Number",
+      key: "contactNumber",
+      type: "tel",
+      placeholder: "Enter your phone number",
+      icon: <Phone size={20} color="#9CA3AF" />,
+      required: true,
+    },
   ];
 
   const addressFields = [
-    { label: "First Name", key: "firstName", type: "text", placeholder: "Enter first name", icon: <PersonIcon size={20} color="#9CA3AF" />, required: true },
-    { label: "Last Name", key: "lastName", type: "text", placeholder: "Enter last name", icon: <Badge size={20} color="#9CA3AF" />, required: true },
-    { label: "Address", key: "address", type: "text", placeholder: "Enter street address", icon: <MapPin size={20} color="#9CA3AF" />, required: true },
-    { label: "City", key: "city", type: "text", placeholder: "Enter city", icon: <LocationCityIcon size={20} color="#9CA3AF" />, required: true },
-    { label: "ZIP Code", key: "zipCode", type: "text", placeholder: "Enter ZIP code", icon: <MapPin size={20} color="#9CA3AF" />, required: true },
-    { label: "Country", key: "countryName", type: "text", placeholder: "Enter country", icon: <PublicIcon size={20} color="#9CA3AF" />, required: true },
+    {
+      label: "First Name",
+      key: "firstName",
+      type: "text",
+      placeholder: "Enter first name",
+      icon: <PersonIcon size={20} color="#9CA3AF" />,
+      required: true,
+    },
+    {
+      label: "Last Name",
+      key: "lastName",
+      type: "text",
+      placeholder: "Enter last name",
+      icon: <Badge size={20} color="#9CA3AF" />,
+      required: true,
+    },
+    {
+      label: "Address",
+      key: "address",
+      type: "text",
+      placeholder: "Enter street address",
+      icon: <MapPin size={20} color="#9CA3AF" />,
+      required: true,
+    },
+    {
+      label: "City",
+      key: "city",
+      type: "text",
+      placeholder: "Enter city",
+      icon: <LocationCityIcon size={20} color="#9CA3AF" />,
+      required: true,
+    },
+    {
+      label: "ZIP Code",
+      key: "zipCode",
+      type: "text",
+      placeholder: "Enter ZIP code",
+      icon: <MapPin size={20} color="#9CA3AF" />,
+      required: true,
+    },
+    {
+      label: "State Name",
+      key: "stateName",
+      type: "text",
+      placeholder: "Enter state",
+      icon: <LocationCityIcon size={20} color="#9CA3AF" />,
+      required: false,
+    },
+    {
+      label: "Country",
+      key: "countryName",
+      type: "select",
+      placeholder: "Select country",
+      icon: <PublicIcon size={20} color="#9CA3AF" />,
+      required: true,
+      options: countries,
+    },
   ];
+
+  useEffect(() => {
+    if (countries.length === 0) {
+      dispatch(fetchCountries());
+    }
+  }, [dispatch, countries.length]);
+
+  useEffect(() => {
+    if (status === "succeeded") {
+      setSnackbar({
+        open: true,
+        message: "Admin created successfully!",
+        severity: "success",
+      });
+      setTimeout(() => {
+        navigate("/estimate/login");
+      }, 2000);
+    } else if (status === "failed") {
+      setSnackbar({
+        open: true,
+        message: error || "Admin Signup failed",
+        severity: "error",
+      });
+    }
+  }, [status, error, navigate]);
 
   return (
     <Box
@@ -150,7 +294,9 @@ export default function AddAdminPage() {
         p: 2,
       }}
     >
-      <Box sx={{ width: "100%", maxWidth: 900 }}> {/* Wider container for desktop */}
+      <Box sx={{ width: "100%", maxWidth: 900 }}>
+        {" "}
+        {/* Wider container for desktop */}
         <Paper
           sx={{
             borderRadius: 4,
@@ -204,72 +350,140 @@ export default function AddAdminPage() {
             <Typography
               variant="subtitle1"
               fontWeight={600}
-              sx={{ color: "#537D96", mb: 2, borderLeft: "4px solid #44A194", pl: 1 }}
+              sx={{
+                color: "#537D96",
+                mb: 2,
+                borderLeft: "4px solid #44A194",
+                pl: 1,
+              }}
             >
               Account Information
             </Typography>
             <Grid container spacing={2} sx={{ mb: 3 }}>
-              {accountFields.map(({ label, key, type, placeholder, icon, required }) => (
-                <Grid key={key} size={{ xs: 12, sm: 6 }}>
-                  <TextField
-                    name={key}
-                    type={type}
-                    placeholder={placeholder}
-                    value={formData[key]}
-                    onChange={handleChange}
-                    required={required}
-                    error={!!errors[key]}
-                    helperText={errors[key]}
-                    fullWidth
-                    slotProps={{
-                      input: {
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            {icon}
-                          </InputAdornment>
-                        ),
-                      },
-                    }}
-                    sx={textFieldSx}
-                  />
-                </Grid>
-              ))}
+              {accountFields.map(
+                ({ key, type, placeholder, icon, required }) => (
+                  <Grid key={key} size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      name={key}
+                      type={type}
+                      placeholder={placeholder}
+                      value={formData[key]}
+                      onChange={handleChange}
+                      required={required}
+                      error={!!errors[key]}
+                      helperText={errors[key]}
+                      fullWidth
+                      slotProps={{
+                        input: {
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              {icon}
+                            </InputAdornment>
+                          ),
+                        },
+                      }}
+                      sx={textFieldSx}
+                    />
+                  </Grid>
+                ),
+              )}
             </Grid>
 
             {/* Personal Information Section */}
             <Typography
               variant="subtitle1"
               fontWeight={600}
-              sx={{ color: "#537D96", mb: 2, borderLeft: "4px solid #44A194", pl: 1, mt: 1 }}
+              sx={{
+                color: "#537D96",
+                mb: 2,
+                borderLeft: "4px solid #44A194",
+                pl: 1,
+                mt: 1,
+              }}
             >
               Personal Information
             </Typography>
             <Grid container spacing={2} sx={{ mb: 2 }}>
-              {addressFields.map(({ label, key, type, placeholder, icon, required }) => (
-                <Grid key={key} size={{ xs: 12, sm: 6 }}>
-                  <TextField
-                    name={key}
-                    type={type}
-                    placeholder={placeholder}
-                    value={formData[key]}
-                    onChange={handleChange}
-                    required={required}
-                    error={!!errors[key]}
-                    helperText={errors[key]}
-                    fullWidth
-                    slotProps={{
-                      input: {
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            {icon}
-                          </InputAdornment>
-                        ),
-                      },
-                    }}
-                    sx={textFieldSx}
-                  />
-                </Grid>
-              ))}
+              {addressFields.map(
+                ({ key, type, placeholder, icon, required, options }) => (
+                  <Grid key={key} size={{ xs: 12, sm: 6 }}>
+                    {type === "select" ? (
+                      <FormControl
+                        fullWidth
+                        error={!!errors[key]}
+                        sx={textFieldSx}
+                      >
+                        <Select
+                          name={key}
+                          value={formData[key]}
+                          onChange={handleChange}
+                          placeholder={placeholder}
+                          required={required}
+                          displayEmpty
+                          sx={{
+                            ...selectSx,
+                            //selected item color
+                            "& .MuiSelect-select": {
+                              color: formData[key]
+                                ? "text.primary"
+                                : "text.disabled",
+                            },
+                          }}
+                          startAdornment={
+                            <InputAdornment position="start">
+                              {icon}
+                            </InputAdornment>
+                          }
+                        >
+                          <MenuItem disabled sx={{ ...menuItemSx }} value="">
+                            select your country
+                          </MenuItem>
+                          {options.map((option) => (
+                            <MenuItem
+                              sx={{ ...menuItemSx }}
+                              key={option.code}
+                              value={option.code}
+                            >
+                              {option.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        {errors[key] && (
+                          <Typography
+                            variant="caption"
+                            color="error"
+                            sx={{ mt: 0.5, ml: 1 }}
+                          >
+                            {errors[key]}
+                          </Typography>
+                        )}
+                      </FormControl>
+                    ) : (
+                      <TextField
+                        name={key}
+                        type={type}
+                        placeholder={placeholder}
+                        value={formData[key]}
+                        onChange={handleChange}
+                        required={required}
+                        error={!!errors[key]}
+                        helperText={errors[key]}
+                        fullWidth
+                        slotProps={{
+                          input: {
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                {icon}
+                              </InputAdornment>
+                            ),
+                          },
+                        }}
+                        sx={textFieldSx}
+                      />
+                    )}
+                  </Grid>
+                ),
+              )}
             </Grid>
 
             {/* Terms Checkbox */}
@@ -319,32 +533,44 @@ export default function AddAdminPage() {
 
             {/* Submit Button */}
             <Box sx={{ display: "flex", justifyContent: "center" }}>
-            <Button
-              type="submit"
-              variant="contained"
-              fullWidth
-              sx={{
-                width: {md:"60%"},
-                py: 1.5,
-                borderRadius: 2,
-                fontWeight: 600,
-                fontSize: "1rem",
-                background: "linear-gradient(to right, #44A194, #537D96)",
-                textTransform: "none",
-                boxShadow: "none",
-                "&:hover": {
+              <Button
+                type="submit"
+                variant="contained"
+                fullWidth
+                disabled={isLoading}
+                sx={{
+                  width: { md: "60%" },
+                  py: 1.5,
+                  borderRadius: 2,
+                  fontWeight: 600,
+                  fontSize: "1rem",
                   background: "linear-gradient(to right, #44A194, #537D96)",
-                  boxShadow: "0 8px 24px rgba(68,161,148,0.4)",
-                  transform: "scale(1.02)",
-                },
-                transition: "all 0.2s",
-              }}
-            >
-              Create Account
-            </Button></Box>
+                  textTransform: "none",
+                  boxShadow: "none",
+                  "&:hover": {
+                    background: "linear-gradient(to right, #44A194, #537D96)",
+                    boxShadow: "0 8px 24px rgba(68,161,148,0.4)",
+                    transform: "scale(1.02)",
+                  },
+                  transition: "all 0.2s",
+                  "&:disabled": {
+                    opacity: 0.6,
+                    cursor: "not-allowed",
+                  },
+                }}
+              >
+                {isLoading ? (
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <CircularProgress size={20} color="inherit" />
+                    <span>Creating Account...</span>
+                  </Box>
+                ) : (
+                  "Create Admin"
+                )}
+              </Button>
+            </Box>
           </Box>
         </Paper>
-
         {/* Footer */}
         <Typography
           variant="body2"

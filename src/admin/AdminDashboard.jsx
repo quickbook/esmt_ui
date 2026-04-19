@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
 import {
   Box,
   Drawer,
@@ -11,11 +11,16 @@ import {
   IconButton,
   useMediaQuery,
   useTheme,
+  Alert,
+  Snackbar,
 } from "@mui/material";
 import { Menu as MenuIcon } from "@mui/icons-material";
 
 import MasterListPage from "./MasterListPage";
 import AddAdminPage from "./AddAdminPage";
+import LoadingScreen from "../components/LoadingScreen";
+import { useDispatch, useSelector } from "react-redux";
+import { getMasterList } from "../redux/Slices/adminSlice";
 
 const drawerWidth = 240;
 
@@ -105,11 +110,22 @@ const adminTabs = [
 
 // ================= DASHBOARD =================
 export default function AdminDashboard() {
+  const dispatch = useDispatch();
+  const roleName = useSelector((state) => state.login.user?.roleName);
+  const masterListFromStore = useSelector((state) => state.admin.masterList);
+  const isLoading = useSelector((state) => state.admin.loading);
   const [tab, setTab] = useState("master");
-  const [masterListData, setMasterListData] = useState(initialMasterListData);
+  const [masterListData, setMasterListData] = useState([]);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const getMasterListRef = useRef(false);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -126,7 +142,7 @@ export default function AdminDashboard() {
           <Typography variant="h6">Admin Dashboard</Typography>
         </Toolbar>
       </AppBar>
-      <List>
+      <List sx={{ cursor: "pointer" }}>
         {adminTabs.map((item) => (
           <ListItem
             key={item.value}
@@ -135,6 +151,12 @@ export default function AdminDashboard() {
               if (isMobile) setMobileOpen(false);
             }}
             sx={{
+              display:
+                item.value === "admin-signup"
+                  ? roleName === "ROOT"
+                    ? "flex"
+                    : "none"
+                  : "flex",
               mb: 1,
               background: tab === item.value ? "#44A19460" : "transparent",
               "&:hover": {
@@ -155,6 +177,23 @@ export default function AdminDashboard() {
       </List>
     </>
   );
+
+  useEffect(() => {
+    if (!getMasterListRef.current) {
+      getMasterListRef.current = true;
+      dispatch(getMasterList());
+    }
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (masterListFromStore && masterListFromStore.length > 0) {
+      setMasterListData(masterListFromStore);
+    }
+  }, [masterListFromStore]);
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -216,6 +255,21 @@ export default function AdminDashboard() {
         )}
         {tab === "admin-signup" && <AddAdminPage />}
       </Box>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

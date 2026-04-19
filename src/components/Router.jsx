@@ -17,13 +17,22 @@ import HomePage from "../pages/HomePage";
 import TopBar from "./TopBar";
 import ErrorPage from "../pages/ErrorPage";
 import { useEffect, useState } from "react";
-import { Fab, Zoom } from "@mui/material";
+import { Alert, Fab, Snackbar, Zoom } from "@mui/material";
 import AdminDashboard from "../admin/AdminDashboard";
 import { ProfilePage } from "../pages/ProfilePage";
+import { useSelector } from "react-redux";
 
 const Router = () => {
-  // Scroll logic
   const location = useLocation();
+  const isLoggedIn = useSelector((state) => state.login.isLoggedIn);
+  const user = useSelector((state) => state.login.user);
+  const roleName = useSelector((state) => state.login.roleName);
+
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   const [showDown, setShowDown] = useState(false);
   const [showUp, setShowUp] = useState(false);
@@ -47,7 +56,7 @@ const Router = () => {
       } else if (windowHeight + scrollTop >= fullHeight - 50) {
         setShowDown(false);
         setShowUp(true);
-      } 
+      }
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -70,9 +79,24 @@ const Router = () => {
       <Routes>
         <Route path="/" element={<Navigate to="/estimate" replace />} />
         <Route path="/estimate" element={<HomePage />} />
-        <Route path="/estimate/login" element={<Login />} />
-        <Route path="/estimate/signup" element={<Signup />} />
-        <Route path="/estimate/profile" element={<ProfilePage />} />
+        <Route
+          path="/estimate/login"
+          element={
+            !isLoggedIn ? <Login snackbar={snackbar} setSnackbar={setSnackbar} /> : <Navigate to="/estimate" replace />
+          }
+        />
+        <Route
+          path="/estimate/signup"
+          element={
+            !isLoggedIn ? <Signup snackbar={snackbar} setSnackbar={setSnackbar} /> : <Navigate to="/estimate" replace />
+          }
+        />
+        <Route
+          path="/estimate/profile"
+          element={
+            isLoggedIn ? <ProfilePage /> : <Navigate to="/estimate" replace />
+          }
+        />
         <Route path="/estimate/customer-info" element={<CustomerInfo />} />
         <Route path="/estimate/pond-info" element={<PondInfo />} />
         <Route path="/estimate/estimator/:type" element={<PondEstimator />} />
@@ -94,48 +118,72 @@ const Router = () => {
         />
         <Route path="/estimate/availability" element={<Availability />} />
         <Route path="/estimate/quote" element={<Quote />} />
-        <Route path="/estimate/admin" element={<AdminDashboard />} />
+        <Route
+          path="/estimate/admin"
+          element={
+            isLoggedIn && (roleName === "ROOT" || roleName === "ADMIN") ? (
+              <AdminDashboard />
+            ) : (
+              <Navigate to="/estimate" replace />
+            )
+          }
+        />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
-        {/* Scroll Down Button */}
-        {showDown && (
-          <Zoom in>
-            <Fab
-              color="secondary"
-              onClick={scrollToBottom}
-              size="medium"
-              aria-label="Scroll to bottom"
-              sx={{
-                position: "fixed",
-                bottom: 20,
-                right: 10,
-                zIndex: 1000,
-              }}
-            >
-              <KeyboardArrowDownIcon sx={{ fontSize: "32px" }} />
-            </Fab>
-          </Zoom>
-        )}
+      {/* Scroll Down Button */}
+      {showDown && (
+        <Zoom in>
+          <Fab
+            color="secondary"
+            onClick={scrollToBottom}
+            size="medium"
+            aria-label="Scroll to bottom"
+            sx={{
+              position: "fixed",
+              bottom: 20,
+              right: 10,
+              zIndex: 1000,
+            }}
+          >
+            <KeyboardArrowDownIcon sx={{ fontSize: "32px" }} />
+          </Fab>
+        </Zoom>
+      )}
 
-        {/* Scroll Up Button */}
-        {showUp && (
-          <Zoom in>
-            <Fab
-              color="secondary"
-              onClick={scrollToTop}
-              size="medium"
-              aria-label="Scroll to top"
-              sx={{
-                position: "fixed",
-                bottom: 20,
-                right: 10,
-                zIndex: 1000,
-              }}
-            >
-              <KeyboardArrowUpIcon sx={{ fontSize: "32px" }} />
-            </Fab>
-          </Zoom>
-        )}
+      {/* Scroll Up Button */}
+      {showUp && (
+        <Zoom in>
+          <Fab
+            color="secondary"
+            onClick={scrollToTop}
+            size="medium"
+            aria-label="Scroll to top"
+            sx={{
+              position: "fixed",
+              bottom: 20,
+              right: 10,
+              zIndex: 1000,
+            }}
+          >
+            <KeyboardArrowUpIcon sx={{ fontSize: "32px" }} />
+          </Fab>
+        </Zoom>
+      )}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 };
