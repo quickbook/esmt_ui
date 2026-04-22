@@ -17,7 +17,7 @@ export const signUpUser = createAsyncThunk(
       const response = await axiosClient.post(getFullUrl(API_ENDPOINTS.AUTH.SIGNUP), userData);
       return response.data;
     } catch (error) {
-      const message = error.response?.data?.message || error.message;
+      const message = error.response?.data?.errorDetails?.errorMessage ?? error.message;
       return rejectWithValue(message);
     }
   }

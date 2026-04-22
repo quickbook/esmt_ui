@@ -1,223 +1,216 @@
-import { createSlice } from '@reduxjs/toolkit';
-import axiosClient from '../../api/axiosClient';
-import { API_ENDPOINTS, getFullUrl } from '../../api/endpoints/config';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axiosClient from "../../api/axiosClient";
+import { API_ENDPOINTS, getFullUrl } from "../../api/endpoints/config";
 
-const initialState = {
-  leadSources: [],
-  pondAccess: [],
-  fishSpecies: [],
-  pondOptions: { NEW: [], OLD: [] },
-  countries:[],
-  loading: {
-    leadSources: false,
-    pondAccess: false,
-    fishSpecies: false,
-    pondOptions: false,
-    countries: false,
-  },
-  error: {
-    leadSources: null,
-    pondAccess: null,
-    fishSpecies: null,
-    pondOptions: null,
-    countries: null,
-  },
-};
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
-const domainSlice = createSlice({
-  name: 'domain',
-  initialState,
-  reducers: {
-    // Lead Sources
-    fetchLeadSourcesStart(state) {
-      state.loading.leadSources = true;
-      state.error.leadSources = null;
-    },
-    fetchLeadSourcesSuccess(state, action) {
-      state.loading.leadSources = false;
-      state.leadSources = action.payload;
-      state.error.leadSources = null;
-    },
-    fetchLeadSourcesFailure(state, action) {
-      state.loading.leadSources = false;
-      state.error.leadSources = action.payload;
-    },
+const setPending  = (key) => (state)         => { state.loading[key] = true;  state.error[key] = null; };
+const setRejected = (key) => (state, action) => { state.loading[key] = false; state.error[key] = action.payload; };
 
-    // Pond Access
-    fetchPondAccessStart(state) {
-      state.loading.pondAccess = true;
-      state.error.pondAccess = null;
-    },
-    fetchPondAccessSuccess(state, action) {
-      state.loading.pondAccess = false;
-      state.pondAccess = action.payload;
-      state.error.pondAccess = null;
-    },
-    fetchPondAccessFailure(state, action) {
-      state.loading.pondAccess = false;
-      state.error.pondAccess = action.payload;
-    },
+// ── Thunks ────────────────────────────────────────────────────────────────────
 
-    // Fish Species
-    fetchFishSpeciesStart(state) {
-      state.loading.fishSpecies = true;
-      state.error.fishSpecies = null;
-    },
-    fetchFishSpeciesSuccess(state, action) {
-      state.loading.fishSpecies = false;
-      state.fishSpecies = action.payload;
-      state.error.fishSpecies = null;
-    },
-    fetchFishSpeciesFailure(state, action) {
-      state.loading.fishSpecies = false;
-      state.error.fishSpecies = action.payload;
-    },
-
-    // Pond Options
-    fetchPondOptionsStart(state) {
-      state.loading.pondOptions = true;
-      state.error.pondOptions = null;
-    },
-    fetchPondOptionsSuccess(state, action) {
-      state.loading.pondOptions = false;
-      state.pondOptions = action.payload || { NEW: [], OLD: [] };
-      state.error.pondOptions = null;
-    },
-    fetchPondOptionsFailure(state, action) {
-      state.loading.pondOptions = false;
-      state.error.pondOptions = action.payload;
-    },
-
-    // Countries
-    fetchCountriesStart(state) {
-      state.loading.countries = true;
-      state.error.countries = null;
-    },
-    fetchCountriesSuccess(state, action) {
-      state.loading.countries = false;
-      state.countries = action.payload;
-      state.error.countries = null;
-    },
-    fetchCountriesFailure(state, action) {
-      state.loading.countries = false;
-      state.error.countries = action.payload;
-    },
-
-    // Clear all domain data
-    clearDomainData(state) {
-      state.leadSources = [];
-      state.pondAccess = [];
-      state.fishSpecies = [];
-      state.pondOptions = { NEW: [], OLD: [] };
-      state.countries = [];
-      state.error = {
-        leadSources: null,
-        pondAccess: null,
-        fishSpecies: null,
-        pondOptions: null,
-        countries: null, 
-      };
-    },
-  },
-});
-
-export const {
-  fetchLeadSourcesStart,
-  fetchLeadSourcesSuccess,
-  fetchLeadSourcesFailure,
-  fetchPondAccessStart,
-  fetchPondAccessSuccess,
-  fetchPondAccessFailure,
-  fetchFishSpeciesStart,
-  fetchFishSpeciesSuccess,
-  fetchFishSpeciesFailure,
-  fetchPondOptionsStart,
-  fetchPondOptionsSuccess,
-  fetchPondOptionsFailure,
-  fetchCountriesStart,
-  fetchCountriesSuccess,
-  fetchCountriesFailure,
-  clearDomainData,
-} = domainSlice.actions;
-
-// Thunk actions for fetching domain data
-export const fetchLeadSources = () => async (dispatch) => {
-  dispatch(fetchLeadSourcesStart());
-  try {
-    const response = await axiosClient.get(getFullUrl(API_ENDPOINTS.DOMAIN.LEAD_SOURCE));
-    dispatch(fetchLeadSourcesSuccess(response.data));
-    //console.log('📊 Lead sources loaded:', response.data);
-  } catch (error) {
-    const message = error.response?.data?.message || error.message;
-    dispatch(fetchLeadSourcesFailure(message));
-    console.error('❌ Failed to load lead sources:', message);
+export const fetchLeadSources = createAsyncThunk(
+  "domain/fetchLeadSources",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosClient.get(getFullUrl(API_ENDPOINTS.DOMAIN.LEAD_SOURCE));
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message ?? error.message);
+    }
   }
-};
+);
 
-export const fetchPondAccess = () => async (dispatch) => {
-  dispatch(fetchPondAccessStart());
-  try {
-    const response = await axiosClient.get(getFullUrl(API_ENDPOINTS.DOMAIN.POND_ACCESS));
-    dispatch(fetchPondAccessSuccess(response.data));
-    //console.log('🏞️ Pond access options loaded:', response.data);
-  } catch (error) {
-    const message = error.response?.data?.message || error.message;
-    dispatch(fetchPondAccessFailure(message));
-    console.error('❌ Failed to load pond access options:', message);
+export const fetchPondAccess = createAsyncThunk(
+  "domain/fetchPondAccess",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosClient.get(getFullUrl(API_ENDPOINTS.DOMAIN.POND_ACCESS));
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message ?? error.message);
+    }
   }
-};
+);
 
-export const fetchFishSpecies = () => async (dispatch) => {
-  dispatch(fetchFishSpeciesStart());
-  try {
-    const response = await axiosClient.get(getFullUrl(API_ENDPOINTS.DOMAIN.FISH_SPECIES));
-    dispatch(fetchFishSpeciesSuccess(response.data));
-    //console.log('🐟 Fish species loaded:', response.data);
-  } catch (error) {
-    const message = error.response?.data?.message || error.message;
-    dispatch(fetchFishSpeciesFailure(message));
-    console.error('❌ Failed to load fish species:', message);
+export const fetchFishSpecies = createAsyncThunk(
+  "domain/fetchFishSpecies",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosClient.get(getFullUrl(API_ENDPOINTS.DOMAIN.FISH_SPECIES));
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message ?? error.message);
+    }
   }
-};
+);
 
-export const fetchPondOptions = () => async (dispatch) => {
-  dispatch(fetchPondOptionsStart());
-  try {
-    const response = await axiosClient.get(getFullUrl(API_ENDPOINTS.DOMAIN.POND_TYPES));
-    dispatch(fetchPondOptionsSuccess(response.data));
-    //console.log('🌾 Pond options loaded:', response.data);
-  } catch (error) {
-    const message = error.response?.data?.message || error.message;
-    dispatch(fetchPondOptionsFailure(message));
-    console.error('❌ Failed to load pond options:', message);
+export const fetchPondOptions = createAsyncThunk(
+  "domain/fetchPondOptions",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosClient.get(getFullUrl(API_ENDPOINTS.DOMAIN.POND_TYPES));
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message ?? error.message);
+    }
   }
-};
+);
 
-export const fetchCountries = () => async (dispatch) => {
-  dispatch(fetchCountriesStart());
-  try {
-    const response = await axiosClient.get(getFullUrl(API_ENDPOINTS.DOMAIN.COUNTRIES));
-    dispatch(fetchCountriesSuccess(response.data));
-    //console.log('🌍 Countries loaded:', response.data);
-  } catch (error) {
-    const message = error.response?.data?.message || error.message;
-    dispatch(fetchCountriesFailure(message));
-    console.error('❌ Failed to load countries:', message);
+export const fetchCountries = createAsyncThunk(
+  "domain/fetchCountries",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosClient.get(getFullUrl(API_ENDPOINTS.DOMAIN.COUNTRIES));
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message ?? error.message);
+    }
   }
-};
+);
 
+export const fetchFishSizes = createAsyncThunk(
+  "domain/fetchFishSizes",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosClient.get(getFullUrl(API_ENDPOINTS.DOMAIN.FISH_SIZES));
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message ?? error.message);
+    }
+  }
+);
 
-// Fetch all domain data at once
-export const fetchAllDomainData = () => async (dispatch) => {
-  console.log('🔄 Fetching all domain data...');
-  await Promise.all([
+export const fetchUnitTypes = createAsyncThunk(
+  "domain/fetchUnitTypes",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosClient.get(getFullUrl(API_ENDPOINTS.DOMAIN.UNIT_TYPES));
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message ?? error.message);
+    }
+  }
+);
+
+// ── Fetch all ─────────────────────────────────────────────────────────────────
+
+/** Dispatches all 7 domain fetches in parallel. */
+export const fetchAllDomainData = () => (dispatch) =>
+  Promise.all([
     dispatch(fetchLeadSources()),
     dispatch(fetchPondAccess()),
     dispatch(fetchFishSpecies()),
     dispatch(fetchPondOptions()),
     dispatch(fetchCountries()),
+    dispatch(fetchFishSizes()),   // ✅ was missing from original fetchAllDomainData
+    dispatch(fetchUnitTypes()),   // ✅ was missing from original fetchAllDomainData
   ]);
-  console.log('✅ All domain data loaded');
+
+// ── Initial state ─────────────────────────────────────────────────────────────
+
+const initialState = {
+  leadSources: [],
+  pondAccess:  [],
+  fishSpecies: [],
+  fishSizes:   [],
+  unitTypes:   [],
+  pondOptions: { NEW: [], OLD: [] },
+  countries:   [],
+  loading: {
+    leadSources: false,
+    pondAccess:  false,
+    fishSpecies: false,
+    pondOptions: false,
+    countries:   false,
+    fishSizes:   false,
+    unitTypes:   false,
+  },
+  error: {
+    leadSources: null,
+    pondAccess:  null,
+    fishSpecies: null,
+    pondOptions: null,
+    countries:   null,
+    fishSizes:   null,
+    unitTypes:   null,
+  },
 };
 
+// ── Slice ─────────────────────────────────────────────────────────────────────
+
+const domainSlice = createSlice({
+  name: "domain",
+  initialState,
+  reducers: {
+    clearDomainData: () => initialState, // ✅ return initialState directly instead of manually resetting every field
+  },
+  extraReducers: (builder) => {
+    builder
+      // ── Lead Sources ──────────────────────────────────────────────────────
+      .addCase(fetchLeadSources.pending,   setPending("leadSources"))
+      .addCase(fetchLeadSources.fulfilled, (state, action) => {
+        state.loading.leadSources = false;
+        state.leadSources         = action.payload;
+        state.error.leadSources   = null;
+      })
+      .addCase(fetchLeadSources.rejected,  setRejected("leadSources"))
+
+      // ── Pond Access ───────────────────────────────────────────────────────
+      .addCase(fetchPondAccess.pending,   setPending("pondAccess"))
+      .addCase(fetchPondAccess.fulfilled, (state, action) => {
+        state.loading.pondAccess = false;
+        state.pondAccess         = action.payload;
+        state.error.pondAccess   = null;
+      })
+      .addCase(fetchPondAccess.rejected,  setRejected("pondAccess"))
+
+      // ── Fish Species ──────────────────────────────────────────────────────
+      .addCase(fetchFishSpecies.pending,   setPending("fishSpecies"))
+      .addCase(fetchFishSpecies.fulfilled, (state, action) => {
+        state.loading.fishSpecies = false;
+        state.fishSpecies         = action.payload;
+        state.error.fishSpecies   = null;
+      })
+      .addCase(fetchFishSpecies.rejected,  setRejected("fishSpecies"))
+
+      // ── Pond Options ──────────────────────────────────────────────────────
+      .addCase(fetchPondOptions.pending,   setPending("pondOptions"))
+      .addCase(fetchPondOptions.fulfilled, (state, action) => {
+        state.loading.pondOptions = false;
+        state.pondOptions         = action.payload ?? { NEW: [], OLD: [] };
+        state.error.pondOptions   = null;
+      })
+      .addCase(fetchPondOptions.rejected,  setRejected("pondOptions"))
+
+      // ── Countries ─────────────────────────────────────────────────────────
+      .addCase(fetchCountries.pending,   setPending("countries"))
+      .addCase(fetchCountries.fulfilled, (state, action) => {
+        state.loading.countries = false;
+        state.countries         = action.payload;
+        state.error.countries   = null;
+      })
+      .addCase(fetchCountries.rejected,  setRejected("countries"))
+
+      // ── Fish Sizes ────────────────────────────────────────────────────────
+      .addCase(fetchFishSizes.pending,   setPending("fishSizes"))
+      .addCase(fetchFishSizes.fulfilled, (state, action) => {
+        state.loading.fishSizes = false;
+        state.fishSizes         = action.payload;
+        state.error.fishSizes   = null;
+      })
+      .addCase(fetchFishSizes.rejected,  setRejected("fishSizes"))
+
+      // ── Unit Types ────────────────────────────────────────────────────────
+      .addCase(fetchUnitTypes.pending,   setPending("unitTypes"))
+      .addCase(fetchUnitTypes.fulfilled, (state, action) => {
+        state.loading.unitTypes = false;
+        state.unitTypes         = action.payload;
+        state.error.unitTypes   = null;
+      })
+      .addCase(fetchUnitTypes.rejected,  setRejected("unitTypes"));
+  },
+});
+
+export const { clearDomainData } = domainSlice.actions;
 export default domainSlice.reducer;

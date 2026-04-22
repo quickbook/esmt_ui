@@ -1,7 +1,8 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axiosClient from '../../api/axiosClient';
-import { API_ENDPOINTS, getFullUrl } from '../../api/endpoints/config';
-import { setError, setLoading } from './authSlice';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axiosClient from "../../api/axiosClient";
+import { API_ENDPOINTS, getFullUrl } from "../../api/endpoints/config";
+
+// ── Initial state ─────────────────────────────────────────────────────────────
 
 const initialState = {
   user: null,
@@ -10,132 +11,113 @@ const initialState = {
   accessToken: null,
   refreshToken: null,
   expiresIn: null,
-  status: 'idle',
+  status: "idle",
   error: null,
 };
 
-export const loginUser = createAsyncThunk(
-  'login/loginUser',
-  async ({ username, password }, { rejectWithValue, dispatch }) => {
-    try {
-      dispatch(setLoading());
-      const response = await axiosClient.post(getFullUrl(API_ENDPOINTS.AUTH.LOGIN), {
-        username,
-        password,
-      });
+// ── Thunk ─────────────────────────────────────────────────────────────────────
 
-      const payload = response.data;
+export const loginUser = createAsyncThunk(
+  "login/loginUser",
+  async ({ username, password }, { rejectWithValue }) => {
+    // ✅ removed dispatch — no cross-slice side-dispatching
+    try {
+      const { data: payload } = await axiosClient.post(
+        getFullUrl(API_ENDPOINTS.AUTH.LOGIN),
+        { username, password },
+      );
+
       const authData = payload?.data;
-      const user = authData?.user || null;
-      const accessToken = authData?.accessToken || null;
-      const refreshToken = authData?.refreshToken || null;
-      const expiresIn = authData?.expiresIn || null;
+      const user = authData?.user ?? null;
+      const accessToken = authData?.accessToken ?? null;
+      const refreshToken = authData?.refreshToken ?? null;
+      const expiresIn = authData?.expiresIn ?? null; // raw seconds from backend e.g. 21599
 
       if (accessToken) {
-        const expiresAt = expiresIn ? Date.now() + expiresIn * 1000 : null;
-        
-        // Store login credentials and user data in localStorage
-        const loginSessionData = {
-          user,
-          accessToken,
-          refreshToken,
-          expiresIn: expiresAt,
-          roleName: user?.roleName || null,
-        };
-        localStorage.setItem('loginSession', JSON.stringify(loginSessionData));
+        localStorage.setItem(
+          "loginSession",
+          JSON.stringify({
+            user,
+            accessToken,
+            refreshToken,
+            expiresIn, // raw seconds — useful for TTL display or recalculation
+            roleName: user?.roleName ?? null,
+          }),
+        );
       }
 
-      return payload;
+      return { user, accessToken, refreshToken, expiresIn};
     } catch (error) {
-      const message = error.response?.data?.message || error.message;
-      dispatch(setError(message));
+      const message =
+        error.response?.data?.errorDetails?.errorMessage ?? error.message; // ✅ full optional chain — won't throw if `errorDetails` is undefined
       return rejectWithValue(message);
     }
-  }
+  },
 );
 
+// ── Slice ─────────────────────────────────────────────────────────────────────
+
 const loginSlice = createSlice({
-  name: 'login',
+  name: "login",
   initialState,
   reducers: {
-    loginPending(state) {
-      state.status = 'loading';
-      state.error = null;
-    },
-    loginSuccess(state, action) {
-      state.user = action.payload;
-      state.roleName = action.payload?.roleName || null;
-      state.isLoggedIn = true;
-      state.accessToken = action.payload?.accessToken || null;
-      state.refreshToken = action.payload?.refreshToken || null;
-      state.expiresIn = action.payload?.expiresIn || null;
-      state.status = 'authenticated';
-      state.error = null;
-      console.log('✅ Login successful:', action.payload);
-    },
-    loginFailed(state, action) {
-      state.error = action.payload;
-      state.status = 'failed';
-      state.isLoggedIn = false;
-      state.accessToken = null;
-      state.refreshToken = null;
-      state.expiresIn = null;
-      state.user = null;
-      state.roleName = null;
-    },
-    logout(state) {
-      state.user = null;
-      state.roleName = null;
-      state.isLoggedIn = false;
-      state.accessToken = null;
-      state.refreshToken = null;
-      state.expiresIn = null;
-      state.status = 'unauthenticated';
-      state.error = null;
-      localStorage.removeItem('loginSession');
+    logout() {
+      // ✅ return initialState instead of manually nulling every field
+      localStorage.removeItem("loginSession");
+      return { ...initialState, status: "unauthenticated" };
     },
     restoreFromLocalStorage(state, action) {
-      const { user, roleName } = action.payload;
-      state.user = user;
-      state.roleName = roleName;
+      const {
+        user,
+        roleName,
+        accessToken,
+        refreshToken,
+        expiresIn,
+      } = action.payload;
+      state.user = user ?? null;
+      state.roleName = roleName ?? null;
       state.isLoggedIn = Boolean(user);
-      state.accessToken = action.payload?.accessToken || null;
-      state.refreshToken = action.payload?.refreshToken || null;
-      state.expiresIn = action.payload?.expiresIn || null;
-      state.status = 'authenticated';
+      state.accessToken = accessToken ?? null;
+      state.refreshToken = refreshToken ?? null;
+      state.expiresIn = expiresIn ?? null;
+      state.status = "authenticated";
       state.error = null;
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(loginUser.pending, (state) => {
-        state.status = 'loading';
+        state.status = "loading";
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        const data = action.payload?.data || {};
-        state.user = data.user || null;
-        state.roleName = data.user?.roleName || null;
-        state.isLoggedIn = Boolean(data.user);
-        state.accessToken = data.accessToken || null;
-        state.refreshToken = data.refreshToken || null;
-        state.expiresIn = data.expiresIn || null;
-        state.status = 'authenticated';
+        const { user, accessToken, refreshToken, expiresIn } = action.payload;
+        state.user = user ?? null;
+        state.roleName = user?.roleName ?? null;
+        state.isLoggedIn = Boolean(user);
+        state.accessToken = accessToken ?? null;
+        state.refreshToken = refreshToken ?? null;
+        state.expiresIn = expiresIn ?? null;
+        state.status = "authenticated";
         state.error = null;
       })
       .addCase(loginUser.rejected, (state, action) => {
-        state.error = action.payload || action.error?.message;
-        state.status = 'failed';
-        state.isLoggedIn = false;
-        state.accessToken = null;
-        state.refreshToken = null;
-        state.expiresIn = null;
-        state.user = null;
-        state.roleName = null;
+        console.log(action.payload);
+        return {
+          // ✅ reset to initialState shape on failure, then override error/status
+          ...initialState,
+          status: "failed",
+          error: action.payload ?? null,
+          
+        };
       });
   },
 });
 
-export const { loginPending, loginSuccess, loginFailed, logout, restoreFromLocalStorage } = loginSlice.actions;
+// ── Exports ───────────────────────────────────────────────────────────────────
+
+export const { logout, restoreFromLocalStorage } = loginSlice.actions;
 export const selectRoleName = (state) => state.login.roleName;
+export const selectIsLoggedIn = (state) => state.login.isLoggedIn;
+export const selectAccessToken = (state) => state.login.accessToken;
 export default loginSlice.reducer;

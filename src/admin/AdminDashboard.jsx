@@ -13,6 +13,7 @@ import {
   useTheme,
   Alert,
   Snackbar,
+  Portal,
 } from "@mui/material";
 import { Menu as MenuIcon } from "@mui/icons-material";
 
@@ -23,84 +24,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { getMasterList } from "../redux/Slices/adminSlice";
 
 const drawerWidth = 240;
-
-export const sizeOptions = [
-  "1 to 3 inch",
-  "3 to 4 inch",
-  "4 to 5 inch",
-  "5 to 6 inch",
-  "7 to 9 inch",
-  "10-12 inch",
-  "12+ inch",
-];
-export const unitOptions = ["price per fish", "price per pound"];
-
-const initialMasterListData = [
-  {
-    size: "1 to 3 inch",
-    fishType: "Bluegill Sunfish",
-    price: 0.1,
-    unitText: "price per fish",
-    displayOrder: 61,
-    variant: "DEFAULT",
-  },
-  {
-    size: "3 to 4 inch",
-    fishType: "Bluegill Sunfish",
-    price: 0.22,
-    unitText: "price per fish",
-    displayOrder: 62,
-    variant: "DEFAULT",
-  },
-  {
-    size: "4 to 5 inch",
-    fishType: "Bluegill Sunfish",
-    price: 0.65,
-    unitText: "price per fish",
-    displayOrder: 63,
-    variant: "DEFAULT",
-  },
-  {
-    size: "1 to 3 inch",
-    fishType: "Redear",
-    price: 0.15,
-    unitText: "price per fish",
-    displayOrder: 64,
-    variant: "DEFAULT",
-  },
-  {
-    size: "3 to 4 inch",
-    fishType: "Redear",
-    price: 0.32,
-    unitText: "price per fish",
-    displayOrder: 65,
-    variant: "DEFAULT",
-  },
-  {
-    size: "4 to 5 inch",
-    fishType: "Redear",
-    price: 0.8,
-    unitText: "price per fish",
-    displayOrder: 66,
-    variant: "DEFAULT",
-  },
-  {
-    size: "1 to 3 inch",
-    fishType: "Black Crappie",
-    price: 0.34,
-    unitText: "price per fish",
-    displayOrder: 67,
-    variant: "DEFAULT",
-  },
-  {
-    size: "3 to 4 inch",
-    fishType: "Black Crappie",
-    price: 0.43,
-    unitText: "price per fish",
-    displayOrder: 68,
-    variant: "DEFAULT",
-  },
-];
 
 const adminTabs = [
   { label: "Master List", value: "master" },
@@ -130,6 +53,10 @@ export default function AdminDashboard() {
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
+
+  useEffect(() => {
+    setMasterListData(masterListFromStore);
+  }, [masterListFromStore, dispatch]);
 
   const drawerContent = (
     <>
@@ -251,10 +178,12 @@ export default function AdminDashboard() {
           <MasterListPage
             masterListData={masterListData}
             setMasterListData={setMasterListData}
+            setSnackbar={setSnackbar}
           />
         )}
-        {tab === "admin-signup" && <AddAdminPage />}
+        {tab === "admin-signup" && <AddAdminPage setSnackbar={setSnackbar} />}
       </Box>
+      <Portal>
       <Snackbar
         open={snackbar.open}
         autoHideDuration={4000}
@@ -269,7 +198,7 @@ export default function AdminDashboard() {
         >
           {snackbar.message}
         </Alert>
-      </Snackbar>
+      </Snackbar></Portal>
     </Box>
   );
 }

@@ -27,6 +27,7 @@ export function Login({ snackbar, setSnackbar }) {
   const [rememberMe, setRememberMe] = useState(false);
   const [errors, setErrors] = useState({});
   const { status } = useSelector((state) => state.login);
+  const loginError = useSelector((state) => state.login.error);
   const isLoading = status === 'loading';
 
   useEffect(() => {

@@ -20,13 +20,13 @@ export const getMasterList = createAsyncThunk(
       );
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message ?? error.message);
+      return rejectWithValue(error.response?.data?.errorDetails?.errorMessage ?? error.message);
     }
   }
 );
 
-export const postMasterListItem = createAsyncThunk(
-  "admin/postMasterListItem",
+export const createMasterListItem = createAsyncThunk(
+  "admin/createMasterListItem",
   async (payload, { rejectWithValue }) => {
     try {
       const response = await axiosAdmin.post(
@@ -35,7 +35,7 @@ export const postMasterListItem = createAsyncThunk(
       );
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message ?? error.message);
+      return rejectWithValue(error.response?.data?.errorDetails?.errorMessage ?? error.message);
     }
   }
 );
@@ -50,7 +50,7 @@ export const updateMasterListItem = createAsyncThunk(
       );
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message ?? error.message);
+      return rejectWithValue(error.response?.data?.errorDetails?.errorMessage ?? error.message);
     }
   }
 );
@@ -64,7 +64,7 @@ export const deleteMasterListItem = createAsyncThunk(
       );
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message ?? error.message);
+      return rejectWithValue(error.response?.data?.errorDetails?.errorMessage ?? error.message);
     }
   }
 );
@@ -101,14 +101,14 @@ const adminSlice = createSlice({
       .addCase(getMasterList.rejected, setRejected)
 
       // ── POST ─────────────────────────────────────────────────────────────
-      .addCase(postMasterListItem.pending,   setPending)
-      .addCase(postMasterListItem.fulfilled, (state, action) => {
+      .addCase(createMasterListItem.pending,   setPending)
+      .addCase(createMasterListItem.fulfilled, (state, action) => {
         state.masterList.push(action.payload);  // optimistically append
         state.status  = "succeeded";
         state.loading = false;
         state.error   = null;
       })
-      .addCase(postMasterListItem.rejected, setRejected)
+      .addCase(createMasterListItem.rejected, setRejected)
 
       // ── PUT ──────────────────────────────────────────────────────────────
       .addCase(updateMasterListItem.pending,   setPending)

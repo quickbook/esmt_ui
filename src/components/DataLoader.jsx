@@ -20,6 +20,8 @@ export default function DataLoader({ children }) {
 
   // Initialize: Load domain data and restore login session from localStorage
   useEffect(() => {
+    // Dispatch all domain data fetches
+    //dispatch(fetchAllDomainData());
 
     // Restore login session from localStorage
     const loginSessionData = localStorage.getItem('loginSession');
@@ -36,6 +38,7 @@ export default function DataLoader({ children }) {
       } catch (error) {
         console.error('❌ Error restoring session:', error);
         dispatch(logout());
+        
       }
     }
   }, [dispatch]);
@@ -49,7 +52,7 @@ export default function DataLoader({ children }) {
     } else if (allLoaded) {
       console.log('✅ All domain data loaded successfully!');
     }
-  }, [isLoading, hasError, allLoaded, loading, error]);
+  }, [isLoading, hasError, allLoaded]);
 
   const handleRetry = () => {
     console.log('🔄 Retrying domain data fetch...');
