@@ -22,6 +22,7 @@ import AddAdminPage from "./AddAdminPage";
 import LoadingScreen from "../components/LoadingScreen";
 import { useDispatch, useSelector } from "react-redux";
 import { getMasterList } from "../redux/Slices/adminSlice";
+import { i } from "framer-motion/client";
 
 const drawerWidth = 240;
 
@@ -37,6 +38,7 @@ export default function AdminDashboard() {
   const roleName = useSelector((state) => state.login.user?.roleName);
   const masterListFromStore = useSelector((state) => state.admin.masterList);
   const isLoading = useSelector((state) => state.admin.loading);
+  const adminStatus = useSelector((state) => state.admin.status);
   const [tab, setTab] = useState("master");
   const [masterListData, setMasterListData] = useState([]);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -49,6 +51,9 @@ export default function AdminDashboard() {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const getMasterListRef = useRef(false);
+  const operationCompletedRef = useRef(false);
+  const isInitialLoadRef = useRef(true);
+  const isReFetchingRef = useRef(false);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -56,7 +61,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     setMasterListData(masterListFromStore);
-  }, [masterListFromStore, dispatch]);
+  }, [masterListFromStore]); // Remove dispatch from dependency array
 
   const drawerContent = (
     <>
@@ -110,13 +115,35 @@ export default function AdminDashboard() {
       getMasterListRef.current = true;
       dispatch(getMasterList());
     }
-  }, [dispatch]);
+  }, []); // Remove dispatch from dependency array
 
   useEffect(() => {
-    if (masterListFromStore && masterListFromStore.length > 0) {
+    if (masterListFromStore && masterListFromStore.length >= 0) {
       setMasterListData(masterListFromStore);
+      if (isInitialLoadRef.current) {
+        isInitialLoadRef.current = false;
+        getMasterListRef.current = true;
+      }
     }
   }, [masterListFromStore]);
+
+  // Re-fetch master list after successful CRUD operations
+  useEffect(() => {
+    if (adminStatus === "succeeded" && !isInitialLoadRef.current && operationCompletedRef.current && !isReFetchingRef.current) {
+      operationCompletedRef.current = false;
+      isReFetchingRef.current = true;
+      // Small delay to ensure the operation is fully complete
+      setTimeout(() => {
+        dispatch(getMasterList());
+      }, 100);
+    }
+    if (adminStatus === "loading" && !isInitialLoadRef.current && !isReFetchingRef.current) {
+      operationCompletedRef.current = true;
+    }
+    if (adminStatus === "idle") {
+      isReFetchingRef.current = false;
+    }
+  }, [adminStatus]); // Remove dispatch from dependency array
 
   if (isLoading) {
     return <LoadingScreen />;

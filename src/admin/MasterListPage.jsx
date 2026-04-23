@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, use } from "react";
 import {
   Box,
   Button,
@@ -295,11 +295,11 @@ export default function MasterListPage({
       };
 
       try {
-        // const result = await dispatch(
-        //   updateMasterListItem(payloadForUpdate),
-        // ).unwrap();
-        //console.log("Updated item:", result);
-        console.log("Update payload:", payloadForUpdate)
+        const result = await dispatch(
+          updateMasterListItem([payloadForUpdate]),
+        ).unwrap();
+        console.log("Updated item:", result);
+        console.log("Update payload:", [payloadForUpdate])
         setSnackbar({
           open: true,
           message: "Fish updated successfully!",
@@ -325,10 +325,10 @@ export default function MasterListPage({
       };
 
       try {
-        // const result = await dispatch(
-        //   createMasterListItem(payloadForCreate),
-        // ).unwrap();
-        //console.log("Created item:", result);
+        const result = await dispatch(
+          createMasterListItem(payloadForCreate),
+        ).unwrap();
+        console.log("Created item:", result);
         console.log("Create payload:", payloadForCreate);
         setSnackbar({
           open: true,
@@ -369,7 +369,7 @@ export default function MasterListPage({
       console.error("Error deleting item:", error);
       setSnackbar({
         open: true,
-        message: error?.message || error || "Error deleting item!",
+        message: error || error?.message || "Error deleting item!",
         severity: "error",
       });
     } finally {
