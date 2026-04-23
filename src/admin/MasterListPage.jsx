@@ -37,6 +37,7 @@ import {
   createMasterListItem,
   deleteMasterListItem,
   updateMasterListItem,
+  getMasterList,
 } from "../redux/Slices/adminSlice";
 
 const EMPTY_FORM = {
@@ -306,6 +307,8 @@ export default function MasterListPage({
           severity: "success",
         });
         handleClose();
+        // Refresh master list after successful update
+        dispatch(getMasterList());
       } catch (error) {
         console.error("Error updating item:", error);
         setSnackbar({
@@ -336,6 +339,8 @@ export default function MasterListPage({
           severity: "success",
         });
         handleClose();
+        // Refresh master list after successful create
+        dispatch(getMasterList());
       } catch (error) {
         console.error("Error adding item:", error);
         setSnackbar({
@@ -365,6 +370,8 @@ export default function MasterListPage({
         message: "Fish deleted successfully!",
         severity: "success",
       });
+      // Refresh master list after successful delete
+      dispatch(getMasterList());
     } catch (error) {
       console.error("Error deleting item:", error);
       setSnackbar({

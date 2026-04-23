@@ -22,7 +22,6 @@ import AddAdminPage from "./AddAdminPage";
 import LoadingScreen from "../components/LoadingScreen";
 import { useDispatch, useSelector } from "react-redux";
 import { getMasterList } from "../redux/Slices/adminSlice";
-import { i } from "framer-motion/client";
 
 const drawerWidth = 240;
 
@@ -111,39 +110,34 @@ export default function AdminDashboard() {
   );
 
   useEffect(() => {
-    if (!getMasterListRef.current) {
-      getMasterListRef.current = true;
-      dispatch(getMasterList());
-    }
-  }, []); // Remove dispatch from dependency array
+  if (!getMasterListRef.current) {
+    getMasterListRef.current = true;
+    isInitialLoadRef.current = false;
+    dispatch(getMasterList());
+  }
+}, []);
 
   useEffect(() => {
-    if (masterListFromStore && masterListFromStore.length >= 0) {
-      setMasterListData(masterListFromStore);
-      if (isInitialLoadRef.current) {
-        isInitialLoadRef.current = false;
-        getMasterListRef.current = true;
-      }
-    }
-  }, [masterListFromStore]);
+  setMasterListData(masterListFromStore);
+}, [masterListFromStore]);
 
   // Re-fetch master list after successful CRUD operations
-  useEffect(() => {
-    if (adminStatus === "succeeded" && !isInitialLoadRef.current && operationCompletedRef.current && !isReFetchingRef.current) {
-      operationCompletedRef.current = false;
-      isReFetchingRef.current = true;
-      // Small delay to ensure the operation is fully complete
-      setTimeout(() => {
-        dispatch(getMasterList());
-      }, 100);
-    }
-    if (adminStatus === "loading" && !isInitialLoadRef.current && !isReFetchingRef.current) {
-      operationCompletedRef.current = true;
-    }
-    if (adminStatus === "idle") {
-      isReFetchingRef.current = false;
-    }
-  }, [adminStatus]); // Remove dispatch from dependency array
+  // useEffect(() => {
+  //   if (adminStatus === "succeeded" && !isInitialLoadRef.current && operationCompletedRef.current && !isReFetchingRef.current) {
+  //     operationCompletedRef.current = false;
+  //     isReFetchingRef.current = true;
+  //     // Small delay to ensure the operation is fully complete
+  //     setTimeout(() => {
+  //       dispatch(getMasterList());
+  //     }, 100);
+  //   }
+  //   if (adminStatus === "loading" && !isInitialLoadRef.current && !isReFetchingRef.current) {
+  //     operationCompletedRef.current = true;
+  //   }
+  //   if (adminStatus === "idle") {
+  //     isReFetchingRef.current = false;
+  //   }
+  // }, [adminStatus]); // Remove dispatch from dependency array
 
   if (isLoading) {
     return <LoadingScreen />;
