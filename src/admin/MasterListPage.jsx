@@ -271,14 +271,22 @@ export default function MasterListPage({
       return;
     }
     if (!isFormDirty()) {
-      setSnackbar({ open: true, message: "No changes made", severity: "warning" });
+      setSnackbar({
+        open: true,
+        message: "No changes made",
+        severity: "warning",
+      });
       return;
     }
 
     // Validate price
     const priceValue = parseFloat(form.price);
     if (isNaN(priceValue) || priceValue < 0) {
-      alert("Please enter a valid non-negative number for price");
+      setSnackbar({
+        open: true,
+        message: "Please enter a valid non-negative number for price",
+        severity: "error",
+      });
       return;
     }
 
@@ -326,33 +334,28 @@ export default function MasterListPage({
         variant: form.variant,
       };
 
-      // try {
-      //   const result = await dispatch(
-      //     createMasterListItem(payloadForCreate),
-      //   ).unwrap();
-      //   console.log("Created item:", result);
-      //   console.log("Create payload:", payloadForCreate);
-      //   setSnackbar({
-      //     open: true,
-      //     message: "Fish added successfully!",
-      //     severity: "success",
-      //   });
-      //   handleClose();
-      //   // Refresh master list after successful create
-      //   dispatch(getMasterList());
-      // } catch (error) {
-      //   console.error("Error adding item:", error);
-      //   setSnackbar({
-      //     open: true,
-      //     message: error?.message || error || "Error adding new item!",
-      //     severity: "error",
-      //   });
-      // }
-      setSnackbar({
-        open: true,
-        message: "Add Fish function is disabled!",
-        severity: "warning",
-      });
+      try {
+        const result = await dispatch(
+          createMasterListItem(payloadForCreate),
+        ).unwrap();
+        console.log("Created item:", result);
+        console.log("Create payload:", payloadForCreate);
+        setSnackbar({
+          open: true,
+          message: "Fish added successfully!",
+          severity: "success",
+        });
+        handleClose();
+        // Refresh master list after successful create
+        dispatch(getMasterList());
+      } catch (error) {
+        console.error("Error adding item:", error);
+        setSnackbar({
+          open: true,
+          message: error?.message || error || "Error adding new item!",
+          severity: "error",
+        });
+      }
     }
   };
 
@@ -367,32 +370,27 @@ export default function MasterListPage({
   const handleConfirmDelete = async () => {
     if (deleteIndex === null) return;
     const payloadForDelete = { ids: [deleteIndex] };
-    // try {
-    //   await dispatch(deleteMasterListItem(payloadForDelete)).unwrap();
-    //   setSnackbar({
-    //     open: true,
-    //     message: "Fish deleted successfully!",
-    //     severity: "success",
-    //   });
-    //   // Refresh master list after successful delete
-    //   dispatch(getMasterList());
-    // } catch (error) {
-    //   console.error("Error deleting item:", error);
-    //   setSnackbar({
-    //     open: true,
-    //     message: error || error?.message || "Error deleting item!",
-    //     severity: "error",
-    //   });
-    // } finally {
-    //   setDeleteDialogOpen(false);
-    //   setDeleteIndex(null);
-    //   setDeleteItemName("");
-    // }
-    setSnackbar({
+    try {
+      await dispatch(deleteMasterListItem(payloadForDelete)).unwrap();
+      setSnackbar({
         open: true,
-        message: "Delete Fish function is disabled!",
-        severity: "warning",
+        message: "Fish deleted successfully!",
+        severity: "success",
       });
+      // Refresh master list after successful delete
+      dispatch(getMasterList());
+    } catch (error) {
+      console.error("Error deleting item:", error);
+      setSnackbar({
+        open: true,
+        message: error || error?.message || "Error deleting item!",
+        severity: "error",
+      });
+    } finally {
+      setDeleteDialogOpen(false);
+      setDeleteIndex(null);
+      setDeleteItemName("");
+    }
   };
 
   const handleCancelDelete = () => {
@@ -432,13 +430,13 @@ export default function MasterListPage({
               }}
             />
 
-            <Button
+            {/* <Button
               variant="contained"
               onClick={handleOpenAdd}
               sx={{ whiteSpace: "nowrap", minWidth: "120px" }}
             >
               Add Fish +
-            </Button>
+            </Button> */}
           </Box>
 
           {/* Row 2: Filter Dropdowns and Clear Button */}
@@ -623,16 +621,23 @@ export default function MasterListPage({
                     <IconButton
                       onClick={() => handleOpenEdit(row, row.id)}
                       size="small"
+                      sx={{
+                        bgcolor: "rgba(255, 255, 255, 0.1)",
+                        "&:hover":{
+                          scale: 1.1,
+                          bgcolor:"rgba(255, 255, 255, 0.3)"
+                        }
+                      }}
                     >
-                      <Edit />
+                      <Edit sx={{ color: "primary.main" }} />
                     </IconButton>
-                    <IconButton
+                    {/* <IconButton
                       color="error"
                       onClick={() => handleDeleteClick(row, row.id)}
                       size="small"
                     >
                       <Delete />
-                    </IconButton>
+                    </IconButton> */}
                   </TableCell>
                 </TableRow>
               ))}
@@ -771,12 +776,14 @@ export default function MasterListPage({
               <Box
                 sx={{
                   display: "flex",
-                  alignItems: "center",
+                  //alignItems: "center",
                   justifyContent: "space-between",
                   width: "100%",
+                  flexDirection: { xs: "column", sm: "row" },
+                  gap: 2,
                 }}
               >
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                   <Typography
                     variant="body1"
                     sx={{
@@ -789,11 +796,11 @@ export default function MasterListPage({
                   <Typography
                     variant="body2"
                     sx={{
-                      color: "text.secondary",
+                      color: "error.light",
                       fontSize: "0.75rem",
                     }}
                   >
-                    (Active/Inactive)
+                    (Inactive will delete the fish)
                   </Typography>
                 </Box>
 
