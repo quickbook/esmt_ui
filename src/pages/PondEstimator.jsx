@@ -353,7 +353,7 @@ export function PondEstimator() {
                 </TableHead>
 
                 <TableBody>
-                  {apiData?.packages.map((pkg, i) => {
+                  {apiData?.packages && apiData?.packages.length > 0 ? apiData.packages.map((pkg, i) => {
                     const isYear1 = pkg.packageCode === "YEAR1";
                     return (
                       <TableRow
@@ -399,7 +399,7 @@ export function PondEstimator() {
                         })}
                       </TableRow>
                     );
-                  })}
+                  }) : <TableRow><TableCell align="center" colSpan={tableColumns.length + 4}>Data not found</TableCell></TableRow>}
                 </TableBody>
               </Table>
 
@@ -441,7 +441,7 @@ export function PondEstimator() {
               </Table>
             </Box>
 
-            {addons && addons.length > 0 && (
+            {addons && addons.length > 0 ? (
               <Box
                 mt={4}
                 p={3}
@@ -574,6 +574,20 @@ export function PondEstimator() {
                   </Box>
                 )}
               </Box>
+            ): (
+              <Box
+                mt={4}
+              >
+                <Typography
+                  sx={{
+                    fontSize: "0.875rem",
+                    fontWeight: "bold",
+                    color: "text.primary",
+                  }}
+                >
+                  No addons available
+                </Typography>
+              </Box>
             )}
 
             <Box
@@ -595,20 +609,20 @@ export function PondEstimator() {
                 {apiData?.minimumOrderAmount} minimum
               </Typography>
               <Typography sx={{ fontSize: "0.75rem", color: "text.primary" }}>
-                {apiData?.infoNotes.map((i, k) => (
+                {apiData?.infoNotes && apiData?.infoNotes.length > 0 ? apiData.infoNotes.map((i, k) => (
                   <span key={k}>
                     {i}
                     <br />
                   </span>
-                ))}
+                )) : <span>&nbsp; No data found</span>}
               </Typography>
               <Typography sx={{ fontSize: "0.75rem", color: "text.primary" }}>
-                {apiData?.disclaimerNotes.map((i, k) => (
+                { apiData?.disclaimerNotes && apiData?.disclaimerNotes.length > 0 ? apiData.disclaimerNotes.map((i, k) => (
                   <span key={k}>
                     {i}
                     <br />
                   </span>
-                ))}
+                )) : <span>&nbsp; No data found</span> }
               </Typography>
             </Box>
 
