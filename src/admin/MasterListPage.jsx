@@ -300,7 +300,6 @@ export default function MasterListPage({
           updateMasterListItem([payloadForUpdate]),
         ).unwrap();
         console.log("Updated item:", result);
-        console.log("Update payload:", [payloadForUpdate])
         setSnackbar({
           open: true,
           message: "Fish updated successfully!",
@@ -327,28 +326,33 @@ export default function MasterListPage({
         variant: form.variant,
       };
 
-      try {
-        const result = await dispatch(
-          createMasterListItem(payloadForCreate),
-        ).unwrap();
-        console.log("Created item:", result);
-        console.log("Create payload:", payloadForCreate);
-        setSnackbar({
-          open: true,
-          message: "Fish added successfully!",
-          severity: "success",
-        });
-        handleClose();
-        // Refresh master list after successful create
-        dispatch(getMasterList());
-      } catch (error) {
-        console.error("Error adding item:", error);
-        setSnackbar({
-          open: true,
-          message: error?.message || error || "Error adding new item!",
-          severity: "error",
-        });
-      }
+      // try {
+      //   const result = await dispatch(
+      //     createMasterListItem(payloadForCreate),
+      //   ).unwrap();
+      //   console.log("Created item:", result);
+      //   console.log("Create payload:", payloadForCreate);
+      //   setSnackbar({
+      //     open: true,
+      //     message: "Fish added successfully!",
+      //     severity: "success",
+      //   });
+      //   handleClose();
+      //   // Refresh master list after successful create
+      //   dispatch(getMasterList());
+      // } catch (error) {
+      //   console.error("Error adding item:", error);
+      //   setSnackbar({
+      //     open: true,
+      //     message: error?.message || error || "Error adding new item!",
+      //     severity: "error",
+      //   });
+      // }
+      setSnackbar({
+        open: true,
+        message: "Add Fish function is disabled!",
+        severity: "warning",
+      });
     }
   };
 
@@ -363,27 +367,32 @@ export default function MasterListPage({
   const handleConfirmDelete = async () => {
     if (deleteIndex === null) return;
     const payloadForDelete = { ids: [deleteIndex] };
-    try {
-      await dispatch(deleteMasterListItem(payloadForDelete)).unwrap();
-      setSnackbar({
+    // try {
+    //   await dispatch(deleteMasterListItem(payloadForDelete)).unwrap();
+    //   setSnackbar({
+    //     open: true,
+    //     message: "Fish deleted successfully!",
+    //     severity: "success",
+    //   });
+    //   // Refresh master list after successful delete
+    //   dispatch(getMasterList());
+    // } catch (error) {
+    //   console.error("Error deleting item:", error);
+    //   setSnackbar({
+    //     open: true,
+    //     message: error || error?.message || "Error deleting item!",
+    //     severity: "error",
+    //   });
+    // } finally {
+    //   setDeleteDialogOpen(false);
+    //   setDeleteIndex(null);
+    //   setDeleteItemName("");
+    // }
+    setSnackbar({
         open: true,
-        message: "Fish deleted successfully!",
-        severity: "success",
+        message: "Delete Fish function is disabled!",
+        severity: "warning",
       });
-      // Refresh master list after successful delete
-      dispatch(getMasterList());
-    } catch (error) {
-      console.error("Error deleting item:", error);
-      setSnackbar({
-        open: true,
-        message: error || error?.message || "Error deleting item!",
-        severity: "error",
-      });
-    } finally {
-      setDeleteDialogOpen(false);
-      setDeleteIndex(null);
-      setDeleteItemName("");
-    }
   };
 
   const handleCancelDelete = () => {

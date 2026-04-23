@@ -50,7 +50,7 @@ const refreshTokenRequest = async () => {
 axiosAdmin.interceptors.request.use(
   async (config) => {
     const stored = JSON.parse(localStorage.getItem("loginSession"));
-    console.log("Stored session:", stored);
+    //console.log("Stored session:", stored);
 
     if (!stored?.accessToken) return config;
 
