@@ -17,7 +17,6 @@ import {
 import { glassBoxStyles } from "../utils/glassStyles";
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-import { calculateFishCost } from "../utils/pricing";
 import { useEstimateForm } from "../contexts/EstimateFormContext";
 
 const apiData = [

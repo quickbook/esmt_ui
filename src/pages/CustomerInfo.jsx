@@ -23,9 +23,9 @@ import { useSelector } from "react-redux";
 export function CustomerInfo() {
   const navigate = useNavigate();
   const leadSource = useSelector((state) => state.domain.leadSources);
-  const { data, updateSection } = useEstimateForm();
+  const { data, updateSection, reset } = useEstimateForm();
   const formData = data.customer;
-  
+
   // State for validation errors
   const [errors, setErrors] = useState({
     fullName: false,
@@ -35,7 +35,7 @@ export function CustomerInfo() {
     address: false,
     hearAbout: false,
   });
-  
+
   // State to track if validation has been attempted
   const [validationAttempted, setValidationAttempted] = useState(false);
 
@@ -43,7 +43,7 @@ export function CustomerInfo() {
     updateSection("customer", { [field]: value });
     // Clear error for this field when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: false }));
+      setErrors((prev) => ({ ...prev, [field]: false }));
     }
   };
 
@@ -53,15 +53,16 @@ export function CustomerInfo() {
       fullName: !formData.fullName?.trim(),
       email: !formData.email?.trim() || !isValidEmail(formData.email),
       phone: !formData.phone?.trim(),
-      quoteEmail: !formData.quoteEmail?.trim() || !isValidEmail(formData.quoteEmail),
+      quoteEmail:
+        !formData.quoteEmail?.trim() || !isValidEmail(formData.quoteEmail),
       address: !formData.address?.trim(),
       hearAbout: !formData.hearAbout,
     };
-    
+
     setErrors(newErrors);
-    return !Object.values(newErrors).some(error => error === true);
+    return !Object.values(newErrors).some((error) => error === true);
   };
-  
+
   // Email validation helper
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@([^\s@]+\.)+[^\s@]+$/;
@@ -74,11 +75,36 @@ export function CustomerInfo() {
 
   const handleNext = () => {
     setValidationAttempted(true);
-    
+
     if (validateForm()) {
       console.log("FORM DATA:", formData);
       navigate("/estimate/pond-info");
     }
+  };
+
+  const handleResetPage = () => {
+    updateSection("customer", {
+      fullName: "",
+      email: "",
+      phone: "",
+      address: "",
+      quoteEmail: "",
+      hearAbout: "",
+    });
+    setErrors({
+      fullName: false,
+      email: false,
+      phone: false,
+      quoteEmail: false,
+      address: false,
+      hearAbout: false,
+    });
+    setValidationAttempted(false);
+  };
+
+  const handleResetAll = () => {
+    reset();
+    navigate("/");
   };
 
   useEffect(() => {
@@ -88,24 +114,28 @@ export function CustomerInfo() {
   // Helper function to get error message
   const getErrorMessage = (field, value) => {
     if (!validationAttempted && !errors[field]) return "";
-    
-    switch(field) {
+
+    switch (field) {
       case "fullName":
         return !formData.fullName?.trim() ? "Full name is required" : "";
       case "email":
         if (!formData.email?.trim()) return "Email address is required";
-        if (!isValidEmail(formData.email)) return "Please enter a valid email address";
+        if (!isValidEmail(formData.email))
+          return "Please enter a valid email address";
         return "";
       case "phone":
         return !formData.phone?.trim() ? "Phone number is required" : "";
       case "quoteEmail":
         if (!formData.quoteEmail?.trim()) return "Quote email is required";
-        if (!isValidEmail(formData.quoteEmail)) return "Please enter a valid email address";
+        if (!isValidEmail(formData.quoteEmail))
+          return "Please enter a valid email address";
         return "";
       case "address":
         return !formData.address?.trim() ? "Physical address is required" : "";
       case "hearAbout":
-        return !formData.hearAbout ? "Please select how you heard about us" : "";
+        return !formData.hearAbout
+          ? "Please select how you heard about us"
+          : "";
       default:
         return "";
     }
@@ -218,7 +248,8 @@ export function CustomerInfo() {
                   color="primary.contrastText"
                   mb={1}
                 >
-                  What is your mailing address? <span style={{ color: "#f44336" }}>*</span>
+                  What is your mailing address?{" "}
+                  <span style={{ color: "#f44336" }}>*</span>
                 </Typography>
                 <TextField
                   required
@@ -244,7 +275,8 @@ export function CustomerInfo() {
                   color="primary.contrastText"
                   mb={1}
                 >
-                  What is your phone number? <span style={{ color: "#f44336" }}>*</span>
+                  What is your phone number?{" "}
+                  <span style={{ color: "#f44336" }}>*</span>
                 </Typography>
                 <TextField
                   required
@@ -270,7 +302,8 @@ export function CustomerInfo() {
                   color="primary.contrastText"
                   mb={1}
                 >
-                  What is an email address I can send a written quote to? <span style={{ color: "#f44336" }}>*</span>
+                  What is an email address I can send a written quote to?{" "}
+                  <span style={{ color: "#f44336" }}>*</span>
                 </Typography>
                 <TextField
                   required
@@ -296,7 +329,8 @@ export function CustomerInfo() {
                   color="primary.contrastText"
                   mb={1}
                 >
-                  Where is the physical address of the pond? <span style={{ color: "#f44336" }}>*</span>
+                  Where is the physical address of the pond?{" "}
+                  <span style={{ color: "#f44336" }}>*</span>
                 </Typography>
                 <TextField
                   required
@@ -320,7 +354,8 @@ export function CustomerInfo() {
                 color="primary.contrastText"
                 mb={1}
               >
-                How did you hear about us? <span style={{ color: "#f44336" }}>*</span>
+                How did you hear about us?{" "}
+                <span style={{ color: "#f44336" }}>*</span>
               </Typography>
               <Select
                 fullWidth
@@ -353,28 +388,54 @@ export function CustomerInfo() {
           </Grid>
 
           {/* Buttons */}
-          <Box display="flex" justifyContent="space-between" mt={1}>
-            <Button
-              onClick={handleBack}
-              sx={{
-                backgroundColor: "text.secondary",
-                color: "secondary.main",
-                "&:hover": { backgroundColor: "text.primary" },
-              }}
-            >
-              <ArrowLeftIcon /> Back
-            </Button>
+          <Box display="flex" flexDirection="column" gap={2} mt={1}>
+            <Box display="flex" justifyContent="space-between">
+              <Button
+                onClick={handleBack}
+                sx={{
+                  backgroundColor: "text.secondary",
+                  color: "secondary.main",
+                  "&:hover": { backgroundColor: "text.primary" },
+                }}
+              >
+                <ArrowLeftIcon /> Back
+              </Button>
 
-            <Button
-              variant="contained"
-              onClick={handleNext}
-              sx={{
-                background: "#44A194",
-                "&:hover": { background: "#537D96" },
-              }}
-            >
-              Continue
-            </Button>
+              {/* <Box display="flex" justifyContent="center" gap={2}>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={handleResetPage}
+                  sx={{
+                    minWidth: "120px",
+                  }}
+                >
+                  Reset Page
+                </Button>
+
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={handleResetAll}
+                  sx={{
+                    minWidth: "120px",
+                  }}
+                >
+                  Reset All
+                </Button>
+              </Box> */}
+
+              <Button
+                variant="contained"
+                onClick={handleNext}
+                sx={{
+                  background: "#44A194",
+                  "&:hover": { background: "#537D96" },
+                }}
+              >
+                Continue
+              </Button>
+            </Box>
           </Box>
         </motion.div>
       </Container>

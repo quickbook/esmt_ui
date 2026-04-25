@@ -552,7 +552,15 @@ export default function MasterListPage({
       </Paper>
 
       {/* ── Table ── */}
-      <Paper sx={{ overflowX: "auto" }}>
+      <Paper
+        sx={{
+          borderRadius: 0.5,
+          background: "rgba(255,255,255,0.1)",
+          backdropFilter: "blur(8px)",
+          border: "1px solid rgba(255,255,255,0.2)",
+          overflowX: "auto",
+        }}
+      >
         {filtered.length === 0 ? (
           <Box
             sx={{
@@ -587,7 +595,7 @@ export default function MasterListPage({
         ) : (
           <Table sx={{ minWidth: 650 }}>
             <TableHead>
-              <TableRow>
+              {/* <TableRow>
                 <TableCell>No.</TableCell>
                 <TableCell>Fish Type</TableCell>
                 <TableCell>Size</TableCell>
@@ -595,6 +603,30 @@ export default function MasterListPage({
                 <TableCell>Price ($)</TableCell>
                 <TableCell>Variant</TableCell>
                 <TableCell>Actions</TableCell>
+              </TableRow> */}
+              <TableRow sx={{ py: 4 }}>
+                {[
+                  "ID",
+                  "Fish Type",
+                  "Size",
+                  "Unit",
+                  "Price ($)",
+                  "Variant",
+                  "Actions",
+                ].map((h) => (
+                  <TableCell
+                    key={h}
+                    sx={{
+                      fontWeight: 700,
+                      bgcolor: "rgba(68,161,148,0.18)",
+                      color: "text.primary",
+                      borderBottom: "1px solid rgba(255,255,255,0.12)",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {h}
+                  </TableCell>
+                ))}
               </TableRow>
             </TableHead>
 
@@ -623,10 +655,10 @@ export default function MasterListPage({
                       size="small"
                       sx={{
                         bgcolor: "rgba(255, 255, 255, 0.1)",
-                        "&:hover":{
+                        "&:hover": {
                           scale: 1.1,
-                          bgcolor:"rgba(255, 255, 255, 0.3)"
-                        }
+                          bgcolor: "rgba(255, 255, 255, 0.3)",
+                        },
                       }}
                     >
                       <Edit sx={{ color: "primary.main" }} />

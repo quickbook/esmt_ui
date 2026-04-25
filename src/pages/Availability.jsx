@@ -19,7 +19,7 @@ import { useEstimateForm } from "../contexts/EstimateFormContext";
 
 export function Availability() {
   const navigate = useNavigate();
-  const { data, updateSection } = useEstimateForm();
+  const { data, updateSection, reset } = useEstimateForm();
   const { availableDate, availableTime } = data.availability;
 
   // State for validation errors
@@ -27,7 +27,7 @@ export function Availability() {
     availableDate: false,
     availableTime: false,
   });
-  
+
   // State to track if validation has been attempted
   const [validationAttempted, setValidationAttempted] = useState(false);
   const [snackOpen, setSnackOpen] = useState(false);
@@ -37,7 +37,7 @@ export function Availability() {
     updateSection("availability", { [field]: value });
     // Clear error for this field when user makes a change
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: false }));
+      setErrors((prev) => ({ ...prev, [field]: false }));
     }
   };
 
@@ -47,27 +47,31 @@ export function Availability() {
       availableDate: !availableDate,
       availableTime: !availableTime,
     };
-    
+
     // Additional date validation (must be within 24-72 hours)
     if (availableDate && !isValidDateRange(availableDate)) {
       newErrors.availableDate = true;
     }
-    
+
     setErrors(newErrors);
-    return !Object.values(newErrors).some(error => error === true);
+    return !Object.values(newErrors).some((error) => error === true);
   };
 
   // Check if date is within 24-72 hours from now
   const isValidDateRange = (dateString) => {
     const selectedDate = new Date(dateString);
     const now = new Date();
-    
+
     // Set time to midnight for date comparison
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const selected = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
-    
+    const selected = new Date(
+      selectedDate.getFullYear(),
+      selectedDate.getMonth(),
+      selectedDate.getDate(),
+    );
+
     const diffDays = Math.ceil((selected - today) / (1000 * 60 * 60 * 24));
-    
+
     // Check if date is within 1-3 days (24-72 hours)
     return diffDays >= 1 && diffDays <= 3;
   };
@@ -75,8 +79,8 @@ export function Availability() {
   // Helper function to get error message
   const getErrorMessage = (field) => {
     if (!validationAttempted && !errors[field]) return "";
-    
-    switch(field) {
+
+    switch (field) {
       case "availableDate":
         if (!availableDate) return "Preferred contact date is required";
         if (!isValidDateRange(availableDate)) {
@@ -95,23 +99,23 @@ export function Availability() {
   const getMinDate = () => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    return tomorrow.toISOString().split('T')[0];
+    return tomorrow.toISOString().split("T")[0];
   };
-  
+
   const getMaxDate = () => {
     const maxDate = new Date();
     maxDate.setDate(maxDate.getDate() + 4);
-    return maxDate.toISOString().split('T')[0];
+    return maxDate.toISOString().split("T")[0];
   };
 
   const handleNext = () => {
     setValidationAttempted(true);
-    
+
     if (validateForm()) {
       navigate("/estimate/quote");
     } else {
       // Show snackbar for first error encountered
-      const firstError = Object.keys(errors).find(key => errors[key]);
+      const firstError = Object.keys(errors).find((key) => errors[key]);
       if (firstError) {
         setSnackMessage(getErrorMessage(firstError));
         setSnackOpen(true);
@@ -121,6 +125,23 @@ export function Availability() {
 
   const handleBack = () => {
     navigate(-1);
+  };
+
+  const handleResetPage = () => {
+    updateSection("availability", {
+      availableDate: "",
+      availableTime: "",
+    });
+    setErrors({
+      availableDate: false,
+      availableTime: false,
+    });
+    setValidationAttempted(false);
+  };
+
+  const handleResetAll = () => {
+    reset();
+    navigate("/");
   };
 
   useEffect(() => {
@@ -209,7 +230,8 @@ export function Availability() {
                   color="primary.light"
                   mb={1}
                 >
-                  Preferred Contact Date <span style={{ color: "#f44336" }}>*</span>
+                  Preferred Contact Date{" "}
+                  <span style={{ color: "#f44336" }}>*</span>
                 </Typography>
 
                 <TextField
@@ -217,7 +239,9 @@ export function Availability() {
                   fullWidth
                   size="medium"
                   value={availableDate}
-                  onChange={(e) => handleChange("availableDate", e.target.value)}
+                  onChange={(e) =>
+                    handleChange("availableDate", e.target.value)
+                  }
                   error={errors.availableDate && validationAttempted}
                   helperText={getErrorMessage("availableDate")}
                   inputProps={{
@@ -250,7 +274,8 @@ export function Availability() {
                   color="primary.light"
                   mb={1}
                 >
-                  Preferred Contact Time <span style={{ color: "#f44336" }}>*</span>
+                  Preferred Contact Time{" "}
+                  <span style={{ color: "#f44336" }}>*</span>
                 </Typography>
 
                 <TextField
@@ -258,7 +283,9 @@ export function Availability() {
                   fullWidth
                   size="medium"
                   value={availableTime}
-                  onChange={(e) => handleChange("availableTime", e.target.value)}
+                  onChange={(e) =>
+                    handleChange("availableTime", e.target.value)
+                  }
                   error={errors.availableTime && validationAttempted}
                   helperText={getErrorMessage("availableTime")}
                   InputLabelProps={{ shrink: true }}
@@ -293,44 +320,68 @@ export function Availability() {
           </Grid>
 
           {/* Buttons */}
-          <Box display="flex" justifyContent="space-between" mt={4}>
-            <Button
-              variant="contained"
-              startIcon={<ArrowLeftIcon />}
-              onClick={handleBack}
-              sx={{
-                backgroundColor: "text.secondary",
-                color: "secondary.main",
-                "&:hover": { backgroundColor: "text.primary" },
-              }}
-            >
-              Back
-            </Button>
+          <Box display="flex" flexDirection="column" gap={2} mt={4}>
+            <Box display="flex" justifyContent="space-between">
+              <Button
+                variant="contained"
+                startIcon={<ArrowLeftIcon />}
+                onClick={handleBack}
+                sx={{
+                  backgroundColor: "text.secondary",
+                  color: "secondary.main",
+                  "&:hover": { backgroundColor: "text.primary" },
+                }}
+              >
+                Back
+              </Button>
+              {/* <Box display="flex" justifyContent="center" gap={2}>
+                <Button
+                  variant="outlined"
+                  color="text.secondary"
+                  onClick={handleResetPage}
+                  sx={{
+                    minWidth: "120px",
+                  }}
+                >
+                  Reset Page
+                </Button>
 
-            <Button
-              variant="contained"
-              endIcon={<ArrowRightIcon />}
-              onClick={handleNext}
-              sx={{
-                backgroundColor: "#44A194",
-                "&:hover": { backgroundColor: "#537D96" },
-              }}
-            >
-              <Typography
-                variant="p"
-                sx={{ display: { xs: "none", md: "flex" } }}
+                <Button
+                  variant="outlined"
+                  color="error"
+                  onClick={handleResetAll}
+                  sx={{
+                    minWidth: "120px",
+                  }}
+                >
+                  Reset All
+                </Button>
+              </Box> */}
+              <Button
+                variant="contained"
+                endIcon={<ArrowRightIcon />}
+                onClick={handleNext}
+                sx={{
+                  backgroundColor: "#44A194",
+                  "&:hover": { backgroundColor: "#537D96" },
+                }}
               >
-                Continue to Quote
-              </Typography>
-              <Typography
-                variant="p"
-                sx={{ display: { xs: "flex", md: "none" } }}
-              >
-                Continue
-              </Typography>
-            </Button>
+                <Typography
+                  variant="p"
+                  sx={{ display: { xs: "none", md: "flex" } }}
+                >
+                  Continue to Quote
+                </Typography>
+                <Typography
+                  variant="p"
+                  sx={{ display: { xs: "flex", md: "none" } }}
+                >
+                  Continue
+                </Typography>
+              </Button>
+            </Box>
           </Box>
-          
+
           <Snackbar
             open={snackOpen}
             autoHideDuration={3000}

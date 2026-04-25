@@ -27,7 +27,7 @@ import { useSelector } from "react-redux";
 export function PondEstimator() {
   const navigate = useNavigate();
   const { type } = useParams();
-  const { data, updateSection } = useEstimateForm();
+  const { data, updateSection, reset } = useEstimateForm();
   const pondEstimateData = useSelector((state) => state.pondEstimate.data);
   const [selectedOptions, setSelectedOptions] = useState(
     data.estimator.selectedOptionCodes || [],
@@ -215,10 +215,47 @@ export function PondEstimator() {
       selectedOptions: selectedOptionDetails,
       addons: selectedAddons,
       totalPrice: optionsTotal + addonTotal,
-      stockingDescription:  apiData.description+" "+apiData?.infoNotes?.join(", "),
+      stockingDescription:
+        apiData.description + " " + apiData?.infoNotes?.join(", "),
     });
 
     navigate("/estimate/availability");
+  };
+
+  const handleResetPage = () => {
+    updateSection("estimator", {
+      pondType: "",
+      selectedOptionIndices: [],
+      selectedOptionCodes: [],
+      selectedOptions: [],
+      grassCarp: {
+        selected: false,
+        quantity: 1,
+        total: 0,
+      },
+      hybridChoice: {
+        regularHybrid: false,
+        specklebelly: false,
+      },
+      breakdown: [],
+      totalPrice: 0,
+      adultFishData: [],
+      totalCostLess450: 0,
+      totalCostMore450: 0,
+      feedBassData: [],
+      totalCostLess12000: 0,
+      totalCostMore12000: 0,
+      grassCarpData: [],
+      totalCostLess1000: 0,
+      totalCostMore1000: 0,
+      alaCarteData: [],
+      alaCarteTotal: 0,
+    });
+  };
+
+  const handleResetAll = () => {
+    reset();
+    navigate("/");
   };
 
   const year1Package = apiData?.packages.find((p) => p.packageCode === "YEAR1");
@@ -353,53 +390,66 @@ export function PondEstimator() {
                 </TableHead>
 
                 <TableBody>
-                  {apiData?.packages && apiData?.packages.length > 0 ? apiData.packages.map((pkg, i) => {
-                    const isYear1 = pkg.packageCode === "YEAR1";
-                    return (
-                      <TableRow
-                        key={i}
-                        sx={{
-                          backgroundColor: selectedOptions.includes(
-                            pkg.packageCode,
-                          )
-                            ? "rgba(43, 161, 146, 0.25)"
-                            : "rgba(0, 0, 0, 0.2)",
-                        }}
-                      >
-                        <TableCell>{pkg.packageName}</TableCell>
-                        <TableCell>
-                          {pkg.packageCode === "YEAR1"
-                            ? "1 inch to Catchable"
-                            : pkg.fishItems?.[0]?.size ||
-                              (pkg.packageCode === "SMALL"
-                                ? "1 to 3 inch"
-                                : pkg.packageCode === "MEDIUM"
-                                  ? "3 to 4 inch"
-                                  : pkg.packageCode === "LARGE"
-                                    ? "4 to 5 inch"
-                                    : "—")}
-                        </TableCell>
-                        <TableCell>${pkg.estimatedPrice}</TableCell>
-                        <TableCell>
-                          <Checkbox
-                            checked={selectedOptions.includes(pkg.packageCode)}
-                            onChange={() => handleToggle(pkg, i)}
-                          />
-                        </TableCell>
-                        {tableColumns.map((colItem, idx) => {
-                          const match = pkg.fishItems?.find(
-                            (f) => f.fishType === colItem.fishType,
-                          );
+                  {apiData?.packages && apiData?.packages.length > 0 ? (
+                    apiData.packages.map((pkg, i) => {
+                      const isYear1 = pkg.packageCode === "YEAR1";
+                      return (
+                        <TableRow
+                          key={i}
+                          sx={{
+                            backgroundColor: selectedOptions.includes(
+                              pkg.packageCode,
+                            )
+                              ? "rgba(43, 161, 146, 0.25)"
+                              : "rgba(0, 0, 0, 0.2)",
+                          }}
+                        >
+                          <TableCell>{pkg.packageName}</TableCell>
+                          <TableCell>
+                            {pkg.packageCode === "YEAR1"
+                              ? "1 inch to Catchable"
+                              : pkg.fishItems?.[0]?.size ||
+                                (pkg.packageCode === "SMALL"
+                                  ? "1 to 3 inch"
+                                  : pkg.packageCode === "MEDIUM"
+                                    ? "3 to 4 inch"
+                                    : pkg.packageCode === "LARGE"
+                                      ? "4 to 5 inch"
+                                      : "—")}
+                          </TableCell>
+                          <TableCell>${pkg.estimatedPrice}</TableCell>
+                          <TableCell>
+                            <Checkbox
+                              checked={selectedOptions.includes(
+                                pkg.packageCode,
+                              )}
+                              onChange={() => handleToggle(pkg, i)}
+                            />
+                          </TableCell>
+                          {tableColumns.map((colItem, idx) => {
+                            const match = pkg.fishItems?.find(
+                              (f) => f.fishType === colItem.fishType,
+                            );
 
-                          return (
-                            <TableCell key={idx} align="center">
-                              {!isYear1 ? match?.quantity || 0 : ""}
-                            </TableCell>
-                          );
-                        })}
-                      </TableRow>
-                    );
-                  }) : <TableRow><TableCell align="center" colSpan={tableColumns.length + 4}>Data not found</TableCell></TableRow>}
+                            return (
+                              <TableCell key={idx} align="center">
+                                {!isYear1 ? match?.quantity || 0 : ""}
+                              </TableCell>
+                            );
+                          })}
+                        </TableRow>
+                      );
+                    })
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        align="center"
+                        colSpan={tableColumns.length + 4}
+                      >
+                        Data not found
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
 
@@ -574,10 +624,8 @@ export function PondEstimator() {
                   </Box>
                 )}
               </Box>
-            ): (
-              <Box
-                mt={4}
-              >
+            ) : (
+              <Box mt={4}>
                 <Typography
                   sx={{
                     fontSize: "0.875rem",
@@ -609,37 +657,71 @@ export function PondEstimator() {
                 {apiData?.minimumOrderAmount} minimum
               </Typography>
               <Typography sx={{ fontSize: "0.75rem", color: "text.primary" }}>
-                {apiData?.infoNotes && apiData?.infoNotes.length > 0 ? apiData.infoNotes.map((i, k) => (
-                  <span key={k}>
-                    {i}
-                    <br />
-                  </span>
-                )) : <span>&nbsp; No data found</span>}
+                {apiData?.infoNotes && apiData?.infoNotes.length > 0 ? (
+                  apiData.infoNotes.map((i, k) => (
+                    <span key={k}>
+                      {i}
+                      <br />
+                    </span>
+                  ))
+                ) : (
+                  <span>&nbsp; No data found</span>
+                )}
               </Typography>
               <Typography sx={{ fontSize: "0.75rem", color: "text.primary" }}>
-                { apiData?.disclaimerNotes && apiData?.disclaimerNotes.length > 0 ? apiData.disclaimerNotes.map((i, k) => (
-                  <span key={k}>
-                    {i}
-                    <br />
-                  </span>
-                )) : <span>&nbsp; No data found</span> }
+                {apiData?.disclaimerNotes &&
+                apiData?.disclaimerNotes.length > 0 ? (
+                  apiData.disclaimerNotes.map((i, k) => (
+                    <span key={k}>
+                      {i}
+                      <br />
+                    </span>
+                  ))
+                ) : (
+                  <span>&nbsp; No data found</span>
+                )}
               </Typography>
             </Box>
 
-            <Box display="flex" justifyContent="space-between" mt={4}>
-              <Button
-                onClick={handleBack}
-                sx={{
-                  backgroundColor: "text.secondary",
-                  color: "secondary.main",
-                  "&:hover": { backgroundColor: "text.primary" },
-                }}
-              >
-                <ArrowLeftIcon /> Back
-              </Button>
-              <Button variant="contained" onClick={handleNext}>
-                Next <ArrowRightIcon />
-              </Button>
+            <Box display="flex" flexDirection="column" gap={2} mt={4}>
+              <Box display="flex" justifyContent="space-between">
+                <Button
+                  onClick={handleBack}
+                  sx={{
+                    backgroundColor: "text.secondary",
+                    color: "secondary.main",
+                    "&:hover": { backgroundColor: "text.primary" },
+                  }}
+                >
+                  <ArrowLeftIcon /> Back
+                </Button>
+                {/* <Box display="flex" justifyContent="center" gap={2}>
+                  <Button
+                    variant="outlined"
+                    color="text.secondary"
+                    onClick={handleResetPage}
+                    sx={{
+                      minWidth: "120px",
+                    }}
+                  >
+                    Reset Page
+                  </Button>
+
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    onClick={handleResetAll}
+                    sx={{
+                      minWidth: "120px",
+                    }}
+                  >
+                    Reset All
+                  </Button>
+                </Box> */}
+                <Button variant="contained" onClick={handleNext}>
+                  Next <ArrowRightIcon />
+                </Button>
+              </Box>
             </Box>
           </Paper>
         </motion.div>

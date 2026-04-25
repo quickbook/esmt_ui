@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Box,
@@ -21,6 +21,7 @@ import { loginUser } from "../redux/Slices/loginSlice";
 
 export function Login({ snackbar, setSnackbar }) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const dispatch = useDispatch();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -30,11 +31,26 @@ export function Login({ snackbar, setSnackbar }) {
   const loginError = useSelector((state) => state.login.error);
   const isLoading = status === 'loading';
 
+  // Handle session expired parameter
+  useEffect(() => {
+    const sessionExpired = searchParams.get('session-expired') === 'true' || searchParams.get('expired') === 'true';
+    if (sessionExpired) {
+      setSnackbar({
+        open: true,
+        message: "Your session has expired. Please log in again.",
+        severity: "warning",
+      });
+      // Clear the URL parameter
+      navigate('/estimate/login', { replace: true });
+    }
+  }, [searchParams, setSnackbar, navigate]);
+
+  // Load saved credentials on mount
   useEffect(() => {
     const savedCredentials = localStorage.getItem("rememberedCredentials");
     if (savedCredentials) {
-      const { username: savedUsername, password: savedPassword, rememberMe: rememberMeFlag } = JSON.parse(savedCredentials);
-      if (rememberMeFlag && savedUsername) {
+      const { username: savedUsername, password: savedPassword } = JSON.parse(savedCredentials);
+      if (savedUsername) {
         setUsername(savedUsername);
         setPassword(savedPassword || "");
         setRememberMe(true);
@@ -67,7 +83,25 @@ export function Login({ snackbar, setSnackbar }) {
   };
 
   const handleRememberMeChange = (e) => {
-    setRememberMe(e.target.checked);
+    const isChecked = e.target.checked;
+    setRememberMe(isChecked);
+    
+    // If unchecked, clear the form fields
+    if (!isChecked) {
+      setUsername("");
+      setPassword("");
+      setErrors({});
+    } else {
+      // If checked, load saved credentials if they exist
+      const savedCredentials = localStorage.getItem("rememberedCredentials");
+      if (savedCredentials) {
+        const { username: savedUsername, password: savedPassword } = JSON.parse(savedCredentials);
+        if (savedUsername) {
+          setUsername(savedUsername);
+          setPassword(savedPassword || "");
+        }
+      }
+    }
   };
 
   const handleLogin = async (e) => {
@@ -90,15 +124,22 @@ export function Login({ snackbar, setSnackbar }) {
         loginUser({ username, password })
       ).unwrap();
 
+      // Handle Remember Me logic
       if (rememberMe) {
+        // Save credentials if remember me is checked
         const credentials = {
           username,
           password,
-          rememberMe: true
         };
         localStorage.setItem("rememberedCredentials", JSON.stringify(credentials));
       } else {
-        localStorage.removeItem("rememberedCredentials");
+        // If remember me is unchecked, keep the saved credentials but clear current form
+        // No need to delete from localStorage
+        // Clear form fields after successful login when remember me is unchecked
+        setUsername("");
+        setPassword("");
+        setRememberMe(false);
+        setErrors({});
       }
 
       setSnackbar({
@@ -327,22 +368,6 @@ export function Login({ snackbar, setSnackbar }) {
           © 2026 Fish Guru. All rights reserved.
         </Typography>
       </Box>
-
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={4000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
-          severity={snackbar.severity}
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
     </Box>
   );
 }

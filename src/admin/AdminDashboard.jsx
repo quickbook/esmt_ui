@@ -1,4 +1,4 @@
-import React, { use, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Box,
   Drawer,
@@ -19,6 +19,7 @@ import { Menu as MenuIcon } from "@mui/icons-material";
 
 import MasterListPage from "./MasterListPage";
 import AddAdminPage from "./AddAdminPage";
+import OrderDetailsPage from "./OrderDetailsPage";
 import LoadingScreen from "../components/LoadingScreen";
 import { useDispatch, useSelector } from "react-redux";
 import { getMasterList } from "../redux/Slices/adminSlice";
@@ -27,7 +28,7 @@ const drawerWidth = 240;
 
 const adminTabs = [
   { label: "Master List", value: "master" },
-  //{ label: "Fish Ponds", value: "ponds" },
+  { label: "Order Details", value: "orders" }, // ← NEW
   { label: "Add Admin", value: "admin-signup" },
 ];
 
@@ -37,7 +38,6 @@ export default function AdminDashboard() {
   const roleName = useSelector((state) => state.login.user?.roleName);
   const masterListFromStore = useSelector((state) => state.admin.masterList);
   const isLoading = useSelector((state) => state.admin.loading);
-  const adminStatus = useSelector((state) => state.admin.status);
   const [tab, setTab] = useState("master");
   const [masterListData, setMasterListData] = useState([]);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -50,9 +50,6 @@ export default function AdminDashboard() {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const getMasterListRef = useRef(false);
-  const operationCompletedRef = useRef(false);
-  const isInitialLoadRef = useRef(true);
-  const isReFetchingRef = useRef(false);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -60,7 +57,11 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     setMasterListData(masterListFromStore);
-  }, [masterListFromStore]); // Remove dispatch from dependency array
+  }, [masterListFromStore]);
+
+  useEffect(() => {
+    dispatch(getMasterList());
+  }, []);
 
   const drawerContent = (
     <>
@@ -92,9 +93,7 @@ export default function AdminDashboard() {
               background: tab === item.value ? "#44A19460" : "transparent",
               "&:hover": {
                 background: tab === item ? "#44A19440" : "#44A19420",
-                "& .MuiListItemText-primary": {
-                  color: "#ffffff",
-                },
+                "& .MuiListItemText-primary": { color: "#ffffff" },
               },
               "& .MuiListItemText-primary": {
                 color:
@@ -108,36 +107,6 @@ export default function AdminDashboard() {
       </List>
     </>
   );
-
-  useEffect(() => {
-  if (!getMasterListRef.current) {
-    getMasterListRef.current = true;
-    isInitialLoadRef.current = false;
-    dispatch(getMasterList());
-  }
-}, []);
-
-  useEffect(() => {
-  setMasterListData(masterListFromStore);
-}, [masterListFromStore]);
-
-  // Re-fetch master list after successful CRUD operations
-  // useEffect(() => {
-  //   if (adminStatus === "succeeded" && !isInitialLoadRef.current && operationCompletedRef.current && !isReFetchingRef.current) {
-  //     operationCompletedRef.current = false;
-  //     isReFetchingRef.current = true;
-  //     // Small delay to ensure the operation is fully complete
-  //     setTimeout(() => {
-  //       dispatch(getMasterList());
-  //     }, 100);
-  //   }
-  //   if (adminStatus === "loading" && !isInitialLoadRef.current && !isReFetchingRef.current) {
-  //     operationCompletedRef.current = true;
-  //   }
-  //   if (adminStatus === "idle") {
-  //     isReFetchingRef.current = false;
-  //   }
-  // }, [adminStatus]); // Remove dispatch from dependency array
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -202,24 +171,30 @@ export default function AdminDashboard() {
             setSnackbar={setSnackbar}
           />
         )}
+
+        {/* ── NEW: Order Details tab ── */}
+        {tab === "orders" && <OrderDetailsPage setSnackbar={setSnackbar} />}
+
         {tab === "admin-signup" && <AddAdminPage setSnackbar={setSnackbar} />}
       </Box>
+
       <Portal>
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={4000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={4000}
           onClose={() => setSnackbar({ ...snackbar, open: false })}
-          severity={snackbar.severity}
-          variant="filled"
-          sx={{ width: "100%" }}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
         >
-          {snackbar.message}
-        </Alert>
-      </Snackbar></Portal>
+          <Alert
+            onClose={() => setSnackbar({ ...snackbar, open: false })}
+            severity={snackbar.severity}
+            variant="filled"
+            sx={{ width: "100%" }}
+          >
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
+      </Portal>
     </Box>
   );
 }
